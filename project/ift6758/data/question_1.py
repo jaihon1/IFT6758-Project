@@ -1,7 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from seaborn.utils import saturate
+
+MASK_TOGGLE = False
 
 def get_player_stats(year: int, player_type: str) -> pd.DataFrame:
     """
@@ -66,31 +67,50 @@ def main():
     mask = goalies['GP'] >= 10
     goalies_masked = goalies[mask]
 
-    # print(goalies.sort_values(by='SV%', ascending=False).head(20))
-    # print(goalies[["Player", "GP", "SV%", "SV"]].sort_values(by='SV%', ascending=False))
-    # print(goalies.min())
-
-
     # Get top golies only
     goalies_masked = goalies_masked.sort_values(by='SV%', ascending=False).head(20)
     goalies = goalies.sort_values(by='SV%', ascending=False).head(20)
-    print(goalies_masked[['SV%', 'Player']])
-    print(goalies[['SV%', 'Player']])
 
-    # [JP]: Plotting 1 graph with the mask, and one without it
-    sns.set_theme(style="whitegrid")
-    fig1=sns.barplot(x="SV%", y="Player", data=goalies, label="Total", color="r").set(
-        title='Top 20 Goalies Save Percentage (with no minimum games played) from 2017-2018 Season',
-        xlabel='SV%', ylabel='Player Name')
-    plt.show()
-    plt.savefig('./_includes/top-goalies-nomask.png')
 
-    sns.set_theme(style="whitegrid")
-    fig1=sns.barplot(x="SV%", y="Player", data=goalies_masked, label="Total", color="b").set(
-        title='Top 20 Goalies Save Percentage (with a minimum of 10 games played) from 2017-2018 Season',
-        xlabel='SV%', ylabel='Player Name')
-    plt.show()
-    plt.savefig('./_includes/top-goalies-mask.png')
+    # Plotting 1 graph with the mask, and one without it
+    if MASK_TOGGLE:
+        # With mask
+        sns.set_theme(style="whitegrid")
+
+        plt.figure(figsize=(15,9))
+        plt.xlim(0,1)
+        plt.locator_params(axis="x", nbins=20)
+
+        fig1 = sns.barplot(x="SV%", y="Player", data=goalies_masked, label="Total", color="b")
+
+        plt.title('Top 20 Goalies Save Percentage (with a minimum of 10 games played) from 2017-2018 Season', weight='bold')
+        plt.xlabel('SV%', weight='bold')
+        plt.ylabel('Player', weight='bold')
+
+        sns.despine()
+
+        plt.savefig('top-goalies-mask.png')
+        plt.show()
+
+    else:
+        # Without mask
+        sns.set_theme(style="whitegrid")
+
+        plt.figure(figsize=(15,9))
+        plt.xlim(0,1)
+        plt.locator_params(axis="x", nbins=20)
+
+        fig1 = sns.barplot(x="SV%", y="Player", data=goalies, label="Total", color="r")
+
+        plt.title('Top 20 Goalies Save Percentage (with no minimum games played) from 2017-2018 Season', weight='bold')
+        plt.xlabel('SV%', weight='bold')
+        plt.ylabel('Player', weight='bold')
+
+        sns.despine()
+
+        plt.savefig('top-goalies-nomask.png')
+        plt.show()
+
 
 
 if __name__ == "__main__":
