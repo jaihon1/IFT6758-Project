@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from seaborn.utils import saturate
 
 def get_player_stats(year: int, player_type: str) -> pd.DataFrame:
     """
@@ -63,7 +64,7 @@ def main():
 
     # Filter out goalies with less than 10 games played
     mask = goalies['GP'] >= 10
-    goalies = goalies[mask]
+    goalies_masked = goalies[mask]
 
     # print(goalies.sort_values(by='SV%', ascending=False).head(20))
     # print(goalies[["Player", "GP", "SV%", "SV"]].sort_values(by='SV%', ascending=False))
@@ -71,15 +72,25 @@ def main():
 
 
     # Get top golies only
+    goalies_masked = goalies_masked.sort_values(by='SV%', ascending=False).head(20)
     goalies = goalies.sort_values(by='SV%', ascending=False).head(20)
+    print(goalies_masked[['SV%', 'Player']])
+    print(goalies[['SV%', 'Player']])
 
-    # Plot
+    # [JP]: Plotting 1 graph with the mask, and one without it
     sns.set_theme(style="whitegrid")
-    sns.barplot(x="SV%", y="Player", data=goalies, label="Total", color="b").set(
-        title='Top 20 Goalies Save Percentage from 2017-2018 Season',
+    fig1=sns.barplot(x="SV%", y="Player", data=goalies, label="Total", color="r").set(
+        title='Top 20 Goalies Save Percentage (with no minimum games played) from 2017-2018 Season',
         xlabel='SV%', ylabel='Player Name')
-
     plt.show()
+    plt.savefig('./_includes/top-goalies-nomask.png')
+
+    sns.set_theme(style="whitegrid")
+    fig1=sns.barplot(x="SV%", y="Player", data=goalies_masked, label="Total", color="b").set(
+        title='Top 20 Goalies Save Percentage (with a minimum of 10 games played) from 2017-2018 Season',
+        xlabel='SV%', ylabel='Player Name')
+    plt.show()
+    plt.savefig('./_includes/top-goalies-mask.png')
 
 
 if __name__ == "__main__":
