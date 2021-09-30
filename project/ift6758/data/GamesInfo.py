@@ -5,19 +5,23 @@ import os
 
 class GamesInfo:
     def __init__(self, season, filepath):
-        pass
+        self.season = season
+        self.filepath = filepath
 
     def load(self, season, filepath):
+        ids = requests.get('https://statsapi.web.nhl.com/api/v1/schedule?season=' + season).json()
+        filepath = open(ids)
+        data = json.load(filepath)
+        filepath.close()
+
         """
         Should load the json files for the corresponding season located at filepath.
         Args:
             season:
             filepath:
-
         Returns:
-
         """
-        pass
+
 
     def download(self, season, filepath):
         """
