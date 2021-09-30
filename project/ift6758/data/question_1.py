@@ -2,7 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# FEATURE TOGGLES
 MASK_TOGGLE = False
+
 
 def get_player_stats(year: int, player_type: str) -> pd.DataFrame:
     """
@@ -83,9 +85,9 @@ def main():
 
         fig1 = sns.barplot(x="SV%", y="Player", data=goalies_masked, label="Total", color="b")
 
-        plt.title('Top 20 Goalies Save Percentage (with a minimum of 10 games played) from 2017-2018 Season', weight='bold')
-        plt.xlabel('SV%', weight='bold')
-        plt.ylabel('Player', weight='bold')
+        plt.title('Top 20 Goalies Save Percentage (with a minimum of 10 games played) from 2017-2018 Season', weight='bold', fontsize=17)
+        plt.xlabel('SV%', weight='bold', fontsize=13)
+        plt.ylabel('Player', weight='bold', fontsize=13)
 
         sns.despine()
 
@@ -102,9 +104,9 @@ def main():
 
         fig1 = sns.barplot(x="SV%", y="Player", data=goalies, label="Total", color="r")
 
-        plt.title('Top 20 Goalies Save Percentage (with no minimum games played) from 2017-2018 Season', weight='bold')
-        plt.xlabel('SV%', weight='bold')
-        plt.ylabel('Player', weight='bold')
+        plt.title('Top 20 Goalies Save Percentage (with no minimum games played) from 2017-2018 Season', weight='bold', fontsize=17)
+        plt.xlabel('SV%', weight='bold', fontsize=13)
+        plt.ylabel('Player', weight='bold', fontsize=13)
 
         sns.despine()
 
