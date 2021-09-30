@@ -1,6 +1,8 @@
+from glob import glob
 import requests
 import json
 import os
+
 
 
 class GamesInfo:
@@ -8,11 +10,13 @@ class GamesInfo:
         self.season = season
         self.filepath = filepath
 
+
     def load(self, season, filepath):
-        ids = requests.get('https://statsapi.web.nhl.com/api/v1/schedule?season=' + season).json()
-        filepath = open(ids)
-        data = json.load(filepath)
-        filepath.close()
+        data = []
+        for file_name in glob('*.json'):
+            with open(filepath) as f:
+                data.append(json.load(f))
+
 
         """
         Should load the json files for the corresponding season located at filepath.
