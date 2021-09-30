@@ -12,19 +12,18 @@ class GamesInfo:
 
 
     def load(self, season, filepath):
+        """
+            Should load the json files for the corresponding season located at filepath.
+            Args:
+                season:
+                filepath:
+            Returns:
+            """
         data = []
-        for file_name in glob('*.json'):
-            with open(filepath) as f:
-                data.append(json.load(f))
+        for file_name in glob.glob(os.path.join(self.filepath, self.season, '*.json')):
+                data.append(json.load(file_name))
 
 
-        """
-        Should load the json files for the corresponding season located at filepath.
-        Args:
-            season:
-            filepath:
-        Returns:
-        """
 
 
     def download(self, season, filepath):
