@@ -102,3 +102,47 @@ class GamesInfo:
 
         print('All the games are saved at', directory)
         return games_info
+
+    def add_season(self, season):
+        """
+
+        Add the games from a new season to self.all_games
+
+        Args:
+            season: int or string of the name of the season to add, ex: 2017 for the 20172018 season
+
+        """
+        if season in self.season:
+            print('season {} already loaded')
+        else:
+            self.season.append(int(season))
+
+            # either load or download the season's games
+            if os.path.isdir(os.path.join(self.filepath, str(season))):
+                # if folder is empty, then download, else load
+                if len(os.listdir(self.filepath)) == 0:
+                    self.all_games[season] = self.__download(season)
+                else:
+                    self.all_games[season] = self.__load(season)
+            else:
+                self.all_games[season] = self.__download(season)
+
+    def __add__(self, other):
+        """
+
+        Combine two GamesInfo object together. Add all the games from one GamesInfo to the other.
+        Args:
+            other: GamesInfo object, the one we want to combine with this object.
+        Returns: new GamesInfo with all the games from both self and other
+        """
+        seasons = self.season
+        filepath = self.filepath
+        all_games = self.all_games
+
+        # add season and the games from it to the games from self
+        for season in other.all_games:
+            if season not in seasons:
+                seasons.append(season)
+                all_games[season] = other.all_games[season]
+
+        return GamesInfo(seasons, filepath, all_games)
