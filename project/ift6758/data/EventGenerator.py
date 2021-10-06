@@ -62,11 +62,12 @@ class EventGenerator:
                 if event_type == 'GOAL':
                     tidy_event.set_goal_strength(event['result']['strength']['name'])
                 
-                # Addind secondaryType, x and y coordiantes as conditional since some games seem to be missing this key
+                # Addind secondaryType, x and y coordinates as conditional since some games seem to be missing this key
                 if 'secondaryType' in event['result'].keys():
                     tidy_event.set_shot_type(event['result']['secondaryType'])
                 if 'x' in event['coordinates'].keys():
                     tidy_event.set_x_coordinate(event['coordinates']['x'])
+                if 'y' in event['coordinates'].keys():
                     tidy_event.set_y_coordinate(event['coordinates']['y'])
 
                     # We can add assisting players here in the future
