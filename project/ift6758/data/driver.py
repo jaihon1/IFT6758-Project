@@ -12,7 +12,7 @@ def main():
     a single dataframe containing all desired features from liveData, from all games for seasons ranging from 2016 to 2020.
     
     Returns: Dataframe'''
-    seasons = [2016]
+    seasons = [2016, 2017, 2018, 2019, 2020]
     GamesInfo(seasons)
 
 
