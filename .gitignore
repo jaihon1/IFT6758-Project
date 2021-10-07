@@ -133,7 +133,7 @@ dmypy.json
 
 
 
-**/games_data/**/.json
+**/games_data/**/*.json
 
 
 # Ruby stuff
