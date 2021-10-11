@@ -1,5 +1,4 @@
 from typing import Dict, List
-from numpy import show_config
 import pandas as pd
 
 
@@ -61,7 +60,7 @@ class EventGenerator:
                 # Analyse strength type of GOAL scored
                 if event_type == 'GOAL':
                     tidy_event.set_goal_strength(event['result']['strength']['name'])
-                
+
                 # Addind secondaryType, x and y coordinates as conditional since some games seem to be missing this key
                 if 'secondaryType' in event['result'].keys():
                     tidy_event.set_shot_type(event['result']['secondaryType'])
@@ -141,13 +140,13 @@ class TidyEvent:
 
     def set_player_scorer(self, player_scorer) -> None:
         self.player_scorer = player_scorer
-    
+
     def set_goal_strength(self, goal_strength) -> None:
         self.goal_strength = goal_strength
 
     def set_x_coordinate(self, coordinate_x) -> None:
         self.coordinate_x = coordinate_x
-    
+
     def set_y_coordinate(self, coordinate_y) -> None:
         self.coordinate_y = coordinate_y
 
