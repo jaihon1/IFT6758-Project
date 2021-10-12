@@ -1,3 +1,5 @@
+import numpy as np
+
 from GamesInfo import GamesInfo
 from EventGenerator import EventGenerator
 import pandas as pd
@@ -13,21 +15,25 @@ def main():
     
     Returns: Dataframe'''
     seasons = [2016, 2017, 2018, 2019, 2020]
-    GamesInfo(seasons)
+
+    dirpath = os.path.join(os.path.dirname(__file__))
+
+    all_games = GamesInfo(seasons, dirpath)
 
 
     data = None
     dataframe = pd.DataFrame()
-    dirpath = os.path.join(os.path.dirname(__file__))
     dirpath_games_data = os.path.join(dirpath, 'games_data')
     for season in seasons:
-        for game_filepath in os.listdir(os.path.join(dirpath_games_data, str(season))):
-            with open(os.path.join(dirpath_games_data, str(season), game_filepath)) as file:
-                print(f'Creating  dataframe for {game_filepath} file...')
-                data = json.load(file)
+        for data in all_games.all_games[season]:
             live_events = data['liveData']['plays']['allPlays']
             game_pk = data['gamePk']
-            game = EventGenerator(game_pk, live_events)
+            home = data['gameData']['teams']['home']['triCode']
+            away = data['gameData']['teams']['away']['triCode']
+            sides = dict()
+            for period in data['liveData']['linescore']['periods']:
+                sides[period['num']] = {home: period['home'].setdefault('rinkSide', np.NaN), away: period['away'].setdefault('rinkSide', np.NaN)}
+            game = EventGenerator(game_pk, home, away, sides, live_events)
             if len(dataframe) == 0:
                 dataframe = game.build()
             else:
