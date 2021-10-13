@@ -132,6 +132,11 @@ dmypy.json
 .DS_Store
 
 
+
+**/games_data/**/*.json
+**/games_data/**/*.csv
+
+
 # Ruby stuff
 # Ignore docs files
 _gh_pages
