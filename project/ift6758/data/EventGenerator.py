@@ -104,8 +104,6 @@ class EventGenerator:
 class TidyEvent:
     """
         Class that generates a dictionnary from selected features in liveData.
-
-        Returns: Dictionnary
     """
 
     def __init__(self, game_pk, event_index, event_type, team_id, period, period_type, period_time, datetime, coordinate_x= None, coordinate_y=None, goal_strength=None, shot_type=None,player_shooter=None, player_scorer=None, player_goalie=None, empty_net=None) -> None:
