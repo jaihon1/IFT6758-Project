@@ -73,40 +73,18 @@ events_new_coor = events_new_coor.apply(lambda row: adjust_negative_value_x(row)
 ### Generating Dataframe For the Season (2018, 2019, 2020)
 
 events_new_coor_2018 = events_new_coor[events_new_coor['game_pk'].str.startswith('2018')]
-
-### Generate p1 et p2(coordonnées de l'origine du Shot) for 2018 and declare q1 et q2 (goal)
-p1_2018 = events_new_coor_2018["coordinate_x"]
-p2_2018 = events_new_coor_2018["coordinate_y"]
-
-# [events_new_coor["datetime"][events_new_coor["datetime"].isin(liste_2018)].index]
-
-q1 = 89  # valeur absolue
-q2 = 0  # valeur absolue
-
-### calculate Shot_distance
-
-Shot_distance = np.sqrt((q1 - abs(p1_2018))** 2 + (q2 - abs(p2_2018))** 2)
-
-print(events_new_coor_2018.shape)
-print(Shot_distance.shape)
-
-### DataFrame events_new_coor sliced for 2018 season
-events_new_coor['game_pk'] = events_new_coor['game_pk'].astype(str)
-events_new_coor_2018= events_new_coor[events_new_coor['game_pk'].str.startswith('2018')]
-
-
-### Nouveau Dataframe pour Saison 2018 : concatenation de  Shot_distances_2018 et du dataset events_new_coor_2018:
-Shot_distance_2018 = pd.Series(Shot_distance, index= events_new_coor_2018.index)    ## série correspondant à la distance des tirs effectués des index de la saison 2018
-events_new_coor_2018 = pd.concat([events_new_coor_2018, Shot_distance_2018.rename("Shot_distance")], axis=1)  # concaténation de la serie Shot_distance 2018 au dataframe events_new_coor 2018
+q1 = 89  # valeur absolue (location sur l'axe X)
+q2 = 0  # valeur absolue (location sur l'axe Y)
+events_new_coor_2018['shot_distance'] = [np.sqrt((q1 - abs(p1))** 2 + (q2 - abs(p2))** 2) for p1, p2, in zip(events_new_coor_2018['coordinate_x'], events_new_coor_2018['coordinate_y'])]
 
 ### define the bins : 20 bins from  minimum value to maximum value
-bins = np.linspace(min(Shot_distance), max(Shot_distance), 20)
+bins = np.linspace(min(events_new_coor_2018['shot_distance']), max(events_new_coor_2018['shot_distance']), 20)
 
 # add labels if desired
 labels = ["1 to 6.1", "6.1 to 11.2", "11.2 to 16.3", "16.3 to 21.4", "21.4 to 26.5", "26.5 to 31.6", "31.6 to 36.7", "36.7 to 41.8", "41.8 to 46.9", "46.9 to 52.0", "52.0 to 57.1", "57.1 to 62.2", "62.2 to 67.4", "67.4 to 72.5", "72.5 to 77.6", "77.6 to 82.7", "82.7 to 87.8", "87.8 to 92.9", "92.9 to 97.98"]
 
 ### add the bins to the dataframe :
-events_new_coor["bin_Shot_distance"] = pd.cut(events_new_coor_2018["Shot_distance"], bins=bins, labels=labels, include_lowest=True)
+events_new_coor["bin_Shot_distance"] = pd.cut(events_new_coor_2018["shot_distance"], bins=bins, labels=labels, include_lowest=True)
 
 ### loop qui itere sur chaque bin et filtre le dataframe pour conserver seulement les valeurs qui dans le bin
 # for interval in bins
