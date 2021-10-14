@@ -150,7 +150,7 @@ class TidyEvent:
 
     def to_dict(self) -> Dict:
         """
-            Method that generates dicitonnary from selected features.
+            Method that generates dictionnary from selected features.
 
             Returns: Dictionnary
         """
