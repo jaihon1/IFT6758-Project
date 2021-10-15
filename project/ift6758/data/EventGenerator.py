@@ -6,11 +6,9 @@ class EventGenerator:
     """
         Class that builds a list of desired events from liveData and ultimately generates a dataframe with the 
         selected features. This class points to TidyEvent class to generate a dictionnary to be able to create the dataframe.
-
-        Returns: Dataframe
     """
 
-    def __init__(self, game_pk, live_events, target_events=['SHOT', 'GOAL']) -> None:
+    def __init__(self, game_pk, home, away, sides, live_events, target_events=['SHOT', 'GOAL']) -> None:
         self.game_pk = game_pk
         self.live_events = live_events
 
@@ -19,6 +17,10 @@ class EventGenerator:
         self.events = []
         self.events_df = None
         self.event_types = {}
+
+        self.home = home
+        self.away = away
+        self.sides = sides
 
     def build(self) -> List:
         """
@@ -37,10 +39,14 @@ class EventGenerator:
                 tidy_event = TidyEvent(
                     self.game_pk,
                     event['about']['eventIdx'], event_type,
-                    event['team']['id'],
+                    event['team']['triCode'],
                     event['about']['period'], event['about']['periodType'], event['about']['periodTime'],
-                    event['about']['dateTime']
+                    event['about']['dateTime'],
                 )
+
+                # add where the team's goal is
+                if event['about']['periodType'] != 'SHOOTOUT':
+                    tidy_event.set_team_side(self.sides[event['about']['period']][event['team']['triCode']])
 
                 # Only consider empty net, when goals are not scored in a shootout
                 if event_type == 'GOAL' and event['about']['periodType'] != 'SHOOTOUT':
@@ -106,7 +112,7 @@ class TidyEvent:
         Class that generates a dictionnary from selected features in liveData.
     """
 
-    def __init__(self, game_pk, event_index, event_type, team_id, period, period_type, period_time, datetime, coordinate_x= None, coordinate_y=None, goal_strength=None, shot_type=None,player_shooter=None, player_scorer=None, player_goalie=None, empty_net=None) -> None:
+    def __init__(self, game_pk, event_index, event_type, team_id, period, period_type, period_time, datetime, coordinate_x= None, coordinate_y=None, goal_strength=None, shot_type=None,player_shooter=None, player_scorer=None, player_goalie=None, empty_net=None, team_side=None) -> None:
         self.game_pk = game_pk
         self.event_index = event_index
         self.event_type = event_type
@@ -122,7 +128,8 @@ class TidyEvent:
         self.player_scorer = player_scorer
         self.player_goalie = player_goalie
         self.empty_net = empty_net
-        self.goal_strength  = goal_strength
+        self.goal_strength = goal_strength
+        self.team_side = team_side
 
     def set_empty_net(self, empty_net: bool) -> None:
         self.empty_net = empty_net
@@ -148,6 +155,9 @@ class TidyEvent:
     def set_y_coordinate(self, coordinate_y) -> None:
         self.coordinate_y = coordinate_y
 
+    def set_team_side(self, side) -> None:
+        self.team_side = side
+
     def to_dict(self) -> Dict:
         """
             Method that generates dictionnary from selected features.
@@ -161,6 +171,7 @@ class TidyEvent:
             'shot_type': self.shot_type,
             'goal_strength' : self.goal_strength,
             'team_id': self.team_id,
+            'team_side': self.team_side,
             'period': self.period,
             'period_type': self.period_type,
             'period_time': self.period_time,

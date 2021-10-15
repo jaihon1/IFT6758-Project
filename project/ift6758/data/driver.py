@@ -1,6 +1,7 @@
 from GamesInfo import GamesInfo
 from EventGenerator import EventGenerator
 import pandas as pd
+import numpy as np
 import os
 
 
@@ -28,15 +29,20 @@ def main():
         for data in games_info.all_games[season]:
             live_events = data['liveData']['plays']['allPlays']
             game_pk = data['gamePk']
-            game = EventGenerator(game_pk, live_events)
+            home = data['gameData']['teams']['home']['triCode']
+            away = data['gameData']['teams']['away']['triCode']
+            sides = dict()
+
+            for period in data['liveData']['linescore']['periods']:
+                sides[period['num']] = {home: period['home'].setdefault('rinkSide', np.NaN), away: period['away'].setdefault('rinkSide', np.NaN)}
+
+            game = EventGenerator(game_pk, home, away, sides, live_events)
 
             if len(dataframe) == 0:
                 dataframe = game.build()
             else:
                 temp_df = game.build()
                 dataframe = pd.concat([dataframe, temp_df])
-
-            # print(len(dataframe))
 
 
     print(len(dataframe))
