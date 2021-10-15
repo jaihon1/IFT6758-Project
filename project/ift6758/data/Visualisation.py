@@ -131,7 +131,7 @@ plt.title('Chance of scoring a goal in function of shot distance: Season 2019')
 plt.ylabel('Percentage of scoring shots', fontsize=12)
 plt.xlabel('Shot distance', fontsize=12)
 plt.show()
-
+print(list_of_Percentage)
 ### Season 2020
 ### Generating Dataframe For the Season (2020)
 
@@ -153,9 +153,28 @@ list_of_Percentage = []
 for i in range(len(labels)):
     temp_df = events_new_coor_2020[events_new_coor_2020["bin_Shot_distance"]==labels[i]]
     list_of_Percentage.append(round(temp_df["event_type"].value_counts()[1] / (temp_df["event_type"].value_counts()[0] + temp_df["event_type"].value_counts()[1]) * 100, 2))
-
+print(list_of_Percentage)
 ### Plotting the BarPlot
 sns.barplot(labels, list_of_Percentage, alpha=0.4)
+plt.xticks(fontsize=9, rotation=45)
+plt.ylim(0, 25)
+plt.title('Chance of scoring a goal in function of shot distance: Season 2020')
+plt.ylabel('Percentage of scoring shots', fontsize=12)
+plt.xlabel('Shot distance', fontsize=12)
+plt.show()
+
+
+### Goal Percentage(# Goals/ # total de shots)
+### adding the column  to the dataframe :
+for events_new_coor_2020["bin_Shot_distance"], temp_df in events_new_coor_2020.groupby('shot_type'):
+    list_of_Goals_Percentage = []
+    for i in range(len(labels)):
+        if temp_df == events_new_coor_2020[events_new_coor_2020["bin_Shot_distance"]==labels[i]]:
+            list_of_Goals_Percentage.append(round(temp_df["event_type"].value_counts()[1] / (temp_df["event_type"].value_counts()[0] + temp_df["event_type"].value_counts()[1]) * 100, 2))
+
+
+### Plotting the BarPlot
+sns.barplot(events_new_coor_2020['shot_type'], list_of_Goals_Percentage, alpha=0.4)
 plt.xticks(fontsize=9, rotation=45)
 plt.ylim(0, 25)
 plt.title('Chance of scoring a goal in function of shot distance: Season 2020')
