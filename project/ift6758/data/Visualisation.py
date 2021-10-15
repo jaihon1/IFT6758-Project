@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+from nest_asyncio import apply
+from numpy.core.fromnumeric import size
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -28,6 +30,7 @@ Number_of_Goals = Number_of_Goals_per_Shot_types.reindex(new_index)
 
 
 #### Overlap of the SHOTS and GOALS : BARPLOT
+sns.set_theme(style="whitegrid")
 fig, ax = plt.subplots(figsize=(12, 6))
 ax2 = ax.twinx()
 ax.set_title('Shots and Goals per number of shot types over all teams in the 2016 season')
@@ -36,17 +39,18 @@ sns.barplot(Number_of_shots.index, Number_of_shots_per_Shot_types.values, alpha=
 sns.barplot(Number_of_Goals.index, Number_of_Goals_per_Shot_types.values, alpha=0.4)
 ax2.set_ylim(0, 25000)
 ax.set_ylim(0, 25000)
-ax.set_ylabel('Absolute frequency')
+ax.set_ylabel('Absolute frequency', size=12)
 ax2.get_yaxis().set_visible(False)
 plt.show()
 
 ### Most dangerous type of Shots
 Dangerous_Shots = Number_of_Goals / (Number_of_shots + Number_of_Goals) * 100
-sns.barplot(Dangerous_Shots.index, Dangerous_Shots.values, alpha=0.5)
+sns.set_theme(style="whitegrid")
+sns.barplot(Dangerous_Shots.index, Dangerous_Shots.values)
 plt.title('Most dangerous type of shots in the 2016 season')
 plt.ylabel('Percentage of scoring shots', fontsize=12)
 plt.xlabel('Types of Shots', fontsize=12)
-plt.xticks(fontsize=10, rotation=45)
+plt.xticks(fontsize=10, rotation=20)
 plt.show()
 
 
@@ -78,28 +82,20 @@ q1 = 89  # valeur absolue (location sur l'axe X)
 q2 = 0  # valeur absolue (location sur l'axe Y)
 events_new_coor_2018['shot_distance'] = [np.sqrt((q1 - abs(p1))** 2 + (q2 - abs(p2))** 2) for p1, p2, in zip(events_new_coor_2018['coordinate_x'], events_new_coor_2018['coordinate_y'])]
 
-### define the bins : 20 bins from  minimum value to maximum value
-bins = np.linspace(min(events_new_coor_2018['shot_distance']), max(events_new_coor_2018['shot_distance']), 21)
+### define the bins : 14 bins from  minimum value to maximum value
+bins = np.linspace(min(events_new_coor_2018['shot_distance']), max(events_new_coor_2018['shot_distance']), 14)
+
 # add labels if desired
-labels = ["1-5.8", "5.8-10.7", "10.7-15.5", "15.5-20.4", "20.4-25.2", "25.2-30.1", "30.1-34.9", "34.9-39.8", "39.8-44.6", "44.6-49.5", "49.5-54.3", "54.3-59.2", "59.2-64.0", "64.0-68.9", "68.9-73.7", "73.7-78.6", "78.6-83.4", "83.4-88.3", "88.3-93.1", "93.1-98.0"]
+labels = ["1-8.5", "8.5-15.9", "15.9-23.4", "23.4-30.8", "30.8-38.3", "38.3-45.8", "45.8-53.2", "53.2-60.7", "60.7-68.1", "68.1-75.6", "75.6-83.1", "83.1-90.5", "90.5-98.0"]
 
 ### add the bins to the dataframe :
 events_new_coor_2018["bin_Shot_distance"] = pd.cut(events_new_coor_2018["shot_distance"], bins=bins, labels=labels, include_lowest=True)
 
 ### loop qui itere sur chaque bin et filtre le dataframe pour conserver seulement les valeurs qui dans le bin
-list_of_Percentage = []
+list_of_Percentage_2018 = []
 for i in range(len(labels)):
     temp_df = events_new_coor_2018[events_new_coor_2018["bin_Shot_distance"]==labels[i]]
-    list_of_Percentage.append(round(temp_df["event_type"].value_counts()[1] / (temp_df["event_type"].value_counts()[0] + temp_df["event_type"].value_counts()[1]) * 100, 2))
-
-### Plotting the BarPlot
-sns.barplot(labels, list_of_Percentage, alpha=0.4)
-plt.xticks(fontsize=9, rotation=45)
-plt.ylim(0, 25)
-plt.title('Chance of scoring a goal in function of shot distance: Season 2018')
-plt.ylabel('Percentage of scoring shots', fontsize=12)
-plt.xlabel('Shot distance', fontsize=12)
-plt.show()
+    list_of_Percentage_2018.append(round(temp_df["event_type"].value_counts()[1] / (temp_df["event_type"].value_counts()[0] + temp_df["event_type"].value_counts()[1]) * 100, 2))
 
 ### Season 2019
 ### Generating Dataframe For the Season (2019)
@@ -109,29 +105,15 @@ q1 = 89  # valeur absolue (location sur l'axe X)
 q2 = 0  # valeur absolue (location sur l'axe Y)
 events_new_coor_2019['shot_distance'] = [np.sqrt((q1 - abs(p1))** 2 + (q2 - abs(p2))** 2) for p1, p2, in zip(events_new_coor_2019['coordinate_x'], events_new_coor_2019['coordinate_y'])]
 
-### define the bins : 20 bins from  minimum value to maximum value
-bins = np.linspace(min(events_new_coor_2019['shot_distance']), max(events_new_coor_2019['shot_distance']), 21)
-# add labels if desired
-labels = ["1-5.8", "5.8-10.7", "10.7-15.5", "15.5-20.4", "20.4-25.2", "25.2-30.1", "30.1-34.9", "34.9-39.8", "39.8-44.6", "44.6-49.5", "49.5-54.3", "54.3-59.2", "59.2-64.0", "64.0-68.9", "68.9-73.7", "73.7-78.6", "78.6-83.4", "83.4-88.3", "88.3-93.1", "93.1-98.0"]
-
 ### add the bins to the dataframe :
 events_new_coor_2019["bin_Shot_distance"] = pd.cut(events_new_coor_2019["shot_distance"], bins=bins, labels=labels, include_lowest=True)
 
 ### loop qui itere sur chaque bin et filtre le dataframe pour conserver seulement les valeurs qui dans le bin
-list_of_Percentage = []
+list_of_Percentage_2019 = []
 for i in range(len(labels)):
     temp_df = events_new_coor_2019[events_new_coor_2019["bin_Shot_distance"]==labels[i]]
-    list_of_Percentage.append(round(temp_df["event_type"].value_counts()[1] / (temp_df["event_type"].value_counts()[0] + temp_df["event_type"].value_counts()[1]) * 100, 2))
+    list_of_Percentage_2019.append(round(temp_df["event_type"].value_counts()[1] / (temp_df["event_type"].value_counts()[0] + temp_df["event_type"].value_counts()[1]) * 100, 2))
 
-### Plotting the BarPlot
-sns.barplot(labels, list_of_Percentage, alpha=0.4)
-plt.xticks(fontsize=9, rotation=45)
-plt.ylim(0, 25)
-plt.title('Chance of scoring a goal in function of shot distance: Season 2019')
-plt.ylabel('Percentage of scoring shots', fontsize=12)
-plt.xlabel('Shot distance', fontsize=12)
-plt.show()
-print(list_of_Percentage)
 ### Season 2020
 ### Generating Dataframe For the Season (2020)
 
@@ -140,44 +122,62 @@ q1 = 89  # valeur absolue (location sur l'axe X)
 q2 = 0  # valeur absolue (location sur l'axe Y)
 events_new_coor_2020['shot_distance'] = [np.sqrt((q1 - abs(p1))** 2 + (q2 - abs(p2))** 2) for p1, p2, in zip(events_new_coor_2020['coordinate_x'], events_new_coor_2020['coordinate_y'])]
 
-### define the bins : 20 bins from  minimum value to maximum value
-bins = np.linspace(min(events_new_coor_2020['shot_distance']), max(events_new_coor_2020['shot_distance']), 21)
-# add labels if desired
-labels = ["1-5.8", "5.8-10.7", "10.7-15.5", "15.5-20.4", "20.4-25.2", "25.2-30.1", "30.1-34.9", "34.9-39.8", "39.8-44.6", "44.6-49.5", "49.5-54.3", "54.3-59.2", "59.2-64.0", "64.0-68.9", "68.9-73.7", "73.7-78.6", "78.6-83.4", "83.4-88.3", "88.3-93.1", "93.1-98.0"]
 
 ### add the bins to the dataframe :
 events_new_coor_2020["bin_Shot_distance"] = pd.cut(events_new_coor_2020["shot_distance"], bins=bins, labels=labels, include_lowest=True)
 
 ### loop qui itere sur chaque bin et filtre le dataframe pour conserver seulement les valeurs qui dans le bin
-list_of_Percentage = []
+list_of_Percentage_2020 = []
 for i in range(len(labels)):
     temp_df = events_new_coor_2020[events_new_coor_2020["bin_Shot_distance"]==labels[i]]
-    list_of_Percentage.append(round(temp_df["event_type"].value_counts()[1] / (temp_df["event_type"].value_counts()[0] + temp_df["event_type"].value_counts()[1]) * 100, 2))
-print(list_of_Percentage)
+    list_of_Percentage_2020.append(round(temp_df["event_type"].value_counts()[1] / (temp_df["event_type"].value_counts()[0] + temp_df["event_type"].value_counts()[1]) * 100, 2))
+
 ### Plotting the BarPlot
-sns.barplot(labels, list_of_Percentage, alpha=0.4)
+fig, axs = plt.subplots(3)
+fig.suptitle('Chance of scoring a goal in function of shot distance for seasons 2018, 2019, 2020')
+sns.set_theme(style="whitegrid")
+sns.barplot(labels, list_of_Percentage_2018, color='black', alpha=0.6, ax=axs[0])
+sns.barplot(labels, list_of_Percentage_2019, color='black', alpha=0.6, ax=axs[1])
+sns.barplot(labels, list_of_Percentage_2020, color='black', alpha=0.6, ax=axs[2])
+axs[0].set(title='Season 2018')
+axs[1].set(title='Season 2019')
+axs[2].set(title='Season 2020')
+axs[0].get_xaxis().set_visible(False)
+axs[1].get_xaxis().set_visible(False)
 plt.xticks(fontsize=9, rotation=45)
 plt.ylim(0, 25)
-plt.title('Chance of scoring a goal in function of shot distance: Season 2020')
-plt.ylabel('Percentage of scoring shots', fontsize=12)
-plt.xlabel('Shot distance', fontsize=12)
+plt.ylabel('                                                                                               Percentage of scoring shots', fontsize=12)
+plt.xlabel('Shot distance (feet)', fontsize=12)
 plt.show()
 
 
 ### Goal Percentage(# Goals/ # total de shots)
-### adding the column  to the dataframe :
-for events_new_coor_2020["bin_Shot_distance"], temp_df in events_new_coor_2020.groupby('shot_type'):
-    list_of_Goals_Percentage = []
-    for i in range(len(labels)):
-        if temp_df == events_new_coor_2020[events_new_coor_2020["bin_Shot_distance"]==labels[i]]:
-            list_of_Goals_Percentage.append(round(temp_df["event_type"].value_counts()[1] / (temp_df["event_type"].value_counts()[0] + temp_df["event_type"].value_counts()[1]) * 100, 2))
+
+events_new_coor_2020_grouped= events_new_coor_2020.groupby(['shot_type', 'bin_Shot_distance']).apply(lambda x: sum(x['event_type'] == 'GOAL') / (sum(x['event_type'] == 'GOAL')+ sum(x['event_type'] == 'SHOT'))*100)
+events_new_coor_2020_grouped_df = pd.DataFrame(events_new_coor_2020_grouped, columns=['shot_efficiency'])
+events_new_coor_2020_grouped_df.reset_index(inplace=True)
 
 
 ### Plotting the BarPlot
-sns.barplot(events_new_coor_2020['shot_type'], list_of_Goals_Percentage, alpha=0.4)
-plt.xticks(fontsize=9, rotation=45)
-plt.ylim(0, 25)
-plt.title('Chance of scoring a goal in function of shot distance: Season 2020')
-plt.ylabel('Percentage of scoring shots', fontsize=12)
-plt.xlabel('Shot distance', fontsize=12)
+sns.set_theme(style="whitegrid")
+f, (ax_top, ax_bottom) = plt.subplots(ncols=1, nrows=2, sharex=True, gridspec_kw={'hspace':0.05})
+sns.barplot(x="bin_Shot_distance", y="shot_efficiency", hue="shot_type",data=events_new_coor_2020_grouped_df, ax=ax_top)
+sns.barplot(x="bin_Shot_distance", y="shot_efficiency", hue="shot_type",data=events_new_coor_2020_grouped_df, ax=ax_bottom)
+ax_top.set_ylim(bottom=80, top=100) 
+ax_bottom.set_ylim(0,35)
+sns.despine(ax=ax_bottom)
+sns.despine(ax=ax_top, bottom=True)
+ax = ax_top
+d = .015 
+kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
+ax.plot((-d, +d), (-d, +d), **kwargs)
+ax2 = ax_bottom
+ax2.set(ylabel=None)
+ax_top.get_xaxis().set_visible(False)
+kwargs.update(transform=ax2.transAxes)
+ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)
+ax2.tick_params(axis='x', labelrotation=45 )
+ax_bottom.legend_.remove()
+ax.set(ylabel='Shot efficiency (Shot to goal)                                                   ', title='Shot efficiency in function of shot type and shot distance')
+ax_bottom.set(xlabel='Shot distance (feet)')
 plt.show()
