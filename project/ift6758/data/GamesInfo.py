@@ -146,3 +146,35 @@ class GamesInfo:
                 all_games[season] = other.all_games[season]
 
         return GamesInfo(seasons, filepath, all_games)
+
+    def get_regular_games(self):
+        """
+
+        Get only the regular games data from all_games
+
+        Returns: dictionary of the regular games where keys are the season and values are lists of games data
+
+        """
+        regular_game = dict()
+        for s in self.season:
+            regular_game[s] = []
+            for game in self.all_games[s]:
+                if game['gameData']['game']['type'] == 'R':
+                    regular_game[s].append(game)
+        return regular_game
+
+    def get_playoff_games(self):
+        """
+
+        Get only the playoff games data from all_games
+
+        Returns: dictionary of the playoff games where keys are the season and values are lists of games data
+
+        """
+        playoff_game = dict()
+        for s in self.season:
+            playoff_game[s] = []
+            for game in self.all_games[s]:
+                if game['gameData']['game']['type'] == 'P':
+                    playoff_game[s].append(game)
+        return playoff_game
