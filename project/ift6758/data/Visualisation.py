@@ -146,19 +146,19 @@ axs[0].get_xaxis().set_visible(False)
 axs[1].get_xaxis().set_visible(False)
 plt.xticks(fontsize=9, rotation=45)
 plt.ylim(0, 25)
-plt.ylabel('                                                                                               Percentage of scoring shots', fontsize=12)
+plt.ylabel('Percentage of scoring shots', fontsize=12)
 plt.xlabel('Shot distance (feet)', fontsize=12)
 plt.show()
 
 
-### Goal Percentage(# Goals/ # total de shots)
+### Goal Percentage(# Goals/ # total de shots) Season 2020
 
 events_new_coor_2020_grouped= events_new_coor_2020.groupby(['shot_type', 'bin_Shot_distance']).apply(lambda x: sum(x['event_type'] == 'GOAL') / (sum(x['event_type'] == 'GOAL')+ sum(x['event_type'] == 'SHOT'))*100)
 events_new_coor_2020_grouped_df = pd.DataFrame(events_new_coor_2020_grouped, columns=['shot_efficiency'])
 events_new_coor_2020_grouped_df.reset_index(inplace=True)
 
 
-### Plotting the BarPlot
+### Plotting the BarPlot   Season 2020
 sns.set_theme(style="whitegrid")
 f, (ax_top, ax_bottom) = plt.subplots(ncols=1, nrows=2, sharex=True, gridspec_kw={'hspace':0.05})
 sns.barplot(x="bin_Shot_distance", y="shot_efficiency", hue="shot_type",data=events_new_coor_2020_grouped_df, ax=ax_top)
@@ -178,6 +178,6 @@ kwargs.update(transform=ax2.transAxes)
 ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)
 ax2.tick_params(axis='x', labelrotation=45 )
 ax_bottom.legend_.remove()
-ax.set(ylabel='Shot efficiency (Shot to goal)                                                   ', title='Shot efficiency in function of shot type and shot distance')
+ax.set(ylabel='Shot efficiency (Shot to goal)', title='Shot efficiency in function of shot type and shot distance for 2020')
 ax_bottom.set(xlabel='Shot distance (feet)')
 plt.show()
