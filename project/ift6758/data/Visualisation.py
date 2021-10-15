@@ -20,9 +20,8 @@ df_2016= df[df['game_pk'].str.startswith('2016')]
 df_2016['game_pk'] = df_2016['game_pk'].astype(int)
 df_2016_goals = df_2016[df_2016['event_type'] == 'GOAL']
 df_2016_shots = df_2016[df_2016['event_type'] == 'SHOT']
-Number_of_shots_per_Shot_types = df_2016_shots['shot_type'].value_counts()
+Number_of_shots_per_Shot_types = df_2016_shots['shot_type'].value_counts() + df_2016_goals['shot_type'].value_counts()
 Number_of_Goals_per_Shot_types = df_2016_goals['shot_type'].value_counts()
-
 ### New Index to make a better and more symetric graph
 new_index= ['Wrist Shot', 'Slap Shot', 'Snap Shot', 'Backhand', 'Tip-In', 'Deflected', 'Wrap-around']
 Number_of_shots = Number_of_shots_per_Shot_types.reindex(new_index)
@@ -35,8 +34,8 @@ fig, ax = plt.subplots(figsize=(12, 6))
 ax2 = ax.twinx()
 ax.set_title('Shots and Goals per number of shot types over all teams in the 2016 season')
 ax.set_xlabel('Types of Shots', fontsize=12)
-sns.barplot(Number_of_shots.index, Number_of_shots_per_Shot_types.values, alpha=0.4)
-sns.barplot(Number_of_Goals.index, Number_of_Goals_per_Shot_types.values, alpha=0.4)
+sns.barplot(Number_of_shots.index, Number_of_shots.values, alpha=0.4)
+sns.barplot(Number_of_Goals.index, Number_of_Goals.values, alpha=0.4)
 ax2.set_ylim(0, 25000)
 ax.set_ylim(0, 25000)
 ax.set_ylabel('Absolute frequency', size=12)
@@ -45,6 +44,8 @@ plt.show()
 
 ### Most dangerous type of Shots
 Dangerous_Shots = Number_of_Goals / (Number_of_shots + Number_of_Goals) * 100
+Dangerous_Shots = Dangerous_Shots.sort_values(ascending=False)
+print(Dangerous_Shots)
 sns.set_theme(style="whitegrid")
 sns.barplot(Dangerous_Shots.index, Dangerous_Shots.values)
 plt.title('Most dangerous type of shots in the 2016 season')
