@@ -6,8 +6,6 @@ class EventGenerator:
     """
         Class that builds a list of desired events from liveData and ultimately generates a dataframe with the 
         selected features. This class points to TidyEvent class to generate a dictionnary to be able to create the dataframe.
-
-        Returns: Dataframe
     """
 
     def __init__(self, game_pk, home, away, sides, live_events, target_events=['SHOT', 'GOAL']) -> None:
