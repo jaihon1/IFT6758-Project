@@ -1,6 +1,4 @@
 import matplotlib.pyplot as plt
-from nest_asyncio import apply
-from numpy.core.fromnumeric import size
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -12,7 +10,6 @@ file_path = os.path.join(dirpath, 'games_data_all_seasons.csv')
 df = pd.read_csv(file_path)
 
 ### Part1
-
 ### Number_of_shots_and_number_of_Goals_per_Shot_types
 
 df['game_pk'] = df['game_pk'].astype(str)
@@ -56,12 +53,6 @@ plt.show()
 
 
 ### Part 2
-#### Reading NewDataFrame done by Laurence's Code generating a team_side column
-### New Dataset'name is "events_new_coor"
-### DataFrame
-
-
-#events = pd.read_csv(file_path)
 events_new_coor = df.copy()[~(df['coordinate_x'].isnull()) & (~df['coordinate_y'].isnull())]
 
 ### Adjusting the negative values of coordinate x depending on the team's side
@@ -92,7 +83,7 @@ labels = ["1-8.5", "8.5-15.9", "15.9-23.4", "23.4-30.8", "30.8-38.3", "38.3-45.8
 ### add the bins to the dataframe :
 events_new_coor_2018["bin_Shot_distance"] = pd.cut(events_new_coor_2018["shot_distance"], bins=bins, labels=labels, include_lowest=True)
 
-### loop qui itere sur chaque bin et filtre le dataframe pour conserver seulement les valeurs dans le bin
+### loop qui itere sur chaque bin et filtre le dataframe pour conserver seulement les valeurs qui dans le bin
 list_of_Percentage_2018 = []
 for i in range(len(labels)):
     temp_df = events_new_coor_2018[events_new_coor_2018["bin_Shot_distance"]==labels[i]]
@@ -135,7 +126,7 @@ for i in range(len(labels)):
 
 ### Plotting the BarPlot
 fig, axs = plt.subplots(3)
-fig.suptitle('Chance of scoring a goal in function of shot distance for seasons 2018, 2019, 2020                                               ')
+fig.suptitle('Chance of scoring a goal in function of shot distance for seasons 2018, 2019, 2020', size=14)
 sns.set_theme(style="whitegrid")
 sns.barplot(labels, list_of_Percentage_2018, color='black', alpha=0.6, ax=axs[0])
 sns.barplot(labels, list_of_Percentage_2019, color='black', alpha=0.6, ax=axs[1])
@@ -145,10 +136,11 @@ axs[1].set(title='Season 2019')
 axs[2].set(title='Season 2020')
 axs[0].get_xaxis().set_visible(False)
 axs[1].get_xaxis().set_visible(False)
-plt.xticks(fontsize=9, rotation=45)
+plt.xticks(fontsize=12, rotation=22)
 plt.ylim(0, 25)
-plt.ylabel('                                                                                                  Percentage of scoring shots', fontsize=12)
-plt.xlabel('Shot distance (feet)', fontsize=12)
+plt.ylabel('                                                                                Percentage of scoring shots', fontsize=16)
+plt.xlabel('Shot distance (feet)', fontsize=14)
+plt.xticks(size=13)
 plt.show()
 
 
@@ -162,6 +154,7 @@ events_new_coor_2020_grouped_df.reset_index(inplace=True)
 ### Plotting the BarPlot   Season 2020
 sns.set_theme(style="whitegrid")
 f, (ax_top, ax_bottom) = plt.subplots(ncols=1, nrows=2, sharex=True, gridspec_kw={'hspace':0.05})
+f.suptitle('             Shot efficiency in function of shot type and shot distance for 2020', fontsize=14)
 sns.barplot(x="bin_Shot_distance", y="shot_efficiency", hue="shot_type",data=events_new_coor_2020_grouped_df, ax=ax_top)
 sns.barplot(x="bin_Shot_distance", y="shot_efficiency", hue="shot_type",data=events_new_coor_2020_grouped_df, ax=ax_bottom)
 ax_top.set_ylim(bottom=80, top=100) 
@@ -177,8 +170,8 @@ ax2.set(ylabel=None)
 ax_top.get_xaxis().set_visible(False)
 kwargs.update(transform=ax2.transAxes)
 ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)
-ax2.tick_params(axis='x', labelrotation=45 )
+ax_bottom.tick_params(axis='x', labelrotation=20, size=16)
 ax_bottom.legend_.remove()
-ax.set(ylabel='Shot efficiency (Shot to goal)                                                   ', title='             Shot efficiency in function of shot type and shot distance for 2020')
-ax_bottom.set(xlabel='Shot distance (feet)')
+ax_bottom.set_xlabel(xlabel='Shot distance (feet)',size=15)
+ax.set_ylabel(ylabel='Shot efficiency (Shot to goal)                                                   ',fontsize=15)
 plt.show()
