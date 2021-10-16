@@ -1,5 +1,4 @@
 from typing import Dict, List
-from numpy import show_config
 import pandas as pd
 
 
@@ -7,8 +6,6 @@ class EventGenerator:
     """
         Class that builds a list of desired events from liveData and ultimately generates a dataframe with the 
         selected features. This class points to TidyEvent class to generate a dictionnary to be able to create the dataframe.
-
-        Returns: Dataframe
     """
 
     def __init__(self, game_pk, home, away, sides, live_events, target_events=['SHOT', 'GOAL']) -> None:
@@ -69,7 +66,7 @@ class EventGenerator:
                 # Analyse strength type of GOAL scored
                 if event_type == 'GOAL':
                     tidy_event.set_goal_strength(event['result']['strength']['name'])
-                
+
                 # Addind secondaryType, x and y coordinates as conditional since some games seem to be missing this key
                 if 'secondaryType' in event['result'].keys():
                     tidy_event.set_shot_type(event['result']['secondaryType'])
@@ -113,8 +110,6 @@ class EventGenerator:
 class TidyEvent:
     """
         Class that generates a dictionnary from selected features in liveData.
-
-        Returns: Dictionnary
     """
 
     def __init__(self, game_pk, event_index, event_type, team_id, period, period_type, period_time, datetime, coordinate_x= None, coordinate_y=None, goal_strength=None, shot_type=None,player_shooter=None, player_scorer=None, player_goalie=None, empty_net=None, team_side=None) -> None:
@@ -150,13 +145,13 @@ class TidyEvent:
 
     def set_player_scorer(self, player_scorer) -> None:
         self.player_scorer = player_scorer
-    
+
     def set_goal_strength(self, goal_strength) -> None:
         self.goal_strength = goal_strength
 
     def set_x_coordinate(self, coordinate_x) -> None:
         self.coordinate_x = coordinate_x
-    
+
     def set_y_coordinate(self, coordinate_y) -> None:
         self.coordinate_y = coordinate_y
 
@@ -165,7 +160,7 @@ class TidyEvent:
 
     def to_dict(self) -> Dict:
         """
-            Method that generates dicitonnary from selected features.
+            Method that generates dictionnary from selected features.
 
             Returns: Dictionnary
         """
