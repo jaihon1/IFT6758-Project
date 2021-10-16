@@ -92,7 +92,7 @@ labels = ["1-8.5", "8.5-15.9", "15.9-23.4", "23.4-30.8", "30.8-38.3", "38.3-45.8
 ### add the bins to the dataframe :
 events_new_coor_2018["bin_Shot_distance"] = pd.cut(events_new_coor_2018["shot_distance"], bins=bins, labels=labels, include_lowest=True)
 
-### loop qui itere sur chaque bin et filtre le dataframe pour conserver seulement les valeurs qui dans le bin
+### loop qui itere sur chaque bin et filtre le dataframe pour conserver seulement les valeurs dans le bin
 list_of_Percentage_2018 = []
 for i in range(len(labels)):
     temp_df = events_new_coor_2018[events_new_coor_2018["bin_Shot_distance"]==labels[i]]
