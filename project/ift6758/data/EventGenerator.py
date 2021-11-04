@@ -9,11 +9,14 @@ class EventGenerator:
         selected features. This class points to TidyEvent class to generate a dictionnary to be able to create the dataframe.
     """
 
-    def __init__(self, game_pk, home, away, sides, live_events, target_events=['SHOT', 'GOAL']) -> None:
+    def __init__(self, game_pk, home, away, sides, live_events, target_events=['Unknown', 'Faceoff', 'Hit', 'Giveaway', 'Goal', 'Shot', 'Missed Shot',
+     'Penalty', 'Stoppage', 'Sub', 'Fight', 'Takeaway', 'Blocked Shot', 'Period Start', 'Period End', 'Game End', 'Game Scheduled', 'Period Ready', 
+     'Period Official', 'Shootout Complete', 'Early Intermission Start', 'Early Intermission End', 'Game Official', 'Official Challenge', 
+     'Emergency Goaltender Player ID Change']) -> None:
         self.game_pk = game_pk
         self.live_events = live_events
 
-        self.target_events = target_events
+        self.target_events = [i.upper() for i in target_events]
 
         self.events = []
         self.events_df = None
