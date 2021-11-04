@@ -11,6 +11,7 @@ df_filtered = df.loc[:,['period', 'period_time','event_type', 'shot_type', 'coor
 df_filtered['game_seconds'] = [dt.datetime.strptime(i, '%M:%S').second + dt.datetime.strptime(i, '%M:%S').minute*60 for i in df_filtered['period_time']]
 df_filtered.drop(columns='period_time', inplace=True)
 df_additional_info = df_filtered.copy()
+print(df_additional_info['period'].value_counts())
 df_additional_info['Last_event_type'] = [df_additional_info.iloc[i-1,df_additional_info.columns.get_loc('event_type')] if df_additional_info.iloc[i,df_additional_info.columns.get_loc('event_type')] == 'SHOT' else np.nan for i in range(len(df_additional_info))]
 df_additional_info['X_Coordinate_of_last_event'] = [df_additional_info.iloc[i-1,df_additional_info.columns.get_loc('coordinate_x')] if df_additional_info.iloc[i,df_additional_info.columns.get_loc('event_type')] == 'SHOT' else np.nan for i in range(len(df_additional_info))]
 df_additional_info['Y_Coordinate_of_last_event'] = [df_additional_info.iloc[i-1,df_additional_info.columns.get_loc('coordinate_y')] if df_additional_info.iloc[i,df_additional_info.columns.get_loc('event_type')] == 'SHOT' else np.nan for i in range(len(df_additional_info))]
