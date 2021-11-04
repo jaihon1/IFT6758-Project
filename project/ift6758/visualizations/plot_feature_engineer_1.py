@@ -14,7 +14,8 @@ hist_distance = sns.histplot(data=data, x='distance_net', hue='is_goal', bins=15
 
 plt.xlabel('Distance from net (feet)')
 plt.ylabel('Number of shots (goal or no goal)')
-plt.legend(labels=['goal', 'no goal'])
+plt.legend(labels=['no goal', 'goal'])
+plt.tight_layout()
 plt.show()
 
 #%%
@@ -24,7 +25,8 @@ hist_angle = sns.histplot(data=data, x='angle_net', hue='is_goal', bins=15, mult
 
 plt.xlabel('Angle from net (degrees)')
 plt.ylabel('Number of shots (goal or no goal)')
-plt.legend(labels=['goal', 'no goal'])
+plt.legend(labels=['no goal', 'goal'])
+plt.tight_layout()
 plt.show()
 
 #%%
