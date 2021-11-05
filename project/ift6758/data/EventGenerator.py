@@ -1,6 +1,7 @@
 import math
 from typing import Dict
 import pandas as pd
+import datetime as dt
 
 
 class EventGenerator:
@@ -9,14 +10,11 @@ class EventGenerator:
         selected features. This class points to TidyEvent class to generate a dictionnary to be able to create the dataframe.
     """
 
-    def __init__(self, game_pk, home, away, sides, live_events, target_events=['Unknown', 'Faceoff', 'Hit', 'Giveaway', 'Goal', 'Shot', 'Missed Shot',
-     'Penalty', 'Stoppage', 'Sub', 'Fight', 'Takeaway', 'Blocked Shot', 'Period Start', 'Period End', 'Game End', 'Game Scheduled', 'Period Ready', 
-     'Period Official', 'Shootout Complete', 'Early Intermission Start', 'Early Intermission End', 'Game Official', 'Official Challenge', 
-     'Emergency Goaltender Player ID Change']) -> None:
+    def __init__(self, game_pk, home, away, sides, live_events, target_events=['GOAL', 'SHOT']) -> None:
         self.game_pk = game_pk
         self.live_events = live_events
 
-        self.target_events = [i.upper() for i in target_events]
+        self.target_events = target_events
 
         self.events = []
         self.events_df = None
@@ -33,10 +31,26 @@ class EventGenerator:
 
             Returns: list
         """
-
+        self.penalty_home = {}
+        self.penalty_away = {}
         for event in self.live_events:
             # Generate all types of events in our game
             event_type = self._fold_event_types(event)
+
+
+            # Penalty section, evaluated at each event (INCOMPLETE AF!!)
+
+
+            if event_type == 'PENALTY':
+                if event['team']['triCode'] == self.home:
+                    self.penalty_home[event['players'][0]['player']['fullName']] = [event['result']['penaltySeverity'], event['result']['penaltyMinutes'], event['about']['period'], event['about']['periodTime']]
+                if event['team']['triCode'] == self.away:
+                    self.penalty_away[event['players'][0]['player']['fullName']] = [event['result']['penaltySeverity'], event['result']['penaltyMinutes'], event['about']['period'], event['about']['periodTime']]
+            self.home_non_goalie_player_numbers = len([i for i in self.penalty_home.keys()])
+            self.away_non_goalie_player_numbers = len([i for i in self.penalty_away.keys()])
+            
+            # Penalty section to add conditions to remove X player if period, period_time, and penlatyTime are respected
+            # Add smart stuff here... :D
 
             if event_type in self.target_events:
                 # Build tidy event object
@@ -45,7 +59,8 @@ class EventGenerator:
                     event['about']['eventIdx'], event_type,
                     event['team']['triCode'],
                     event['about']['period'], event['about']['periodType'], event['about']['periodTime'],
-                    event['about']['dateTime'],
+                    event['about']['dateTime'], self.prev_event_type, self.prev_event_x_coord, self.prev_event_y_coord, 
+                    self.prev_event_period, self.prev_event_period_time
                 )
 
                 # add where the team's goal is
@@ -99,9 +114,21 @@ class EventGenerator:
                     angle = math.degrees(math.atan2(distance_y, distance_x))
                     tidy_event.set_angle_net(angle)
 
+
+
                     # We can add assisting players here in the future
 
                 self.events.append(tidy_event)
+                #Addind event to previous timepoint
+            self.prev_event_type = event_type
+            if 'x' not in event['coordinates'].keys():
+                self.prev_event_x_coord = None
+            else : self.prev_event_x_coord = event['coordinates']['x']
+            if 'y' not in event['coordinates'].keys():
+                self.prev_event_y_coord = None
+            else : self.prev_event_y_coord = event['coordinates']['y']            
+            self.prev_event_period = event['about']['period']
+            self.prev_event_period_time = event['about']['periodTime']        
 
         return self.convert_to_dataframe()
 
@@ -132,7 +159,8 @@ class TidyEvent:
         Class that generates a dictionnary from selected features in liveData.
     """
 
-    def __init__(self, game_pk, event_index, event_type, team_id, period, period_type, period_time, datetime,
+    def __init__(self, game_pk, event_index, event_type, team_id, period, period_type, period_time, datetime, previous_event_type,
+                 previous_event_x_coord, previous_event_y_coord, previous_event_period, previous_event_period_time,
                  coordinate_x=None, coordinate_y=None, goal_strength=None, shot_type=None, player_shooter=None,
                  player_scorer=None, player_goalie=None, empty_net=None, is_goal=None, team_side=None,
                  distance_net=None, angle_net=None) -> None:
@@ -156,6 +184,11 @@ class TidyEvent:
         self.team_side = team_side
         self.distance_net = distance_net
         self.angle_net = angle_net
+        self.previous_event_type = previous_event_type
+        self.previous_event_x_coord = previous_event_x_coord
+        self.previous_event_y_coord = previous_event_y_coord
+        self.previous_event_period = previous_event_period
+        self.previous_event_period_time = previous_event_period_time
 
     def set_empty_net(self, empty_net: int) -> None:
         self.empty_net = empty_net
@@ -219,5 +252,10 @@ class TidyEvent:
             'empty_net': self.empty_net,
             'is_goal': self.is_goal,
             'distance_net': self.distance_net,
-            'angle_net': self.angle_net
+            'angle_net': self.angle_net,
+            'previous_event_type': self.previous_event_type,
+            'previous_event_x_coord': self.previous_event_x_coord,
+            'previous_event_y_coord': self.previous_event_y_coord,
+            'previous_event_period': self.previous_event_period,
+            'previous_event_period_time': self.previous_event_period_time
         }
