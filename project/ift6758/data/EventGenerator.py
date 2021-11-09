@@ -84,8 +84,6 @@ class EventGenerator:
 
             Returns: list
         """
-        self.penalty_home = {}
-        self.penalty_away = {}
 
         for event in self.live_events:
             # Generate all types of events in our game
@@ -96,9 +94,16 @@ class EventGenerator:
 
 
             if event_type in self.target_events:
+                # Get side of the team
+                if event['team']['triCode'] == self.home:
+                    side = 'home'
+                else:
+                    side = 'away'
+
                 # Build tidy event object
                 tidy_event = TidyEvent(
                     self.game_pk,
+                    side,
                     event['about']['eventIdx'], event_type,
                     event['team']['triCode'],
                     event['about']['period'], event['about']['periodType'], event['about']['periodTime'],
@@ -135,6 +140,21 @@ class EventGenerator:
                     time_since_pp = current_time - self.penalty_home_current[0].time_start
                     tidy_event.set_time_since_pp_started(time_since_pp)
 
+                # get friendly and opposite players on ice
+                if event['team']['triCode'] == self.home:
+                    friendly_players = 5 - len(self.penalty_home_current)
+                    opposite_players = 5 - len(self.penalty_away_current)
+
+                    tidy_event.set_current_friendly_on_ice(friendly_players)
+                    tidy_event.set_current_opposite_on_ice(opposite_players)
+
+                elif event['team']['triCode'] == self.away:
+                    friendly_players = 5 - len(self.penalty_away_current)
+                    opposite_players = 5 - len(self.penalty_home_current)
+
+                    tidy_event.set_current_friendly_on_ice(friendly_players)
+                    tidy_event.set_current_opposite_on_ice(opposite_players)
+
                 # Check if there was a power play goal and, if so, remove the penalty of the other team
                 if event['result']['eventTypeId'] == 'GOAL':
                     if event['team']['triCode'] == self.home and len(self.penalty_away_current) > 0:
@@ -143,6 +163,7 @@ class EventGenerator:
                     elif event['team']['triCode'] == self.away and len(self.penalty_home_current) > 0:
                         # print("PP GOAL AWAY")
                         self.penalty_home_current.pop(0)
+
 
                 # Setup players involved in the event
                 for player in event['players']:
@@ -242,12 +263,13 @@ class TidyEvent:
         Class that generates a dictionnary from selected features in liveData.
     """
 
-    def __init__(self, game_pk, event_index, event_type, team_id, period, period_type, period_time, datetime, previous_event_type,
+    def __init__(self, game_pk, side, event_index, event_type, team_id, period, period_type, period_time, datetime, previous_event_type,
                  previous_event_x_coord, previous_event_y_coord, previous_event_period, previous_event_period_time,
                  coordinate_x=None, coordinate_y=None, goal_strength=None, shot_type=None, player_shooter=None,
                  player_scorer=None, player_goalie=None, empty_net=None, is_goal=None, team_side=None,
                  distance_net=None, angle_net=None) -> None:
         self.game_pk = game_pk
+        self.side = side
         self.event_index = event_index
         self.event_type = event_type
         self.shot_type = shot_type
@@ -274,6 +296,8 @@ class TidyEvent:
         self.previous_event_period_time = previous_event_period_time
         self.time_since_pp_started = 0
         self.current_time_seconds = None
+        self.current_friendly_on_ice = None
+        self.current_opposite_on_ice = None
 
     def set_empty_net(self, empty_net: int) -> None:
         self.empty_net = empty_net
@@ -317,6 +341,12 @@ class TidyEvent:
     def set_current_time_seconds(self, time) -> None:
         self.current_time_seconds = time
 
+    def set_current_friendly_on_ice(self, friendly_on_ice) -> None:
+        self.current_friendly_on_ice = friendly_on_ice
+
+    def set_current_opposite_on_ice(self, opposite_on_ice) -> None:
+        self.current_opposite_on_ice = opposite_on_ice
+
     def to_dict(self) -> Dict:
         """
             Method that generates dictionnary from selected features.
@@ -325,6 +355,7 @@ class TidyEvent:
         """
         return {
             'game_pk': self.game_pk,
+            'side': self.side,
             'event_index': self.event_index,
             'event_type': self.event_type,
             'shot_type': self.shot_type,
@@ -350,5 +381,7 @@ class TidyEvent:
             'previous_event_period': self.previous_event_period,
             'previous_event_period_time': self.previous_event_period_time,
             'time_since_pp_started': self.time_since_pp_started,
-            'current_time_seconds': self.current_time_seconds
+            'current_time_seconds': self.current_time_seconds,
+            'current_friendly_on_ice': self.current_friendly_on_ice,
+            'current_opposite_on_ice': self.current_opposite_on_ice,
         }

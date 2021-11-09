@@ -6,6 +6,7 @@ import os
 
 DEBUG_MODE = False
 
+
 def main():
     '''
     Main function that uses json files from games_data directory and points to EventGenerator class to generate
@@ -48,9 +49,14 @@ def main():
                 temp_df = game.build()
                 dataframe = pd.concat([dataframe, temp_df])
 
+            if DEBUG_MODE:
+                break
 
-    print(len(dataframe))
+
+
+    # print(len(dataframe))
     print(dataframe.iloc[:11,:])
+    # print(dataframe[['team_id', 'side', 'event_type', 'time_since_pp_started', 'current_friendly_on_ice', 'current_opposite_on_ice', 'current_time_seconds']])
     dataframe.to_csv(f'{dirpath_games_data}/games_data_all_seasons.csv')
 
 
