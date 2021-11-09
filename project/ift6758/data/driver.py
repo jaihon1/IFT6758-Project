@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 
+DEBUG_MODE = False
 
 def main():
     '''
@@ -14,6 +15,9 @@ def main():
 
     # Downloa/Load data of each game
     seasons = [2015, 2016, 2017, 2018, 2019, 2020]
+    if DEBUG_MODE:
+        seasons = [2015]
+
     games_info = GamesInfo(seasons)
 
 

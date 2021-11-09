@@ -24,6 +24,59 @@ class EventGenerator:
         self.away = away
         self.sides = sides
 
+        self.penalty_away_current = []
+        self.penalty_home_current = []
+
+
+    def _print(self, current_time):
+        print(self.game_pk, 'home', len(self.penalty_home_current), 'away', len(self.penalty_away_current), 'time', current_time)
+
+    def _convert_to_time(self, period, period_time):
+        time_mins = int(period_time.split(':')[0])
+        time_secs = int(period_time.split(':')[1])
+
+        time = time_mins * 60 + time_secs + (period - 1) * 20 * 60
+
+        return time
+
+    def _fold_penalty(self, event):
+        """
+            Method to fold the new penalty event
+
+            Returns: None
+        """
+        # get current event time
+        period_time = event['about']['periodTime']
+        period = int(event['about']['period'])
+        current_time = self._convert_to_time(period, period_time)
+
+        # self._print(current_time)
+
+        # check if penalty is expired for both teams
+        for i, penalty in enumerate(self.penalty_away_current):
+            if penalty.time_end <= current_time:
+                self.penalty_away_current.pop(i)
+
+        for i, penalty in enumerate(self.penalty_home_current):
+            if penalty.time_end <= current_time:
+                self.penalty_home_current.pop(i)
+
+
+        # add new penalty to current list
+        if event['result']['eventTypeId'] == 'PENALTY':
+            penalty_time_end = current_time + int(event['result']['penaltyMinutes']) * 60
+            penalty = Penalty(event['team']['triCode'], event['result']['penaltySeverity'], event['result']['penaltyMinutes'], current_time, penalty_time_end, event['result']['secondaryType'])
+
+            # skip fighting penalty (not couting because not considered as an odd man advantage)
+            if event['result']['secondaryType'] != 'Fighting':
+                # check if penalty is for home or away and add to current list
+                if event['team']['triCode'] == self.home:
+                    self.penalty_home_current.append(penalty)
+                else:
+                    self.penalty_away_current.append(penalty)
+
+
+
     def build(self) -> pd.DataFrame:
         """
             Method that generates a list of features that will be used to generate the final dataframe.
@@ -33,24 +86,14 @@ class EventGenerator:
         """
         self.penalty_home = {}
         self.penalty_away = {}
+
         for event in self.live_events:
             # Generate all types of events in our game
             event_type = self._fold_event_types(event)
 
-
             # Penalty section, evaluated at each event (INCOMPLETE AF!!)
+            self._fold_penalty(event)
 
-
-            if event_type == 'PENALTY':
-                if event['team']['triCode'] == self.home:
-                    self.penalty_home[event['players'][0]['player']['fullName']] = [event['result']['penaltySeverity'], event['result']['penaltyMinutes'], event['about']['period'], event['about']['periodTime']]
-                if event['team']['triCode'] == self.away:
-                    self.penalty_away[event['players'][0]['player']['fullName']] = [event['result']['penaltySeverity'], event['result']['penaltyMinutes'], event['about']['period'], event['about']['periodTime']]
-            self.home_non_goalie_player_numbers = len([i for i in self.penalty_home.keys()])
-            self.away_non_goalie_player_numbers = len([i for i in self.penalty_away.keys()])
-            
-            # Penalty section to add conditions to remove X player if period, period_time, and penlatyTime are respected
-            # Add smart stuff here... :D
 
             if event_type in self.target_events:
                 # Build tidy event object
@@ -59,7 +102,7 @@ class EventGenerator:
                     event['about']['eventIdx'], event_type,
                     event['team']['triCode'],
                     event['about']['period'], event['about']['periodType'], event['about']['periodTime'],
-                    event['about']['dateTime'], self.prev_event_type, self.prev_event_x_coord, self.prev_event_y_coord, 
+                    event['about']['dateTime'], self.prev_event_type, self.prev_event_x_coord, self.prev_event_y_coord,
                     self.prev_event_period, self.prev_event_period_time
                 )
 
@@ -77,6 +120,30 @@ class EventGenerator:
                 else:
                     tidy_event.set_is_goal(0)
 
+                # Setup time since PP
+                # get current event time
+                period_time = event['about']['periodTime']
+                period = int(event['about']['period'])
+                current_time = self._convert_to_time(period, period_time)
+                tidy_event.set_current_time_seconds(current_time)
+
+                if event['team']['triCode'] == self.home and len(self.penalty_away_current) > 0:
+                    time_since_pp = current_time - self.penalty_away_current[0].time_start
+                    tidy_event.set_time_since_pp_started(time_since_pp)
+
+                elif event['team']['triCode'] == self.away and len(self.penalty_home_current) > 0:
+                    time_since_pp = current_time - self.penalty_home_current[0].time_start
+                    tidy_event.set_time_since_pp_started(time_since_pp)
+
+                # Check if there was a power play goal and, if so, remove the penalty of the other team
+                if event['result']['eventTypeId'] == 'GOAL':
+                    if event['team']['triCode'] == self.home and len(self.penalty_away_current) > 0:
+                        # print("PP GOAL HOME")
+                        self.penalty_away_current.pop(0)
+                    elif event['team']['triCode'] == self.away and len(self.penalty_home_current) > 0:
+                        # print("PP GOAL AWAY")
+                        self.penalty_home_current.pop(0)
+
                 # Setup players involved in the event
                 for player in event['players']:
                     if player['playerType'] == 'Shooter':
@@ -88,6 +155,7 @@ class EventGenerator:
 
                     elif player['playerType'] == 'Goalie':
                         tidy_event.set_player_goalie(player['player']['fullName'])
+
                 # Analyse strength type of GOAL scored
                 if event_type == 'GOAL':
                     tidy_event.set_goal_strength(event['result']['strength']['name'])
@@ -107,6 +175,7 @@ class EventGenerator:
                             coordinate_x = abs(coordinate_x)
                     else:
                         coordinate_x = abs(tidy_event.coordinate_x)
+
                     net_coordinate = (89, 0)
                     distance_x = net_coordinate[0] - coordinate_x
                     distance_y = tidy_event.coordinate_y - net_coordinate[1]
@@ -114,21 +183,20 @@ class EventGenerator:
                     angle = math.degrees(math.atan2(distance_y, distance_x))
                     tidy_event.set_angle_net(angle)
 
-
-
                     # We can add assisting players here in the future
 
                 self.events.append(tidy_event)
                 #Addind event to previous timepoint
+
             self.prev_event_type = event_type
             if 'x' not in event['coordinates'].keys():
                 self.prev_event_x_coord = None
             else : self.prev_event_x_coord = event['coordinates']['x']
             if 'y' not in event['coordinates'].keys():
                 self.prev_event_y_coord = None
-            else : self.prev_event_y_coord = event['coordinates']['y']            
+            else : self.prev_event_y_coord = event['coordinates']['y']
             self.prev_event_period = event['about']['period']
-            self.prev_event_period_time = event['about']['periodTime']        
+            self.prev_event_period_time = event['about']['periodTime']
 
         return self.convert_to_dataframe()
 
@@ -152,6 +220,21 @@ class EventGenerator:
             self.event_types[event['result']['eventTypeId']] = event['result']['description']
 
         return event['result']['eventTypeId']
+
+
+class Penalty:
+    """
+        Class to store penalty information
+    """
+    def __init__(self, team: str, severity: str, minutes: int, time_start: int, time_end: int, secondaryType: str):
+        self.team = team
+        self.severity = severity
+        self.minutes = minutes
+        self.time_start = time_start
+        self.time_end = time_end
+        self.secondaryType = secondaryType
+
+
 
 
 class TidyEvent:
@@ -189,6 +272,8 @@ class TidyEvent:
         self.previous_event_y_coord = previous_event_y_coord
         self.previous_event_period = previous_event_period
         self.previous_event_period_time = previous_event_period_time
+        self.time_since_pp_started = 0
+        self.current_time_seconds = None
 
     def set_empty_net(self, empty_net: int) -> None:
         self.empty_net = empty_net
@@ -226,6 +311,12 @@ class TidyEvent:
     def set_angle_net(self, angle_net) -> None:
         self.angle_net = angle_net
 
+    def set_time_since_pp_started(self, time) -> None:
+        self.time_since_pp_started = time
+
+    def set_current_time_seconds(self, time) -> None:
+        self.current_time_seconds = time
+
     def to_dict(self) -> Dict:
         """
             Method that generates dictionnary from selected features.
@@ -257,5 +348,7 @@ class TidyEvent:
             'previous_event_x_coord': self.previous_event_x_coord,
             'previous_event_y_coord': self.previous_event_y_coord,
             'previous_event_period': self.previous_event_period,
-            'previous_event_period_time': self.previous_event_period_time
+            'previous_event_period_time': self.previous_event_period_time,
+            'time_since_pp_started': self.time_since_pp_started,
+            'current_time_seconds': self.current_time_seconds
         }
