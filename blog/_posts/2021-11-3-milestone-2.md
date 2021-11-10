@@ -36,16 +36,16 @@ Using our work from the previous milestone, we have extended our features by add
     <figcaption style="font-size: 12px;text-align: center;">Figure 4: Goal rate vs distance.</figcaption>
 </figure>
 
-All the figures above give us interesting infromation about shots and goals in the NHL. If we analyze Figure 4, we can observe that when attacking players are very close to the opponent's net, the chance that they score is much higher, which intuitively makes sense.
+All the figures above, give us interesting information about shots and goals in the NHL. If we analyze Figure 4, we can observe that when attacking players are very close to the opponent's net, the chance that they score is much higher, which intuitively makes sense.
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
     <img src="/public/goal_rate_vs_angle.png" alt="goal_rate_vs_angle">
     <figcaption style="font-size: 12px;text-align: center;">Figure 5: Goal rate vs angle.</figcaption>
 </figure>
 
-From Figure 5 above, we can see that the goal rate is much higher when the shot is coming from the left and right side compared when the shot comes from the the center of the ice. This makes sense  as goalies are much more vulnerable when shots come from the top of the circles (both left and right side).
+From Figure 5 above, we can see that the goal rate is much higher when the shot is coming from the left and right side compared when the shot comes from the center of the ice. This makes sense  as goalies are much more vulnerable when shots come from the top of the circles (both left and right sides).
 
-Another interesting thing about Figure 5 is when we compare the goal rate from the left side to the right side. One reason why the goal rate is higher on the right side could be because the majority of NHL goalies have their glove on their left hand (maybe it's easier to stop shots with the glove in contrast to the blocker hand). Another reason might simply be because players shooting from the right side are much better than the ones shooting from the left side and, therefore, have a higher goal rate.
+Another interesting thing about Figure 5 is when we compare the goal rate from the left side to the right side. One reason why the goal rate is higher on the right side could be because the majority of NHL goalies have their glove on their left hand (maybe it's easier to stop shots with the glove in contrast to the blocker hand). Another reason might simply be because players shooting from the right side are much better than the ones shooting from the left side, and therefore have a higher goal rate.
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
     <img src="/public/histogram_goals.png" alt="Goals (empty net and non-empty net) vs distance">
@@ -53,3 +53,5 @@ Another interesting thing about Figure 5 is when we compare the goal rate from t
 </figure>
 
 Looking at the data from Figure 6, we can observe many interesting facts. Firstly, the vast majority of goals are on non-empty net which is logical since goalies are in the net most of the time. Secondly, we can observe that most of the goals are being scored within 60 feet from the net, which is inside the opponents' half of the rink. These two observations are aligned with our domain knowledge, and it makes perfect sense that the further you are from the opponents' net, the harder it is to score when there is a goalie in front of the net. With that said, the goals that were made from a distance of 150 feet when there was a goalie sound a bit unlikely.
+
+We can observe in Figure 6 that the goals scored on a non-empty net from a distance of 150-170 feet are quite high. It could be that it has been originally misclassified as "non-empty goals" as opposed to be "empty-net goals". Another reason could be that these goals were scored by the other team that was then misclassified.
