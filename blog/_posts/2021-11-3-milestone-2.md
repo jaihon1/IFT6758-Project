@@ -5,7 +5,7 @@ title: IFT6758 Milestone 2
 
 ## Question 2
 
-Using our work from the previous milestone, we have extended our features by adding the following ones:
+Using our work from the previous milestone, we have extended our features by adding the following ones presented in the table below:
 
 | Feature      | Description |
 | ----------- | ----------- |
@@ -31,10 +31,16 @@ Using our work from the previous milestone, we have extended our features by add
     <figcaption style="font-size: 12px;text-align: center;">Figure 3: Goal rate vs distance.</figcaption>
 </figure>
 
+All the figures above give us interesting infromation about shots and goals in the NHL. If we analyze Figure 3, we can observe that when attacking players are very close to the opponent's net, the chance that they score is much higher, which intuitively makes sense.
+
 <figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
     <img src="/public/goal_rate_vs_angle.png" alt="goal_rate_vs_angle">
     <figcaption style="font-size: 12px;text-align: center;">Figure 4: Goal rate vs angle.</figcaption>
 </figure>
+
+From Figure 4 above, we can see that the goal rate is much higher when the shot is coming from the left and right side compared when the shot comes from the the center of the ice. This makes sense  as goalies are much more vulnerable when shots come from the top of the circles (both left and right side).
+
+Another interesting thing about Figure 4 is when we compare the goal rate from the left side to the right side. One reason why the goal rate is higher on the right side could be because the majority of NHL goalies have their glove on their left hand (maybe it's easier to stop shots with the glove in contrast to the blocker hand). Another reason might simply be because players shooting from the right side are much better than the ones shooting from the left side and, therefore, have a higher goal rate.
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
     <img src="/public/histogram_goals.png" alt="Goals (empty net and non-empty net) vs distance">
