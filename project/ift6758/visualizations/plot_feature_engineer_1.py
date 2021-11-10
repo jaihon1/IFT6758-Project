@@ -33,6 +33,7 @@ plt.show()
 #%%
 # joint plot of distance vs angle
 joint_distance_angle = sns.jointplot(data=data, x='distance_net', y='angle_net')
+plt.tight_layout()
 plt.show()
 
 # %%
