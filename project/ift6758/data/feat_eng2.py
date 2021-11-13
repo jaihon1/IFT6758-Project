@@ -4,7 +4,7 @@ import datetime as dt
 from datetime import timedelta
 import numpy as np
 from pathlib import Path
-csv_path = os.path.join(os.path.dirname(__file__),'games_data/games_data_all_seasons.csv')
+csv_path = os.path.join(os.path.dirname(__file__),'C:\Users\samib\Desktop\ProjectIFT6758\IFT6758-Project\project\ift6758\data\games_data_all_seasons.csv')
 df = pd.read_csv(csv_path)
 df_filtered = df.loc[:, ['game_pk','period', 'period_type', 'period_time','event_type', 'shot_type', 'coordinate_x', 'coordinate_y', 'distance_net', 'angle_net', 'empty_net', 'previous_event_type', 'previous_event_x_coord', 'previous_event_y_coord', 'previous_event_period', 'previous_event_period_time']]
 df_filtered['game_seconds'] = [dt.datetime.strptime(i, '%M:%S').second + dt.datetime.strptime(i, '%M:%S').minute*60 for i in df_filtered['period_time']]
