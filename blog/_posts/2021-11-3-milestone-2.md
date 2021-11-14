@@ -42,3 +42,26 @@ Using our work from the previous milestone, we have extended our features by add
 </figure>
 
 Looking at the data from Figure 5, we can observe many interesting facts. Firstly, the vast majority of goals are on non-empty net which is logical since goalies are in the net most of the time. Secondly, we can observe that most of the goals are being scored within 60 feet from the net, which is inside the opponents' half of the rink. These two observations are aligned with our domain knowledge, and it makes perfect sense that the further you are from the opponents' net, the harder it is to score when there is a goalie in front of the net. With that said, the goals that were made from a distance of 150 feet when there was a goalie sound a bit unlikely.
+
+Question 4
+list of all of the features that you created for this section. List each feature by both the column name in your dataframe AND a simple human-readable explanation
+Game seconds:
+Game period:
+Coordinates:
+Shot distance:
+Shot angle:
+Shot type:
+Empty net:
+Last event type:
+Coordinates of the last event (x, y, separate columns):
+Time from the last event:
+Distance from the last event:
+Rebound (bool):
+Change in shot angle:
+Speed:
+Time since the power-play started (seconds):
+Number of friendly non-goalie skaters on the ice:
+Number of opposing non-goalie skaters on the ice
+
+
+
