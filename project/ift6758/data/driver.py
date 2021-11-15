@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 
-DEBUG_MODE = False
+DEBUG_MODE = True
 
 
 def main():
@@ -49,8 +49,8 @@ def main():
                 temp_df = game.build()
                 dataframe = pd.concat([dataframe, temp_df])
 
-            if DEBUG_MODE:
-                break
+        if DEBUG_MODE:
+            break
 
 
 
