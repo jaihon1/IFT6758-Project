@@ -1,3 +1,4 @@
+#%%
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
@@ -5,7 +6,7 @@ import numpy as np
 
 #%%
 
-data = pd.read_csv('./project/ift6758/data/games_data/games_data_all_seasons.csv')
+data = pd.read_csv('../../../project/ift6758/data/games_data/games_data_all_seasons.csv')
 
 #%%
 # plot histogram of goal or no goal according to distance from net
@@ -32,6 +33,7 @@ plt.show()
 #%%
 # joint plot of distance vs angle
 joint_distance_angle = sns.jointplot(data=data, x='distance_net', y='angle_net')
+plt.tight_layout()
 plt.show()
 
 # %%
@@ -80,4 +82,8 @@ hist_distance_goals = sns.histplot(data=data_goals, x='distance_net', hue='empty
 plt.xlabel('Distance from net (feet)')
 plt.ylabel('Number of goals')
 plt.legend(labels=['non-empty net', 'empty net'])
+plt.tight_layout()
+plt.grid()
 plt.show()
+
+# %%
