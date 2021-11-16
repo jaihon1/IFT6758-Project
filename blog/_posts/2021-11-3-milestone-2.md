@@ -43,7 +43,7 @@ All the figures above, give us interesting information about shots and goals in 
     <figcaption style="font-size: 12px;text-align: center;">Figure 5: Goal rate vs angle.</figcaption>
 </figure>
 
-From Figure 5 above, we can see that the goal rate is much higher when the shot is coming from the left and right side compared when the shot comes from the center of the ice. This makes sense  as goalies are much more vulnerable when shots come from the top of the circles (both left and right sides).
+From Figure 5 above, we can see that the goal rate is much higher when the shot is coming from the left and right side compared to when the shot comes from the center of the ice. This makes sense as goalies are much more vulnerable when shots come from the top of the circles (both left and right sides).
 
 Another interesting thing about Figure 5 is when we compare the goal rate from the left side to the right side. One reason why the goal rate is higher on the right side could be because the majority of NHL goalies have their glove on their left hand (maybe it's easier to stop shots with the glove in contrast to the blocker hand). Another reason might simply be because players shooting from the right side are much better than the ones shooting from the left side, and therefore have a higher goal rate.
 
