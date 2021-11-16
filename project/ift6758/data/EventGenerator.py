@@ -34,11 +34,8 @@ class EventGenerator:
     def _convert_to_time(self, period, period_time):
         time_mins = int(period_time.split(':')[0])
         time_secs = int(period_time.split(':')[1])
-        
-        if period <=3:
-            time = time_mins * 60 + time_secs + (period-1) *20 *60
-        else:
-            time = time_mins * 60 + time_secs + (period - 1) *5 * 60
+
+        time = time_mins * 60 + time_secs + (period-1) *20 *60
 
         return time
 
@@ -69,8 +66,9 @@ class EventGenerator:
         if event['result']['eventTypeId'] == 'PENALTY':
             penalty_time_end = current_time + int(event['result']['penaltyMinutes']) * 60
             penalty = Penalty(event['team']['triCode'], event['result']['penaltySeverity'], event['result']['penaltyMinutes'], current_time, penalty_time_end, event['result']['secondaryType'])
-            # skip fighting penalty (not couting because not considered as an odd man advantage)
-            if event['result']['secondaryType'] != 'Fighting':
+
+            # skip fighting penalty (not couting because not considered as an odd man advantage) also skip Game misconduct
+            if not(event['result']['secondaryType'] == 'Fighting' or event['result']['secondaryType'] == 'Game misconduct'):
                 # check if penalty is for home or away and add to current list
                 if event['team']['triCode'] == self.home:
                     self.penalty_home_current.append(penalty)
@@ -134,12 +132,11 @@ class EventGenerator:
                 current_time = self._convert_to_time(period, period_time)
                 tidy_event.set_current_time_seconds(current_time)
 
-                # [J.P] Ici aussi du coup il faut ajouter la verification par rapport au len des deux teams, pas juste si away > 0 ?
-                if event['team']['triCode'] == self.home and len(self.penalty_away_current) > 0:
+                if event['team']['triCode'] == self.home and (len(self.penalty_home_current) < len(self.penalty_away_current)):
                     time_since_pp = current_time - self.penalty_away_current[0].time_start
                     tidy_event.set_time_since_pp_started(time_since_pp)
 
-                elif event['team']['triCode'] == self.away and len(self.penalty_home_current) > 0:
+                elif event['team']['triCode'] == self.away and (len(self.penalty_away_current) < len(self.penalty_home_current)):
                     time_since_pp = current_time - self.penalty_home_current[0].time_start
                     tidy_event.set_time_since_pp_started(time_since_pp)
 
@@ -160,23 +157,27 @@ class EventGenerator:
 
                 # Check if there was a power play goal and, if so, remove the penalty of the other team
                 if event['result']['eventTypeId'] == 'GOAL':
-                    # [J.P]: I think we have to add a condition to compare len of both penalty_away and home_current to check if it is really a powerplay
-                    if event['team']['triCode'] == self.home and len(self.penalty_away_current) > 0 :
-                        #print("PP GOAL HOME")
-                        # [J.P] : Added this section to illustrate that sometimes powerplay is not set correctly
-                        if len(self.penalty_home_current) > len(self.penalty_away_current):
-                            print('Problem: There are more players on the bench at home compared to away --> NOT POWERPLAY!')
-                            print(len(self.penalty_home_current), len(self.penalty_away_current))
-                        # [J.P]: Added this section to illustrate that most of the time when a goal is scored, it is a non-minor penalty that is removed (Same goes for lines 172-177)
-                        if self.penalty_away_current[0].severity != "Minor":
-                            print(f'Removing a NON-MINOR penalty: {self.penalty_away_current[0].severity}')
-                        self.penalty_away_current.pop(0)
-                    elif event['team']['triCode'] == self.away and len(self.penalty_home_current) > 0:
-                        #print("PP GOAL AWAY")
-                        if len(self.penalty_away_current) > len(self.penalty_home_current):
-                            print('Problem: There are more players on the bench at AWAY compared to HOME --> NOT POWERPLAY!')
-                            print(len(self.penalty_away_current), len(self.penalty_home_current))                        
-                        self.penalty_home_current.pop(0)
+                    if event['team']['triCode'] == self.home and (len(self.penalty_home_current) < len(self.penalty_away_current)):
+                        # if len(self.penalty_home_current) > len(self.penalty_away_current):
+                        #     print('Problem: There are more players on the bench at home compared to away --> NOT POWERPLAY!')
+                        #     print(len(self.penalty_home_current), len(self.penalty_away_current))
+
+                        # remove penalty from away team
+                        for i, penalty in enumerate(self.penalty_away_current):
+                            if penalty.severity == 'Minor':
+                                self.penalty_away_current.pop(i)
+                                break
+
+                    elif event['team']['triCode'] == self.away and (len(self.penalty_away_current) < len(self.penalty_home_current)):
+                        # if len(self.penalty_away_current) > len(self.penalty_home_current):
+                        #     print('Problem: There are more players on the bench at AWAY compared to HOME --> NOT POWERPLAY!')
+                        #     print(len(self.penalty_away_current), len(self.penalty_home_current))
+
+                        # Find a minor penalty and remove it
+                        for i, penalty in enumerate(self.penalty_home_current):
+                            if penalty.severity == 'Minor':
+                                self.penalty_home_current.pop(i)
+                                break
 
 
                 # Setup players involved in the event
@@ -269,9 +270,9 @@ class Penalty:
         self.time_end = time_end
         self.secondaryType = secondaryType
 
-    def __repr__(self) -> str:
-        
-        return f'{self.team}, {self.severity}, {self.minutes}, {self.time_start}, {self.time_end}, {self.secondaryType}'
+    # def __repr__(self) -> str:
+    #     return f'{self.team}, {self.severity}, {self.minutes}, {self.time_start}, {self.time_end}, {self.secondaryType}'
+
 
 class TidyEvent:
     """
