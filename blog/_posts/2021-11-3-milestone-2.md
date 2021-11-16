@@ -36,7 +36,7 @@ Using our work from the previous milestone, we have extended our features by add
     <figcaption style="font-size: 12px;text-align: center;">Figure 4: Goal rate vs distance.</figcaption>
 </figure>
 
-All the figures above, give us interesting information about shots and goals in the NHL. If we analyze Figure 4, we can observe that when attacking players are very close to the opponent's net, the chance that they score is much higher, which intuitively makes sense.
+All the figures above give us interesting information about shots and goals in the NHL. For example, figure 1 shows us that both goals and no goals happened more often closer to the net and that goals are much less frequent than goal. Figure 3 tells us that shots that are done farther from the net, generally are more aligned with it (smaller angle). Finally, if we analyze Figure 4, we can observe that when attacking players are very close to the opponent's net, the chance that they score is much higher which intuitively makes sense.
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
     <img src="/public/goal_rate_vs_angle.png" alt="goal_rate_vs_angle">
