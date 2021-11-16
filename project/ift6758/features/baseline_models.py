@@ -58,25 +58,19 @@ plt.show()
 
 #%%
 # Compute percentile
-percentile = np.linspace(0, 99, 100)
-percentile_pred = np.percentile(pred_proba[:, 0], percentile)
+percentile = np.arange(0, 100, 2)
+percentile_pred = np.percentile(pred_proba[:, 1], percentile)
 
-total_goal = y_valid.sum()
+y_valid_df = pd.DataFrame(y_valid)
 
-goal_rate = []
-cumulative_goal = []
-for p in percentile_pred:
-    proba_above_perc = y_valid[pred_proba[:, 0] <= p]
-    goal_rate.append(proba_above_perc.sum()/(len(proba_above_perc)))
-    cumulative_goal.append(proba_above_perc.sum()/total_goal)
+y_valid_df['bins_percentile'] = pd.cut(pred_proba[:, 1], percentile_pred)
+goal_rate_by_percentile = y_valid_df.groupby(by=['bins_percentile']).apply(lambda g: g['is_goal'].sum()/len(g))
 
-# plt.plot(percentile[::-1], goal_rate[::-1])
-# plt.xlim(100, 0)
-# plt.ylim(0,1)
-# plt.show()
-
-
-plt.plot(percentile, cumulative_goal[::-1])
+sns.set_theme()
+sns.lineplot(x=percentile[:-1], y=goal_rate_by_percentile*100)
+#plt.grid(True)
 plt.xlim(100, 0)
-# plt.ylim(0,1)
+plt.ylim(0, 100)
+plt.xlabel('Shot probability model percentile')
+plt.ylabel('Goals / (Shots + Goals)')
 plt.show()
