@@ -55,3 +55,16 @@ Another interesting thing about Figure 5 is when we compare the goal rate from t
 Looking at the data from Figure 6, we can observe many interesting facts. Firstly, the vast majority of goals are on non-empty net which is logical since goalies are in the net most of the time. Secondly, we can observe that most of the goals are being scored within 60 feet from the net, which is inside the opponents' half of the rink. These two observations are aligned with our domain knowledge, and it makes perfect sense that the further you are from the opponents' net, the harder it is to score when there is a goalie in front of the net. With that said, the goals that were made from a distance of 150 feet when there was a goalie sound a bit unlikely.
 
 We can observe in Figure 6 that the goals scored on a non-empty net from a distance of 150-170 feet are quite high. It could be that it has been originally misclassified as "non-empty net goals" as opposed to "empty-net goals". Another reason could be that these goals were scored by the other team that was then misclassified.
+
+
+### Question 3
+
+Trained a Logistric Regression using only the *distance* feature got us the following results:
+
+| Dataset      | Accuracy (%) |
+| ----------- | ----------- |
+| Train | X% |
+| Validation | X% |
+| Test | X% |
+
+
