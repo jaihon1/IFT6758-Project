@@ -44,24 +44,24 @@ Using our work from the previous milestone, we have extended our features by add
 Looking at the data from Figure 5, we can observe many interesting facts. Firstly, the vast majority of goals are on non-empty net which is logical since goalies are in the net most of the time. Secondly, we can observe that most of the goals are being scored within 60 feet from the net, which is inside the opponents' half of the rink. These two observations are aligned with our domain knowledge, and it makes perfect sense that the further you are from the opponents' net, the harder it is to score when there is a goalie in front of the net. With that said, the goals that were made from a distance of 150 feet when there was a goalie sound a bit unlikely.
 
 Question 4
-list of all of the features that you created for this section. List each feature by both the column name in your dataframe AND a simple human-readable explanation
-Game seconds:
-Game period:
-Coordinates:
-Shot distance:
-Shot angle:
-Shot type:
+
+Game seconds: total sum of seconds elapsed in the game
+Game period: date of the game
+Coordinates: coordinates(x, y) of the shot
+Shot distance:  distance from the shot to the net
+Shot angle: angle from between the shot and the net
+Shot type: type of Shot (Wrist, Slap, Backhand, etc...)
 Empty net:
 Last event type:
-Coordinates of the last event (x, y, separate columns):
-Time from the last event:
-Distance from the last event:
-Rebound (bool):
-Change in shot angle:
-Speed:
-Time since the power-play started (seconds):
-Number of friendly non-goalie skaters on the ice:
-Number of opposing non-goalie skaters on the ice
+Coordinates of the last event: coordinates(x, y) of the last event
+Time from the last event: time elapsed from the last event
+Distance from the last event: distance calculated from the last event
+Rebound (bool): True if the last event was also a shot, otherwise False
+Change in shot angle: only include if the shot is a rebound, otherwise 0
+Speed: defined as the distance from the previous event, divided by the time since the previous event.
+Time since the power-play started (seconds): time since the penalty started
+Number of friendly non-goalie skaters on the ice: Number of the team skaters on the ice
+Number of opposing non-goalie skaters on the ice: Number of the opposing skaters on the ice
 
 
 
