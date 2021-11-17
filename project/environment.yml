@@ -1,12 +1,14 @@
 name: ift6758-conda-env
 channels:
   - conda-forge
+  - comet_ml
 dependencies:
   - python>=3.6
   - numpy
   - pandas
   - matplotlib
   - seaborn
+  - scikit-learn
   - requests
   - opencv
   - tqdm
@@ -17,3 +19,4 @@ dependencies:
   - ipywidgets
   - jupyterlab>=3.0.0
   - ipdb
+  - comet_ml
