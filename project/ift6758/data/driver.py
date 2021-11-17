@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 
 def main():
@@ -31,12 +31,14 @@ def main():
     for season in games_info.all_games:
         print(f'Creating  dataframe for {season} season...')
 
-        for data in games_info.all_games[season]:
+        for i, data in enumerate(games_info.all_games[season]):
             live_events = data['liveData']['plays']['allPlays']
             game_pk = data['gamePk']
             home = data['gameData']['teams']['home']['triCode']
             away = data['gameData']['teams']['away']['triCode']
             sides = dict()
+
+            # print(i, home, away)
 
             for period in data['liveData']['linescore']['periods']:
                 sides[period['num']] = {home: period['home'].setdefault('rinkSide', np.NaN), away: period['away'].setdefault('rinkSide', np.NaN)}
@@ -55,8 +57,9 @@ def main():
 
 
     # print(len(dataframe))
-    print(dataframe.iloc[:11,:])
-    # print(dataframe[['team_id', 'side', 'event_type', 'time_since_pp_started', 'current_friendly_on_ice', 'current_opposite_on_ice', 'current_time_seconds']])
+    # print(dataframe.iloc[:11,:])
+    print(dataframe[['team_id', 'side', 'event_type', 'time_since_pp_started', 'current_friendly_on_ice', 'current_opposite_on_ice', 'current_time_seconds']])
+    # print(dataframe[['team_id', 'side', 'event_type', 'datetime']])
     dataframe.to_csv(f'{dirpath_games_data}/games_data_all_seasons.csv')
 
 
