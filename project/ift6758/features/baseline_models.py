@@ -6,6 +6,7 @@ from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
 from sklearn.dummy import DummyClassifier
 import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.ticker as mtick
 
 
 data = pd.read_csv('project/ift6758/data/games_data/games_data_all_seasons.csv')
@@ -46,6 +47,7 @@ pred_random_model = random_model.predict_proba(x_valid)
 def plot_roc_curve(pred_prob, true_y, marker, label):
     score = roc_auc_score(true_y, pred_prob)
     fpr, tpr, _ = roc_curve(true_y, pred_prob)
+    plt.grid(True)
     plt.plot(fpr, tpr, linestyle=marker, label=label+f' (area={score:.2f})')
 
 
@@ -67,10 +69,27 @@ y_valid_df['bins_percentile'] = pd.cut(pred_proba[:, 1], percentile_pred)
 goal_rate_by_percentile = y_valid_df.groupby(by=['bins_percentile']).apply(lambda g: g['is_goal'].sum()/len(g))
 
 sns.set_theme()
-sns.lineplot(x=percentile[:-1], y=goal_rate_by_percentile*100)
-#plt.grid(True)
+g = sns.lineplot(x=percentile[:-1], y=goal_rate_by_percentile*100)
+ax = g.axes
+ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
 plt.xlim(100, 0)
 plt.ylim(0, 100)
 plt.xlabel('Shot probability model percentile')
 plt.ylabel('Goals / (Shots + Goals)')
+plt.show()
+
+#%%
+# plot cumulative proportion of goals as function of shot probability model percentile
+total_number_goal = (y_valid_df['is_goal'] == 1).sum()
+sum_goals_by_percentile = y_valid_df.groupby(by='bins_percentile').apply(lambda g: g['is_goal'].sum()/total_number_goal)
+cum_sum_goals = sum_goals_by_percentile[::-1].cumsum(axis=0)[::-1]
+
+sns.set_theme()
+g = sns.lineplot(x=percentile[1:], y=cum_sum_goals*100)
+ax = g.axes
+ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
+plt.xlim(100, 0)
+plt.ylim(0, 100)
+plt.xlabel('Shot probability model percentile')
+plt.ylabel('Proportion')
 plt.show()
