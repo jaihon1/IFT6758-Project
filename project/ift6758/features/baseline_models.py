@@ -15,7 +15,7 @@ from comet_ml import Experiment
 
 #%%
 
-data = pd.read_csv('../../../project/ift6758/data/games_data/games_data_all_seasons.csv')
+data = pd.read_csv('project/ift6758/data/games_data/games_data_all_seasons.csv')
 
 data = data[~(data['distance_net'].isna())]
 
