@@ -1,16 +1,17 @@
 #%%
 import os
+import joblib
 
 import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
+from comet_ml import Experiment
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
-from sklearn.dummy import DummyClassifier
-from comet_ml import Experiment
+from sklearn.calibration import CalibrationDisplay
 
 
 #%%
@@ -25,22 +26,35 @@ train, test = data[~data['game_pk'].str.startswith('2019')], data[data['game_pk'
 #%%
 x_train, x_valid, y_train, y_valid = train_test_split(train.drop(columns=['is_goal']), train['is_goal'], test_size=0.2, stratify=train['is_goal'])
 
-def train_logistic(X, y, features):
+
+def train_logistic(X, y, features, comet=False):
+    if comet:
+        # Create experiment for comet
+        experiment = Experiment(
+            api_key=os.environ.get("COMET_API_KEY"),
+            project_name="ift6758-project",
+            workspace="jaihon",
+        )
+        experiment.log_parameters({'model': 'regression', 'feature': features})
     X = X[features]
     X = X[features].abs()
 
-    clf = LogisticRegression()
+    clf = LogisticRegression(random_state=42)
     clf.fit(X, y)
+
+    if comet:
+        model_name = 'regression_'+'_'.join(features)
+        joblib.dump(clf, model_name+'.joblib')
+        experiment.log_model(model_name, model_name+'.joblib')
 
     return clf
 
-x_train = x_train.array.reshape(-1, 1)
-x_valid = x_valid.array.reshape(-1, 1)
 
 #%%
-clf_distance = train_logistic(x_train, y_train, ['distance_net'])
-clf_angle = train_logistic(x_train, y_train, ['angle_net'])
-clf_both = train_logistic(x_train, y_train, ['distance_net', 'angle_net'])
+comet = False
+clf_distance = train_logistic(x_train, y_train, ['distance_net'], comet)
+clf_angle = train_logistic(x_train, y_train, ['angle_net'], comet)
+clf_both = train_logistic(x_train, y_train, ['distance_net', 'angle_net'], comet)
 
 #%%
 pred_proba_distance = clf_distance.predict_proba(x_valid[['distance_net']])
@@ -59,8 +73,6 @@ class0 = (len(y_valid) - class1)/len(y_valid)
 #%%
 # ROC curve
 
-#random_model = DummyClassifier(strategy='uniform')
-#random_model.fit(x_train, y_train)
 np.random.seed(42)
 pred_random_model = np.random.uniform(size=len(y_valid))
 
@@ -139,4 +151,15 @@ plt.xlabel('Shot probability model percentile')
 plt.ylabel('Proportion')
 plt.show()
 
-
+ #%%
+# calibration curve
+sns.set_theme()
+fig = plt.figure()
+ax = plt.axes()
+disp_random = CalibrationDisplay.from_predictions(y_valid, pred_random_model, n_bins=25, ax=ax, name='Random classifier', ref_line=False)
+disp_distance = CalibrationDisplay.from_predictions(y_valid, pred_proba_distance[:,1], n_bins=25, ax=ax, name='Regression distance', ref_line=False)
+disp_both = CalibrationDisplay.from_predictions(y_valid, pred_proba_both[:,1], n_bins=25, ax=ax, name='Regression both distance and angle', ref_line=False)
+disp_angle = CalibrationDisplay.from_predictions(y_valid, pred_proba_angle[:, 1], n_bins=25, ax=ax, name='Regression angle', ref_line=False)
+plt.xlim(0,0.3)
+plt.legend(loc=9)
+plt.show()
