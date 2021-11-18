@@ -3,7 +3,7 @@ layout: post
 title: IFT6758 Milestone 2
 ---
 
-## Question 2
+### Question 2
 
 Using our work from the previous milestone, we have extended our features by adding the following ones presented in the table below:
 
@@ -59,6 +59,7 @@ We can observe in Figure 6 that the goals scored on a non-empty net from a dista
 
 ### Question 3
 
+#### Results
 For our baseline, we trained a Logistric Regression model using only the *distance* feature that we have previously extracted from the raw data, and it gave us a **90.59%** accuracy when we ran it on our validation dataset. We also generated the following confusion matrix to have a better look at our model's results:
 
 | Target/Prediction | **Class 0 (not goal)** | **Class 1 (goal)** |
@@ -69,7 +70,8 @@ For our baseline, we trained a Logistric Regression model using only the *distan
 This confusion matrix clearly shows us that there is a major issue with our predictions. We are only getting high accuracy performance because the majority of our data points are classified as a *not goal*. By always predicting *not goal* our model does a pretty good job if we only look at the overall accuracy.
 
 
-From Figure 7 below, the main thing we can observe is that shots that have a higher propability represents a much greater proportion of the total goals scored compared to shots with lower probabilities. Another important aspect is how this proportion metric is different for our different models. Even though the model trained on distance and the model trained on angle are better than the random baseline model, the model that we trained by combining both features (distance and angle) gave us better results. Meaning it is much better at predicting the probability that a shot would turn to be a goal.
+#### Analysis
+From Figure 7 below, the main thing we can observe is that shots that have a higher probability represents a much greater proportion of the total goals scored compared to shots with lower probabilities. Another important aspect is how this proportion metric is different for our different models. Even though the model trained on the distance feature and the model trained on the angle feature are better than the random baseline, the model that we trained on both features (distance and angle) gave us better results. Meaning it is much better at predicting the probability that a shot would turn to be a goal.
 
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
@@ -77,16 +79,31 @@ From Figure 7 below, the main thing we can observe is that shots that have a hig
     <figcaption style="font-size: 12px;text-align: center;">Figure 7: Logistic Regression: Goal proportion.</figcaption>
 </figure>
 
-The results shown in Figure 8 is also about shot probabilities. It shows us that our trained models perform much better that the random classifier at predicting the shot probability. As in our previous analysis, our model that was trained on both features (distance and angle) does gives us better results that models trained on the features separately.
+The results shown in Figure 8 is also about shot probabilities. It shows us that our trained models perform much better that the random classifier at predicting the shot probability. As in our previous analysis, our model that was trained on both features (distance and angle) does give us better results that models trained on the features separately.
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
     <img src="/public/goal_rate_curve_baseline.png" alt="goal_rate_curve_baseline">
     <figcaption style="font-size: 12px;text-align: center;">Figure 8: Logistic Regression: Goal rate.</figcaption>
 </figure>
 
-In order to have a deeper anlaysis our of our binary classifers, using our results we generated a receiver operating characteristic curve (ROC). As we can see in Figure 9 above, the random classifier gives a a diagonal as expected. We can also observe that our model trained on both of our features gives the better curve compared to our models that were trained separately on the features. Our ROC score is also much higher (*area=0.68*) when we trained our model on both features.
+In order to have a deeper analysis of the behavior of our binary classifiers, using our results we generated a receiver operating characteristic curve (ROC). As we can see in Figure 9 above, the random classifier gives a perfect diagonal as expected. We can also observe that our model trained on both of our features gives the better curve compared to our models that were trained separately on the features. Our ROC score is also much higher (*area=0.68*) when we trained our model on both features.
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
     <img src="/public/roc_curve_baseline.png" alt="roc_curve_baseline">
     <figcaption style="font-size: 12px;text-align: center;">Figure 9: Logistic Regression: ROC rate.</figcaption>
 </figure>
+
+Given the calibration curve shown in Figure 10, we can easily see that our trained models did learn some valuable representations of our data. Comparing all our current models, the model that was trained on both features (distance and angle) has the closest calibration values to the *perfectly* calibrated model. Again, as mentioned before, it confirms that overall this model is the model that gives us the best results so far.
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/calibration_curve_baseline.png" alt="calibration_curve_baseline">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 10: Logistic Regression: Calibration cruve.</figcaption>
+</figure>
+
+
+#### Links to our models
+
+1. [Logistic Regression on distance and angle](https://www.comet.ml/jaihon/ift6758-project/1b1de38b80df44ec8c09922378dfc68f)
+2. [Logistic Regression on distance](https://www.comet.ml/jaihon/ift6758-project/eb73704e51df424e93d719790cbb9f86?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+3. [Logistic Regression on angle](https://www.comet.ml/jaihon/ift6758-project/3687694f67cc43d8a0e1bc93fce2953a?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+
