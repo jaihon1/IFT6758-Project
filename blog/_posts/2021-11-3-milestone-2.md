@@ -69,15 +69,6 @@ Coordinates: coordinates(x, y) of the shot
 Shot distance:  distance from the shot to the net
 Shot angle: angle from between the shot and the net
 Shot type: type of Shot (Wrist, Slap, Backhand, etc...)
-=======
-list of all of the features that you created for this section. List each feature by both the column name in your dataframe AND a simple human-readable explanation
-Game seconds:
-Game period:
-Coordinates:
-Shot distance:
-Shot angle:
-Shot type:
->>>>>>> 30c5622edb4f0a26a7bc10f6cf6d97eee4a99fd3
 Empty net:
 Last event type:
 Coordinates of the last event: coordinates(x, y) of the last event
