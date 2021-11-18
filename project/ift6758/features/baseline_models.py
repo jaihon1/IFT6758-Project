@@ -27,9 +27,8 @@ x_train, x_valid, y_train, y_valid = train_test_split(train.drop(columns=['is_go
 
 def train_logistic(X, y, features):
     X = X[features]
+    X = X[features].abs()
 
-    if features == ['angle_net']:
-        X = X[features].abs()
     clf = LogisticRegression()
     clf.fit(X, y)
 
@@ -45,8 +44,8 @@ clf_both = train_logistic(x_train, y_train, ['distance_net', 'angle_net'])
 
 #%%
 pred_proba_distance = clf_distance.predict_proba(x_valid[['distance_net']])
-pred_proba_angle = clf_angle.predict_proba(x_valid[['angle_net']])
-pred_proba_both = clf_both.predict_proba(x_valid[['distance_net', 'angle_net']])
+pred_proba_angle = clf_angle.predict_proba(x_valid[['angle_net']].abs())
+pred_proba_both = clf_both.predict_proba(x_valid[['distance_net', 'angle_net']].abs())
 
 #%%
 # Evaluate default logistic regression
@@ -69,6 +68,7 @@ pred_random_model = np.random.uniform(size=len(y_valid))
 def plot_roc_curve(pred_prob, true_y, marker, label):
     score = roc_auc_score(true_y, pred_prob)
     fpr, tpr, _ = roc_curve(true_y, pred_prob)
+    sns.set_theme()
     plt.grid(True)
     plt.plot(fpr, tpr, linestyle=marker, label=label+f' (area={score:.2f})')
 
@@ -97,6 +97,7 @@ def plot_goal_rate(proba, label):
         percentile = percentile[:-1]
     else:
         percentile = percentile[:-2]
+    sns.set_theme()
     g = sns.lineplot(x=percentile, y=goal_rate_by_percentile*100, label=label)
     ax = g.axes
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
