@@ -16,6 +16,7 @@ def main():
 
     # Downloa/Load data of each game
     seasons = [2015, 2016, 2017, 2018, 2019, 2020]
+
     if DEBUG_MODE:
         seasons = [2015]
 
@@ -37,8 +38,6 @@ def main():
             home = data['gameData']['teams']['home']['triCode']
             away = data['gameData']['teams']['away']['triCode']
             sides = dict()
-
-            # print(i, home, away)
 
             for period in data['liveData']['linescore']['periods']:
                 sides[period['num']] = {home: period['home'].setdefault('rinkSide', np.NaN), away: period['away'].setdefault('rinkSide', np.NaN)}
