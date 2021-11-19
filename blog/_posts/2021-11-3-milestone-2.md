@@ -3,7 +3,7 @@ layout: post
 title: IFT6758 Milestone 2
 ---
 
-## Question 2
+### Question 2
 
 Using our work from the previous milestone, we have extended our features by adding the following ones presented in the table below:
 
@@ -13,7 +13,6 @@ Using our work from the previous milestone, we have extended our features by add
 | angle_net | The shot/goal angle from the net |
 | is_goal | Whether or not the shot was a goal or not |
 | empty_net | Whether or not the shot/goal was at an empty net |
-
 
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
@@ -57,36 +56,84 @@ Looking at the data from Figure 6, we can observe many interesting facts. Firstl
 We can observe in Figure 6 that the goals scored on a non-empty net from a distance of 150-170 feet are quite high. It could be that it has been originally misclassified as "non-empty net goals" as opposed to "empty-net goals". Another reason could be that these goals were scored by the other team that was then misclassified.
 
 
+### Question 3
 
-## Question 4
+#### Results
+For our baseline, we trained a Logistric Regression model using only the *distance* feature that we have previously extracted from the raw data, and it gave us a **90.59%** accuracy when we ran it on our validation dataset. We also generated the following confusion matrix to have a better look at our model's results:
 
-<<<<<<< HEAD
-Question 4
+| Target/Prediction | **Class 0 (not goal)** | **Class 1 (goal)** |
+| :-------: | :-------: | :-------: |
+| **Class 0 (not goal)** | 70748 | 0 |
+| **Class 1 (goal)** | 7344 | 0 |
 
-Game seconds: total sum of seconds elapsed in the game
-Game period: date of the game
-Coordinates: coordinates(x, y) of the shot
-Shot distance:  distance from the shot to the net
-Shot angle: angle from between the shot and the net
-Shot type: type of Shot (Wrist, Slap, Backhand, etc...)
-=======
-list of all of the features that you created for this section. List each feature by both the column name in your dataframe AND a simple human-readable explanation
-Game seconds:
-Game period:
-Coordinates:
-Shot distance:
-Shot angle:
-Shot type:
->>>>>>> 30c5622edb4f0a26a7bc10f6cf6d97eee4a99fd3
-Empty net:
-Last event type:
-Coordinates of the last event: coordinates(x, y) of the last event
-Time from the last event: time elapsed from the last event
-Distance from the last event: distance calculated from the last event
-Rebound (bool): True if the last event was also a shot, otherwise False
-Change in shot angle: only include if the shot is a rebound, otherwise 0
-Speed: defined as the distance from the previous event, divided by the time since the previous event.
-Time since the power-play started (seconds): time since the penalty started
-Number of friendly non-goalie skaters on the ice: Number of the team skaters on the ice
-Number of opposing non-goalie skaters on the ice: Number of the opposing skaters on the ice
+This confusion matrix clearly shows us that there is a major issue with our predictions. We are only getting high accuracy performance because the majority of our data points are classified as a *not goal*. By always predicting *not goal* our model does a pretty good job if we only look at the overall accuracy.
 
+
+#### Analysis
+From Figure 7 below, the main thing we can observe is that shots that have a higher probability represents a much greater proportion of the total goals scored compared to shots with lower probabilities. Another important aspect is how this proportion metric is different for our different models. Even though the model trained on the distance feature and the model trained on the angle feature are better than the random baseline, the model that we trained on both features (distance and angle) gave us better results. Meaning it is much better at predicting the probability that a shot would turn to be a goal.
+
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/cumulative_sum_goal_baseline.png" alt="cumulative_sum_goal_baseline">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 7: Logistic Regression: Goal proportion.</figcaption>
+</figure>
+
+The results shown in Figure 8 is also about shot probabilities. It shows us that our trained models perform much better that the random classifier at predicting the shot probability. As in our previous analysis, our model that was trained on both features (distance and angle) does give us better results that models trained on the features separately.
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/goal_rate_curve_baseline.png" alt="goal_rate_curve_baseline">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 8: Logistic Regression: Goal rate.</figcaption>
+</figure>
+
+In order to have a deeper analysis of the behavior of our binary classifiers, using our results we generated a receiver operating characteristic curve (ROC). As we can see in Figure 9 above, the random classifier gives a perfect diagonal as expected. We can also observe that our model trained on both of our features gives the better curve compared to our models that were trained separately on the features. Our ROC score is also much higher (*area=0.68*) when we trained our model on both features.
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/roc_curve_baseline.png" alt="roc_curve_baseline">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Logistic Regression: ROC rate.</figcaption>
+</figure>
+
+Given the calibration curve shown in Figure 10, we can easily see that our trained models did learn some valuable representations of our data. Comparing all our current models, the model that was trained on both features (distance and angle) has the closest calibration values to the *perfectly* calibrated model. Again, as mentioned before, it confirms that overall this model is the model that gives us the best results so far.
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/calibration_curve_baseline.png" alt="calibration_curve_baseline">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 10: Logistic Regression: Calibration cruve.</figcaption>
+</figure>
+
+
+#### Links to our models
+
+1. [Logistic Regression on distance and angle](https://www.comet.ml/jaihon/ift6758-project/1b1de38b80df44ec8c09922378dfc68f)
+2. [Logistic Regression on distance](https://www.comet.ml/jaihon/ift6758-project/eb73704e51df424e93d719790cbb9f86?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+3. [Logistic Regression on angle](https://www.comet.ml/jaihon/ift6758-project/3687694f67cc43d8a0e1bc93fce2953a?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+
+
+
+### Question 4
+
+| Feature      | Description |
+| ----------- | ----------- |
+| Game seconds | total sum of seconds elapsed in the game |
+| Game period | date of the game |
+| Coordinates | coordinates(x, y) of the shot |
+| Shot distance | distance from the shot to the net |
+| Shot angle | angle from between the shot and the net |
+| Shot type | type of Shot (Wrist, Slap, Backhand, etc...) |
+| Empty net| when the team scores a goal into a net with no goaltender present |
+| Last event type | last type of event |
+| Coordinates of the last event | coordinates(x, y) of the last event |
+| Time from the last event | time elapsed from the last event |
+| Distance from the last event | distance calculated from the last event |
+| Rebound (bool) | Rebound of the last event (True if shot, otherwise False) |
+| Change in shot angle | change in the shot angle if the shot is a rebound |
+| Speed | defined as the distance from the previous event, divided by the time since the previous event |
+| Time since the power-play started (seconds) | time in seconds since the penalty started |
+| Number of friendly non-goalie skaters on the ice | Number of team skaters on the ice |
+| Number of opposing non-goalie skaters on the ice | Number of opposing skaters on the ice|
+| time_since_pp_started | ...|
+| current_friendly_on_ice | ...|
+| current_opposite_on_ice | ...|
+
+
+
+###  link to the experiment which stores the filtered DataFrame artifac
+https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets
