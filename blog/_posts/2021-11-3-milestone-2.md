@@ -61,6 +61,7 @@ We can observe in Figure 6 that the goals scored on a non-empty net from a dista
 ## Question 4
 
 <<<<<<< HEAD
+
 Question 4
 
 Game seconds: total sum of seconds elapsed in the game
@@ -69,15 +70,17 @@ Coordinates: coordinates(x, y) of the shot
 Shot distance:  distance from the shot to the net
 Shot angle: angle from between the shot and the net
 Shot type: type of Shot (Wrist, Slap, Backhand, etc...)
-Empty net:
-Last event type:
+Empty net:  when the team scores a goal into a net with no goaltender present
+Last event type: last type of event
 Coordinates of the last event: coordinates(x, y) of the last event
 Time from the last event: time elapsed from the last event
 Distance from the last event: distance calculated from the last event
-Rebound (bool): True if the last event was also a shot, otherwise False
-Change in shot angle: only include if the shot is a rebound, otherwise 0
+Rebound (bool): Rebound of the last event (True if shot, otherwise False)
+Change in shot angle: change in the shot angle if the shot is a rebound
 Speed: defined as the distance from the previous event, divided by the time since the previous event.
-Time since the power-play started (seconds): time since the penalty started
-Number of friendly non-goalie skaters on the ice: Number of the team skaters on the ice
-Number of opposing non-goalie skaters on the ice: Number of the opposing skaters on the ice
+Time since the power-play started (seconds): time in seconds since the penalty started
+Number of friendly non-goalie skaters on the ice: Number of team skaters on the ice
+Number of opposing non-goalie skaters on the ice: Number of opposing skaters on the ice
 
+###  link to the experiment which stores the filtered DataFrame artifac
+https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets
