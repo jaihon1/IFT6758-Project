@@ -66,6 +66,8 @@ def prep_data(data_train):
         # print(df_encoded.shape)
 
 
+    # TODO: add normalization/standardization to features
+
     # Split the data into features and labels for train and validation
     x_train, x_valid, y_train, y_valid = train_test_split(data.drop(columns=['is_goal']), data['is_goal'], test_size=0.2, stratify=data['is_goal'])
 
@@ -78,7 +80,7 @@ def prep_data(data_train):
     return x_train, x_valid, y_train, y_valid
 
 #%%
-def train(x_train, x_valid, y_train, y_valid):
+def build(x_train, x_valid, y_train, y_valid):
 
     # Create the model
     model = keras.Sequential([
@@ -93,14 +95,16 @@ def train(x_train, x_valid, y_train, y_valid):
                   metrics=['accuracy'])
 
 
-    epoch = 7
+    epoch = 10
 
     filepath = 'my_best_model.epoch{epoch:02d}-loss{val_loss:.2f}.hdf5'
     checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
     callbacks = [checkpoint]
 
+    class_weight = {0: 1., 1: 4.}
+
     # Train the model
-    model.fit(x_train, y_train, epochs=epoch, validation_data=(x_valid, y_valid), callbacks=callbacks)
+    model.fit(x_train, y_train, epochs=epoch, validation_data=(x_valid, y_valid), callbacks=callbacks, class_weight=class_weight)
 
     # Evaluate the model
     model.evaluate(x_valid, y_valid)
@@ -109,42 +113,46 @@ def train(x_train, x_valid, y_train, y_valid):
 #%%
 
 def main(data_train):
+
+    TRAIN = False
+
     x_train, x_valid, y_train, y_valid = prep_data(data_train)
 
-    # train(x_train, x_valid, y_train, y_valid)
+    if TRAIN:
+        build(x_train, x_valid, y_train, y_valid)
 
 
+    else:
+        # File path
+        filepath = './my_best_model.epoch08-loss0.32.hdf5'
 
-    # File path
-    filepath = './my_best_model.epoch07-loss0.27.hdf5'
+        # Load the model
+        model = keras.models.load_model(filepath, compile = True)
 
-    # Load the model
-    model = keras.models.load_model(filepath, compile = True)
-
-    # Generate predictions for samples
-    predictions = model.predict(x_valid)
-    # print(predictions)
-    # print(np.mean(predictions))
-    # print(np.std(predictions))
-
-
-    threshold = 0.26
-    predictions[predictions <= threshold] = 0
-    predictions[predictions > threshold] = 1
-
-    y_valid = y_valid.to_numpy()
+        # Generate predictions for samples
+        predictions = model.predict(x_valid)
+        # print(predictions)
+        # print(np.mean(predictions))
+        # print(np.std(predictions))
 
 
-    print(classification_report(y_valid, predictions))
-    print(confusion_matrix(y_valid, predictions))
+        threshold = 0.43
+        predictions[predictions <= threshold] = 0
+        predictions[predictions > threshold] = 1
 
-    # correct = 0
+        y_valid = y_valid.to_numpy()
 
-    # for i, prediction in enumerate(predictions):
-    #     if prediction == y_valid[i]:
-    #         correct += 1
 
-    # print(correct / len(predictions))
+        print(classification_report(y_valid, predictions))
+        print(confusion_matrix(y_valid, predictions))
+
+        # correct = 0
+
+        # for i, prediction in enumerate(predictions):
+        #     if prediction == y_valid[i]:
+        #         correct += 1
+
+        # print(correct / len(predictions))
 
 
 
