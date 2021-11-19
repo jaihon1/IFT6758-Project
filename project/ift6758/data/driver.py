@@ -38,8 +38,6 @@ def main():
             away = data['gameData']['teams']['away']['triCode']
             sides = dict()
 
-            # print(i, home, away)
-
             for period in data['liveData']['linescore']['periods']:
                 sides[period['num']] = {home: period['home'].setdefault('rinkSide', np.NaN), away: period['away'].setdefault('rinkSide', np.NaN)}
 
@@ -55,11 +53,6 @@ def main():
             break
 
 
-
-    # print(len(dataframe))
-    # print(dataframe.iloc[:11,:])
-    print(dataframe[['team_id', 'side', 'event_type', 'time_since_pp_started', 'current_friendly_on_ice', 'current_opposite_on_ice', 'current_time_seconds']])
-    # print(dataframe[['team_id', 'side', 'event_type', 'datetime']])
     dataframe.to_csv(f'{dirpath_games_data}/games_data_all_seasons.csv')
 
 
