@@ -22,3 +22,4 @@ dependencies:
   - keras
   - tensorflow
   - comet_ml
+  - xgboost
