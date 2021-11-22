@@ -121,7 +121,7 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 | Empty net| when the team scores a goal into a net with no goaltender present |
 | Last event type | type of the last event |
 | Coordinates of the last event | coordinates(x, y) of the last event |
-| Time from the last event | time elapsed from the last event |
+| Time from the last event | time elapsed since the last event |
 | Distance from the last event | distance calculated from the last event |
 | Rebound (bool) | Rebound of the last event (True if shot, otherwise False) |
 | Change in shot angle | change in the shot angle if the shot is a rebound |
