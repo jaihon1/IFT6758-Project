@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 
 def main():
