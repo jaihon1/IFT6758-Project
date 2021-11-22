@@ -29,7 +29,7 @@ def main():
     dirpath = os.path.join(os.path.dirname(__file__))
     dirpath_games_data = os.path.join(dirpath, 'games_data')
 
-    for season in games_info.all_games:
+    for season in games_info.get_regular_games():
         print(f'Creating  dataframe for {season} season...')
 
         for i, data in enumerate(games_info.all_games[season]):
