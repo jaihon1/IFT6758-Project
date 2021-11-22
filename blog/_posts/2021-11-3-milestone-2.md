@@ -110,6 +110,11 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 
 ### Question 4
 
+We added below a list of all of the features that we created, and we listed each feature by both the column name
+in the dataframe and a simple explanation. For the novel features, we describe what they are.
+At the end, we added a link to the experiment which stores the filtered DataFrame.
+
+
 | Feature      | Description |
 | ----------- | ----------- |
 | Game seconds | total sum of seconds elapsed in the game |
@@ -129,11 +134,14 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 | Time since the power-play started (seconds) | time in seconds since the penalty started |
 | Number of friendly non-goalie skaters on the ice | Number of team skaters on the ice |
 | Number of opposing non-goalie skaters on the ice | Number of opposing skaters on the ice|
-| time_since_pp_started | ...|
-| current_friendly_on_ice | ...|
-| current_opposite_on_ice | ...|
+| time_since_pp_started |  time since powerplay started |
+| current_friendly_on_ice | Number of friendly players on ice|
+| current_opposite_on_ice | Number of opposite players on ice|
 
 
 
-###  link to the experiment which stores the filtered DataFrame artifac
+
+
+
+###  link to the experiment which stores the filtered DataFrame artifact
 https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets
