@@ -110,18 +110,23 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 
 ### Question 4
 
+We added below a list of all of the features that we created, and we listed each feature by both the column name
+in the dataframe and a simple explanation. For the novel features, we describe what they are.
+At the end, we added a link to the experiment which stores the filtered DataFrame.
+
+
 | Feature      | Description |
 | ----------- | ----------- |
 | Game seconds | total sum of seconds elapsed in the game |
-| Game period | date of the game |
+| Game period | period of the game during which the shot happened |
 | Coordinates | coordinates(x, y) of the shot |
 | Shot distance | distance from the shot to the net |
-| Shot angle | angle from between the shot and the net |
+| Shot angle | angle between the shot and the net |
 | Shot type | type of Shot (Wrist, Slap, Backhand, etc...) |
 | Empty net| when the team scores a goal into a net with no goaltender present |
-| Last event type | last type of event |
+| Last event type | type of the last event |
 | Coordinates of the last event | coordinates(x, y) of the last event |
-| Time from the last event | time elapsed from the last event |
+| Time from the last event | time elapsed since the last event |
 | Distance from the last event | distance calculated from the last event |
 | Rebound (bool) | Rebound of the last event (True if shot, otherwise False) |
 | Change in shot angle | change in the shot angle if the shot is a rebound |
@@ -129,11 +134,19 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 | Time since the power-play started (seconds) | time in seconds since the penalty started |
 | Number of friendly non-goalie skaters on the ice | Number of team skaters on the ice |
 | Number of opposing non-goalie skaters on the ice | Number of opposing skaters on the ice|
-| time_since_pp_started | ...|
-| current_friendly_on_ice | ...|
-| current_opposite_on_ice | ...|
+| time_since_pp_started |  time since powerplay started |
+| current_friendly_on_ice | Number of friendly players on ice|
+| current_opposite_on_ice | Number of opposite players on ice|
 
 
 
-###  link to the experiment which stores the filtered DataFrame artifac
+
+
+
+<<<<<<< HEAD
+###  link to the experiment which stores the filtered DataFrame artifact
 https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets
+=======
+###  link to the experiment which stores the filtered DataFrame artifac
+[wpg_v_wsh_2017021065.csv](https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
+>>>>>>> dd0988830ebffd7fb223e0674b3e4d5f1d9999f6
