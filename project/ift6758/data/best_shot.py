@@ -27,9 +27,10 @@ data = pd.read_csv("games_data/games_data_all_seasons.csv")
 
 # split into train and test
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
+data = data[data['Speed'] < 300]
+
 train_data, test_data = data[~data['game_pk'].str.startswith('2019')], data[data['game_pk'].str.startswith('2019')]
 
-print(data.columns)
 
 #%%
 # features = [
@@ -48,12 +49,25 @@ print(data.columns)
 
 def prep_data(data_train):
     # Set seleceted features
-    selected_features = ['side', 'shot_type',
-       'period', 'period_type', 'coordinate_x', 'coordinate_y', 'empty_net',
-       'is_goal', 'distance_net', 'angle_net', 'previous_event_type',
-       'time_since_pp_started', 'current_time_seconds',
-       'current_friendly_on_ice', 'current_opposite_on_ice'
+    selected_features = [
+        'is_goal', 'side',
+        'shot_type', 'team_side', 'period',
+        'period_type', 'coordinate_x', 'coordinate_y',
+        'distance_net', 'angle_net', 'previous_event_type',
+        'previous_event_x_coord',
+        'previous_event_y_coord',
+        'previous_event_time_seconds', 'time_since_pp_started',
+        'current_time_seconds', 'current_friendly_on_ice',
+        'current_opposite_on_ice', 'shot_last_event_delta',
+        'shot_last_event_distance', 'Change_in_shot_angle', 'Speed', 'Rebound'
     ]
+
+    # selected_features = ['is_goal', 'side', 'shot_type',
+    #    'period', 'period_type', 'coordinate_x', 'coordinate_y', 'empty_net',
+    #     'distance_net', 'angle_net', 'previous_event_type',
+    #    'time_since_pp_started', 'current_time_seconds',
+    #    'current_friendly_on_ice', 'current_opposite_on_ice'
+    # ]
 
     data = data_train[selected_features]
 
@@ -61,10 +75,17 @@ def prep_data(data_train):
     data = data.dropna(subset = selected_features)
 
     # Encoding categorical features into a one-hot encoding
-    categorical_features = ['side', 'shot_type', 'period', 'period_type', 'empty_net', 'previous_event_type']
+    categorical_features = [
+        'side',
+        'shot_type', 'team_side', 'period',
+        'period_type', 'previous_event_type',
+        'current_friendly_on_ice', 'current_opposite_on_ice', 'Rebound'
+    ]
+    # categorical_features = ['side', 'shot_type', 'period', 'period_type', 'previous_event_type']
 
     # Ecoding the features
     for feature in categorical_features:
+        print(f"Encoding categorical feature {feature}.")
         one_hot_encoder = OneHotEncoder(sparse=False)
         encoding_df = data[[feature]]
 
@@ -83,13 +104,18 @@ def prep_data(data_train):
         # print(df_encoded.shape)
 
 
-
     # Split the data into features and labels for train and validation
     x_train, x_valid, y_train, y_valid = train_test_split(data.drop(columns=['is_goal']), data['is_goal'], test_size=0.2, stratify=data['is_goal'])
 
     features_standardizing = [
         'coordinate_x', 'coordinate_y',
-        'distance_net', 'angle_net', 'time_since_pp_started', 'current_time_seconds', 'current_friendly_on_ice', 'current_opposite_on_ice'
+        'distance_net', 'angle_net',
+        'previous_event_x_coord',
+        'previous_event_y_coord',
+        'previous_event_time_seconds', 'time_since_pp_started',
+        'current_time_seconds',
+        'shot_last_event_delta',
+        'shot_last_event_distance', 'Change_in_shot_angle', 'Speed'
     ]
 
     # normalization/standardization to features
@@ -123,7 +149,7 @@ def train_model(x_train, x_valid, y_train, y_valid):
                   loss='binary_crossentropy',
                   metrics=['accuracy'])
 
-    epoch = 10
+    epoch = 2
 
     filepath = 'nn.epoch{epoch:02d}-loss{val_loss:.2f}.hdf5'
     checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
@@ -156,6 +182,9 @@ def train_nn(x_train, x_valid, y_train, y_valid, features, comet=False):
         )
         experiment.log_parameters({'model': 'nn', 'feature': features})
 
+
+    print('Input shape:', x_train.shape)
+
     clf = train_model(x_train, x_valid, y_train, y_valid)
 
 
@@ -173,12 +202,19 @@ def plot_roc_curve(pred_prob, true_y, marker, label):
     plt.grid(True)
     plt.plot(fpr, tpr, linestyle=marker, label=label+f' (area={score:.2f})')
 #%%
+x_train, x_valid, y_train, y_valid, features = prep_data(train_data)
 
+#%%
 def main(data_train):
 
-    TOGGLE_TRAIN = False
+    TOGGLE_TRAIN = True
 
     x_train, x_valid, y_train, y_valid, features = prep_data(data_train)
+
+    print(x_train.shape)
+    print(x_valid.shape)
+    print(y_train.shape)
+    print(y_valid.shape)
 
 
     if TOGGLE_TRAIN:
