@@ -116,7 +116,7 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 | Game period | period of the game during which the shot happened |
 | Coordinates | coordinates(x, y) of the shot |
 | Shot distance | distance from the shot to the net |
-| Shot angle | angle from between the shot and the net |
+| Shot angle | angle between the shot and the net |
 | Shot type | type of Shot (Wrist, Slap, Backhand, etc...) |
 | Empty net| when the team scores a goal into a net with no goaltender present |
 | Last event type | last type of event |
