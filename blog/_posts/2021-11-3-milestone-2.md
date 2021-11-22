@@ -143,10 +143,6 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 
 
 
-<<<<<<< HEAD
-###  link to the experiment which stores the filtered DataFrame artifact
-https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets
-=======
+
 ###  link to the experiment which stores the filtered DataFrame artifac
 [wpg_v_wsh_2017021065.csv](https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
->>>>>>> dd0988830ebffd7fb223e0674b3e4d5f1d9999f6
