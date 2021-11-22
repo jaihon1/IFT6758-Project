@@ -3,6 +3,7 @@ from EventGenerator import EventGenerator
 import pandas as pd
 import numpy as np
 import os
+from feat_eng2 import add_new_features
 
 DEBUG_MODE = False
 
@@ -15,8 +16,12 @@ def main():
     '''
 
     # Downloa/Load data of each game
+<<<<<<< HEAD
     seasons = [2015, 2016, 2017, 2018, 2019, 2020]
 
+=======
+    seasons = [2015, 2016, 2017, 2018, 2019]
+>>>>>>> dd0988830ebffd7fb223e0674b3e4d5f1d9999f6
     if DEBUG_MODE:
         seasons = [2015]
 
@@ -55,6 +60,8 @@ def main():
 
 
     dataframe.to_csv(f'{dirpath_games_data}/games_data_all_seasons.csv')
+    add_new_features()
+
 
 
 if __name__ == "__main__":

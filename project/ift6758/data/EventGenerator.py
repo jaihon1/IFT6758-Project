@@ -2,6 +2,7 @@ import math
 from typing import Dict
 import pandas as pd
 import datetime as dt
+import numpy as np
 
 
 class EventGenerator:
@@ -107,8 +108,8 @@ class EventGenerator:
                     event['about']['eventIdx'], event_type,
                     event['team']['triCode'],
                     event['about']['period'], event['about']['periodType'], event['about']['periodTime'],
-                    event['about']['dateTime'], self.prev_event_type, self.prev_event_x_coord, self.prev_event_y_coord,
-                    self.prev_event_period, self.prev_event_period_time
+                    event['about']['dateTime'], self.prev_event_type, self.prev_event_team, self.prev_event_x_coord, self.prev_event_y_coord,
+                    self.prev_event_period, self.prev_event_period_time, self.prev_event_time_seconds
                 )
 
                 # add where the team's goal is
@@ -233,6 +234,11 @@ class EventGenerator:
             else : self.prev_event_y_coord = event['coordinates']['y']
             self.prev_event_period = event['about']['period']
             self.prev_event_period_time = event['about']['periodTime']
+            if 'team' not in event:
+                self.prev_event_team = np.nan
+            else:
+                self.prev_event_team = event['team']['triCode']
+            self.prev_event_time_seconds = self._convert_to_time(event['about']['period'], event['about']['periodTime'])
 
         return self.convert_to_dataframe()
 
@@ -279,8 +285,8 @@ class TidyEvent:
         Class that generates a dictionnary from selected features in liveData.
     """
 
-    def __init__(self, game_pk, side, event_index, event_type, team_id, period, period_type, period_time, datetime, previous_event_type,
-                 previous_event_x_coord, previous_event_y_coord, previous_event_period, previous_event_period_time,
+    def __init__(self, game_pk, side, event_index, event_type, team_id, period, period_type, period_time, datetime, previous_event_type, previous_event_team,
+                 previous_event_x_coord, previous_event_y_coord, previous_event_period, previous_event_period_time, previous_event_time,
                  coordinate_x=None, coordinate_y=None, goal_strength=None, shot_type=None, player_shooter=None,
                  player_scorer=None, player_goalie=None, empty_net=None, is_goal=None, team_side=None,
                  distance_net=None, angle_net=None) -> None:
@@ -306,10 +312,12 @@ class TidyEvent:
         self.distance_net = distance_net
         self.angle_net = angle_net
         self.previous_event_type = previous_event_type
+        self.previous_event_team = previous_event_team
         self.previous_event_x_coord = previous_event_x_coord
         self.previous_event_y_coord = previous_event_y_coord
         self.previous_event_period = previous_event_period
         self.previous_event_period_time = previous_event_period_time
+        self.previous_event_times_seconds = previous_event_time
         self.time_since_pp_started = 0
         self.current_time_seconds = None
         self.current_friendly_on_ice = None
@@ -392,10 +400,12 @@ class TidyEvent:
             'distance_net': self.distance_net,
             'angle_net': self.angle_net,
             'previous_event_type': self.previous_event_type,
+            'previous_event_team': self.previous_event_team,
             'previous_event_x_coord': self.previous_event_x_coord,
             'previous_event_y_coord': self.previous_event_y_coord,
             'previous_event_period': self.previous_event_period,
             'previous_event_period_time': self.previous_event_period_time,
+            'previous_event_time_seconds': self.previous_event_times_seconds,
             'time_since_pp_started': self.time_since_pp_started,
             'current_time_seconds': self.current_time_seconds,
             'current_friendly_on_ice': self.current_friendly_on_ice,

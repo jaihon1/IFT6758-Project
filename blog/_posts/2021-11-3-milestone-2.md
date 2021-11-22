@@ -118,15 +118,15 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 | Feature      | Description |
 | ----------- | ----------- |
 | Game seconds | total sum of seconds elapsed in the game |
-| Game period | date of the game |
+| Game period | period of the game during which the shot happened |
 | Coordinates | coordinates(x, y) of the shot |
 | Shot distance | distance from the shot to the net |
-| Shot angle | angle from between the shot and the net |
+| Shot angle | angle between the shot and the net |
 | Shot type | type of Shot (Wrist, Slap, Backhand, etc...) |
 | Empty net| when the team scores a goal into a net with no goaltender present |
-| Last event type | last type of event |
+| Last event type | type of the last event |
 | Coordinates of the last event | coordinates(x, y) of the last event |
-| Time from the last event | time elapsed from the last event |
+| Time from the last event | time elapsed since the last event |
 | Distance from the last event | distance calculated from the last event |
 | Rebound (bool) | Rebound of the last event (True if shot, otherwise False) |
 | Change in shot angle | change in the shot angle if the shot is a rebound |
@@ -143,5 +143,10 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 
 
 
+<<<<<<< HEAD
 ###  link to the experiment which stores the filtered DataFrame artifact
 https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets
+=======
+###  link to the experiment which stores the filtered DataFrame artifac
+[wpg_v_wsh_2017021065.csv](https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
+>>>>>>> dd0988830ebffd7fb223e0674b3e4d5f1d9999f6
