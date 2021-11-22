@@ -29,16 +29,21 @@ data = pd.read_csv("games_data/games_data_all_seasons.csv")
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
 train_data, test_data = data[~data['game_pk'].str.startswith('2019')], data[data['game_pk'].str.startswith('2019')]
 
+print(data.columns)
+
 #%%
-# features = ['game_pk', 'side', 'event_index', 'event_type', 'shot_type',
-#     'goal_strength', 'team_id', 'team_side', 'period', 'period_type',
-#     'period_time', 'datetime', 'coordinate_x', 'coordinate_y',
+# features = [
+#     'game_pk', 'side', 'event_index', 'event_type',
+#     'shot_type', 'goal_strength', 'team_id', 'team_side', 'period',
+#     'period_type', 'datetime', 'coordinate_x', 'coordinate_y',
 #     'player_shooter', 'player_scorer', 'player_goalie', 'empty_net',
 #     'is_goal', 'distance_net', 'angle_net', 'previous_event_type',
-#     'previous_event_x_coord', 'previous_event_y_coord',
-#     'previous_event_period', 'previous_event_period_time',
-#     'time_since_pp_started', 'current_time_seconds',
-#     'current_friendly_on_ice', 'current_opposite_on_ice'
+#     'previous_event_team', 'previous_event_x_coord',
+#     'previous_event_y_coord', 'previous_event_period',
+#     'previous_event_time_seconds', 'time_since_pp_started',
+#     'current_time_seconds', 'current_friendly_on_ice',
+#     'current_opposite_on_ice', 'shot_last_event_delta',
+#     'shot_last_event_distance', 'Rebound', 'Change_in_shot_angle', 'Speed'
 # ]
 
 def prep_data(data_train):
