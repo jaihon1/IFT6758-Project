@@ -113,7 +113,7 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 | Feature      | Description |
 | ----------- | ----------- |
 | Game seconds | total sum of seconds elapsed in the game |
-| Game period | date of the game |
+| Game period | period of the game during which the shot happened |
 | Coordinates | coordinates(x, y) of the shot |
 | Shot distance | distance from the shot to the net |
 | Shot angle | angle from between the shot and the net |
