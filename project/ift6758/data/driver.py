@@ -16,12 +16,9 @@ def main():
     '''
 
     # Downloa/Load data of each game
-<<<<<<< HEAD
-    seasons = [2015, 2016, 2017, 2018, 2019, 2020]
 
-=======
     seasons = [2015, 2016, 2017, 2018, 2019]
->>>>>>> dd0988830ebffd7fb223e0674b3e4d5f1d9999f6
+
     if DEBUG_MODE:
         seasons = [2015]
 
