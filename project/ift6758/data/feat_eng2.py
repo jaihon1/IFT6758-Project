@@ -5,8 +5,7 @@ from datetime import timedelta
 import numpy as np
 from pathlib import Path
 csv_path = os.path.join(os.path.dirname(__file__),'games_data/games_data_all_seasons.csv')
-df = pd.read_csv(csv_path)
-df_filtered = df.loc[:, ['game_pk','period', 'period_type','current_time_seconds', 'period_time','event_type', 'team_id', 'shot_type', 'coordinate_x', 'coordinate_y', 'distance_net', 'angle_net', 'empty_net', 'previous_event_type','previous_event_team', 'previous_event_x_coord', 'previous_event_y_coord', 'previous_event_period', 'previous_event_period_time', 'previous_event_time_seconds']]
+df_filtered = pd.read_csv(csv_path)
 df_filtered.drop(columns=['period_time','previous_event_period_time'], inplace=True)
 df_filtered['shot_last_event_delta'] = [t1 - t0 for t1, t0 in zip(df_filtered['current_time_seconds'], df_filtered['previous_event_time_seconds'])]
 df_filtered['shot_last_event_distance'] = [np.sqrt((x2-x1)**2 + (y2 - y1)**2) for x1, x2, y1, y2 in zip(df_filtered['previous_event_x_coord'], df_filtered['coordinate_x'], df_filtered['previous_event_y_coord'], df_filtered['coordinate_y'])]
@@ -18,4 +17,5 @@ df_filtered.loc[df_filtered['Rebound'] == 'True', 'Change_in_shot_angle'] = np.d
 df_filtered.loc[df_filtered['Rebound'] == 'False', 'Change_in_shot_angle'] = '0'
 # ### Adding Speed feature: distance from the previous event, divided by the time since the previous event
 df_filtered['Speed'] = df_filtered['shot_last_event_distance'] / df_filtered['shot_last_event_delta']
+df_filtered.to_csv(csv_path, header=True, index=True)
 print(df_filtered.iloc[:20,:])
