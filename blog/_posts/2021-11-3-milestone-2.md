@@ -103,7 +103,7 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 
 #### Links to our models
 
-1. [Logistic Regression on distance and angle](https://www.comet.ml/jaihon/ift6758-project/1b1de38b80df44ec8c09922378dfc68f)
-2. [Logistic Regression on distance](https://www.comet.ml/jaihon/ift6758-project/eb73704e51df424e93d719790cbb9f86?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
-3. [Logistic Regression on angle](https://www.comet.ml/jaihon/ift6758-project/3687694f67cc43d8a0e1bc93fce2953a?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+1. [Logistic Regression on distance and angle](https://www.comet.ml/jaihon/ift6758-project/88c175fd9d3c4892acf334fcfdb4a6d0)
+2. [Logistic Regression on distance](https://www.comet.ml/jaihon/ift6758-project/6997fdfbdc76426db60408591e58ac5a)
+3. [Logistic Regression on angle](https://www.comet.ml/jaihon/ift6758-project/934baca85c9448c997d8d0727845db65)
 
