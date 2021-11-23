@@ -146,3 +146,18 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 ###  link to the experiment which stores the filtered DataFrame artifact
 ###  (https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
 [wpg_v_wsh_2017021065.csv]
+
+
+## Question 6: Best Shot
+
+Brief intro on what and why we decide to use in this part...
+
+### Model Results and Analysis
+Show all required graphs (4 graphs) for all interesting/best experiments done for this model.
+
+##### 1. KNN
+
+##### 2. Neural Network
+
+
+##### 3. Random Forest

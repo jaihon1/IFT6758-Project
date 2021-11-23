@@ -6,11 +6,13 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 
 from comet_ml import Experiment
 
 # import keras
 from keras.callbacks import ModelCheckpoint
+from sklearn.calibration import CalibrationDisplay
 from tensorflow import keras
 
 
@@ -22,8 +24,8 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 #%%
 # Load the data
-data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
-# data = pd.read_csv("games_data/games_data_all_seasons.csv")
+# data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
+data = pd.read_csv("games_data/games_data_all_seasons.csv")
 
 
 # split into train and test
@@ -118,6 +120,49 @@ def prep_data(data_train):
     x_valid[features_standardizing] = scaler.fit_transform(x_valid[features_standardizing])
 
     return x_train, x_valid, y_train, y_valid, selected_features
+
+#%%
+# Compute percentile
+def plot_goal_rate(proba, true_y, label):
+    percentile = np.arange(0, 100, 2)
+    percentile_pred = np.percentile(proba, percentile)
+
+    y_valid_df = pd.DataFrame(true_y)
+
+    y_valid_df['bins_percentile'] = pd.cut(proba, percentile_pred, duplicates='drop')
+    goal_rate_by_percentile = y_valid_df.groupby(by=['bins_percentile']).apply(lambda g: g['is_goal'].sum()/len(g))
+
+    if len(percentile_pred)-len(goal_rate_by_percentile) == 1:
+        percentile = percentile[:-1]
+    else:
+        percentile = percentile[:-2]
+
+    sns.set_theme()
+    g = sns.lineplot(x=percentile, y=goal_rate_by_percentile*100, label=label)
+    ax = g.axes
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
+
+    return y_valid_df
+
+#%%
+# plot cumulative proportion of goals as function of shot probability model percentile
+def plot_cumulative_sum(true_y, y_valid_df, label):
+    percentile = np.arange(0,100,2)
+
+    total_number_goal = (true_y == 1).sum()
+
+    sum_goals_by_percentile = y_valid_df.groupby(by='bins_percentile').apply(lambda g: g['is_goal'].sum()/total_number_goal)
+    cum_sum_goals = sum_goals_by_percentile[::-1].cumsum(axis=0)[::-1]
+
+    sns.set_theme()
+    if len(percentile)-len(cum_sum_goals) == 1:
+        percentile = percentile[:-1]
+    else:
+        percentile = percentile[:-2]
+
+    g = sns.lineplot(x=percentile, y=cum_sum_goals*100, label=label)
+    ax = g.axes
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
 
 
 #%%
@@ -246,21 +291,44 @@ def main(data_train):
 
         # Generate predictions for samples
         predictions = model.predict(x_valid)
-        # print(predictions)
-        # print(np.mean(predictions))
-        # print(np.std(predictions))
-
-
-        y_valid = y_valid.to_numpy()
 
 
         find_optimal_threshold(predictions, y_valid)
 
-        # ROC curve
-        plot_roc_curve(predictions, y_valid, '-', 'nn distance')
-        plt.xlabel('False positive rate')
-        plt.ylabel('True positive rate')
-        plt.legend()
+        # # ROC curve
+        # plot_roc_curve(predictions, y_valid.to_numpy(), '-', 'nn distance')
+        # plt.xlabel('False positive rate')
+        # plt.ylabel('True positive rate')
+        # plt.legend()
+        # plt.show()
+
+        # # Goal rate
+        # valid_goal_rate = plot_goal_rate(predictions.flatten(), y_valid, 'NN')
+
+        # plt.xlim(100, 0)
+        # plt.ylim(0, 100)
+        # plt.xlabel('Shot probability model percentile')
+        # plt.ylabel('Goals / (Shots + Goals)')
+        # plt.show()
+
+
+        # # Cumulative goal rate
+        # plot_cumulative_sum(y_valid, valid_goal_rate, 'NN')
+
+        # plt.xlim(100, 0)
+        # plt.ylim(0, 100)
+        # plt.xlabel('Shot probability model percentile')
+        # plt.ylabel('Proportion')
+        # plt.show()
+
+
+        # calibration curve
+        sns.set_theme()
+        fig = plt.figure()
+        ax = plt.axes()
+        disp_random = CalibrationDisplay.from_predictions(y_valid, predictions, n_bins=25, ax=ax, name='Random classifier', ref_line=False)
+        plt.xlim(0,0.3)
+        plt.legend(loc=2)
         plt.show()
 
 
