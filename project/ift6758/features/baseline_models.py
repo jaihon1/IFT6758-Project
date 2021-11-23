@@ -16,7 +16,7 @@ from sklearn.calibration import CalibrationDisplay
 
 #%%
 
-data = pd.read_csv('project/ift6758/data/games_data/games_data_all_seasons.csv')
+data = pd.read_csv(os.path.join(os.environ.get('PATH_DATA'), 'games_data_all_seasons.csv'))
 
 data = data[~(data['distance_net'].isna())]
 
@@ -51,7 +51,7 @@ def train_logistic(X, y, features, comet=False):
 
 
 #%%
-comet = False
+comet = True
 clf_distance = train_logistic(x_train, y_train, ['distance_net'], comet)
 clf_angle = train_logistic(x_train, y_train, ['angle_net'], comet)
 clf_both = train_logistic(x_train, y_train, ['distance_net', 'angle_net'], comet)
@@ -161,5 +161,5 @@ disp_distance = CalibrationDisplay.from_predictions(y_valid, pred_proba_distance
 disp_both = CalibrationDisplay.from_predictions(y_valid, pred_proba_both[:,1], n_bins=25, ax=ax, name='Regression both distance and angle', ref_line=False)
 disp_angle = CalibrationDisplay.from_predictions(y_valid, pred_proba_angle[:, 1], n_bins=25, ax=ax, name='Regression angle', ref_line=False)
 plt.xlim(0,0.3)
-plt.legend(loc=9)
+plt.legend(loc=2)
 plt.show()
