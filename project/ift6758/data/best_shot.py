@@ -16,18 +16,19 @@ from tensorflow import keras
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve, f1_score
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
 
 #%%
 # Load the data
-# data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
-data = pd.read_csv("games_data/games_data_all_seasons.csv")
+data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
+# data = pd.read_csv("games_data/games_data_all_seasons.csv")
 
 
 # split into train and test
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
-data = data[data['Speed'] < 300]
+data = data[data['Speed'] < 300] # remove outliers with value = inf
 
 train_data, test_data = data[~data['game_pk'].str.startswith('2019')], data[data['game_pk'].str.startswith('2019')]
 
@@ -61,14 +62,6 @@ def prep_data(data_train):
         'current_opposite_on_ice', 'shot_last_event_delta',
         'shot_last_event_distance', 'Change_in_shot_angle', 'Speed', 'Rebound'
     ]
-
-    # selected_features = ['is_goal', 'side', 'shot_type',
-    #    'period', 'period_type', 'coordinate_x', 'coordinate_y', 'empty_net',
-    #     'distance_net', 'angle_net', 'previous_event_type',
-    #    'time_since_pp_started', 'current_time_seconds',
-    #    'current_friendly_on_ice', 'current_opposite_on_ice'
-    # ]
-
     data = data_train[selected_features]
 
     # Drop rows with NaN values
@@ -81,11 +74,11 @@ def prep_data(data_train):
         'period_type', 'previous_event_type',
         'current_friendly_on_ice', 'current_opposite_on_ice', 'Rebound'
     ]
-    # categorical_features = ['side', 'shot_type', 'period', 'period_type', 'previous_event_type']
+
 
     # Ecoding the features
     for feature in categorical_features:
-        print(f"Encoding categorical feature {feature}.")
+        # print(f"Encoding categorical feature {feature}.")
         one_hot_encoder = OneHotEncoder(sparse=False)
         encoding_df = data[[feature]]
 
@@ -124,41 +117,74 @@ def prep_data(data_train):
     x_train[features_standardizing] = scaler.fit_transform(x_train[features_standardizing])
     x_valid[features_standardizing] = scaler.fit_transform(x_valid[features_standardizing])
 
-    # print(data.shape)
-    # print(x_train.shape)
-    # print(x_valid.shape)
-    # print(y_train.shape)
-    # print(y_valid.shape)
-
     return x_train, x_valid, y_train, y_valid, selected_features
 
+
 #%%
-def train_model(x_train, x_valid, y_train, y_valid):
+def plot_roc_curve(pred_prob, true_y, marker, label):
+    score = roc_auc_score(true_y, pred_prob)
+    fpr, tpr, _ = roc_curve(true_y, pred_prob)
+    sns.set_theme()
+    plt.grid(True)
+    plt.plot(fpr, tpr, linestyle=marker, label=label+f' (area={score:.2f})')
+
+
+def find_optimal_threshold(predictions, true_y):
+    scores = []
+
+    for i in range(0, 100):
+        # create a numpy array with the same shape as predictions
+        masked_predictions = np.zeros(predictions.shape)
+        for j, prediction in enumerate(predictions):
+            if prediction <= i/100:
+                masked_predictions[j] = 0
+            else:
+                masked_predictions[j] = 1
+
+        scores.append(f1_score(true_y, masked_predictions))
+
+
+    print(np.max(scores), np.argmax(scores))
+
+    threshold = np.argmax(scores) / 100
+    masked_predictions = np.zeros(predictions.shape)
+
+    for i, prediction in enumerate(predictions):
+        if prediction <= threshold:
+            masked_predictions[i] = 0
+        else:
+            masked_predictions[i] = 1
+
+    print(classification_report(true_y, masked_predictions))
+    print(confusion_matrix(true_y, masked_predictions))
+
+#%%
+def train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch, lr):
 
     # Create the model
     model = keras.Sequential([
-        keras.layers.Dense(32, activation='relu', input_shape=(x_train.shape[1],)),
+        keras.layers.Dense(64, activation='relu', input_shape=(x_train.shape[1],)),
+        keras.layers.Dropout(0.05),
+        keras.layers.Dense(32, activation='relu'),
+        keras.layers.Dropout(0.05),
         keras.layers.Dense(16, activation='relu'),
+        keras.layers.Dropout(0.05),
         keras.layers.Dense(1, activation='sigmoid')
     ])
 
-    opt = keras.optimizers.Adam(learning_rate=0.001)
+    opt = keras.optimizers.Adam(learning_rate=lr)
 
     # Compile the model
     model.compile(optimizer=opt,
                   loss='binary_crossentropy',
                   metrics=['accuracy'])
 
-    epoch = 2
-
     filepath = 'nn.epoch{epoch:02d}-loss{val_loss:.2f}.hdf5'
     checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
     callbacks = [checkpoint]
 
-    class_weight = {0: 1., 1: 2.}
-
     # Train the model
-    model.fit(x_train, y_train, epochs=epoch, validation_data=(x_valid, y_valid), callbacks=callbacks, class_weight=class_weight)
+    model.fit(x_train, y_train, epochs=epoch, validation_data=(x_valid, y_valid), callbacks=callbacks, class_weight=class_weight, batch_size=128)
 
     # Evaluate the model
     model.evaluate(x_valid, y_valid)
@@ -168,6 +194,8 @@ def train_model(x_train, x_valid, y_train, y_valid):
 
 #%%
 def train_nn(x_train, x_valid, y_train, y_valid, features, comet=False):
+    class_weight = {0: 1., 1: 3.}
+
     if comet:
         # Create experiment for comet
         experiment = Experiment(
@@ -180,50 +208,38 @@ def train_nn(x_train, x_valid, y_train, y_valid, features, comet=False):
             auto_histogram_gradient_logging=True,
             auto_histogram_activation_logging=True
         )
-        experiment.log_parameters({'model': 'nn', 'feature': features})
+        experiment.log_parameters({'model': 'nn', 'feature': features, 'class_weight': class_weight})
 
 
     print('Input shape:', x_train.shape)
 
-    clf = train_model(x_train, x_valid, y_train, y_valid)
+    clf = train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch=30, lr=0.001)
 
 
     if comet:
-        model_name = 'nn'+'_'.join(features)
+        model_name = 'nn'+'_'
         joblib.dump(clf, model_name+'.joblib')
         experiment.log_model(model_name, model_name+'.joblib')
 
     return clf
-#%%
-def plot_roc_curve(pred_prob, true_y, marker, label):
-    score = roc_auc_score(true_y, pred_prob)
-    fpr, tpr, _ = roc_curve(true_y, pred_prob)
-    sns.set_theme()
-    plt.grid(True)
-    plt.plot(fpr, tpr, linestyle=marker, label=label+f' (area={score:.2f})')
-#%%
-x_train, x_valid, y_train, y_valid, features = prep_data(train_data)
 
 #%%
 def main(data_train):
 
-    TOGGLE_TRAIN = True
+    TOGGLE_TRAIN = False
+
+    print(os.environ.get("COMET_API_KEY"))
 
     x_train, x_valid, y_train, y_valid, features = prep_data(data_train)
 
-    print(x_train.shape)
-    print(x_valid.shape)
-    print(y_train.shape)
-    print(y_valid.shape)
 
 
     if TOGGLE_TRAIN:
-        clf = train_nn(x_train, x_valid, y_train, y_valid, features, comet=False)
-
+        clf = train_nn(x_train, x_valid, y_train, y_valid, features, comet=True)
 
     else:
         # File path
-        filepath = './nn.epoch05-loss0.28.hdf5'
+        filepath = 'nn_models/nn.epoch41-loss0.33.hdf5'
 
         # Load the model
         model = keras.models.load_model(filepath, compile = True)
@@ -231,27 +247,14 @@ def main(data_train):
         # Generate predictions for samples
         predictions = model.predict(x_valid)
         # print(predictions)
-        print(np.mean(predictions))
-        print(np.std(predictions))
+        # print(np.mean(predictions))
+        # print(np.std(predictions))
 
-
-        threshold = 0.28
-        predictions[predictions <= threshold] = 0
-        predictions[predictions > threshold] = 1
 
         y_valid = y_valid.to_numpy()
 
 
-        print(classification_report(y_valid, predictions))
-        print(confusion_matrix(y_valid, predictions))
-
-        # correct = 0
-
-        # for i, prediction in enumerate(predictions):
-        #     if prediction == y_valid[i]:
-        #         correct += 1
-
-        # print(correct / len(predictions))
+        find_optimal_threshold(predictions, y_valid)
 
         # ROC curve
         plot_roc_curve(predictions, y_valid, '-', 'nn distance')
