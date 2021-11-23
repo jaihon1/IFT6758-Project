@@ -139,10 +139,9 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 | current_opposite_on_ice | Number of opposite players on ice|
 
 
+### in the bonus question, we added also th number of friendly non-goalie skaters on the ice and the number of opposing non-goalie
+# skaters on the ice and for that we added 2 methods in TidyEvent Class that returns 2 other values in the final dictionary
 
+###  link to the experiment which stores the filtered DataFrame artifact
 
-
-
-
-###  link to the experiment which stores the filtered DataFrame artifac
 [wpg_v_wsh_2017021065.csv](https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
