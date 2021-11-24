@@ -15,7 +15,6 @@ Using our work from the previous milestone, we have extended our features by add
 | empty_net | Whether or not the shot/goal was at an empty net |
 
 
-
 <figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
     <img src="/public/histogram_goals_nogoals_vs_distance.png" alt="histogram_goals_nogoals_vs_angle">
     <figcaption style="font-size: 12px;text-align: center;">Figure 1: Goals and no goals vs distance.</figcaption>
@@ -107,3 +106,47 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 2. [Logistic Regression on distance](https://www.comet.ml/jaihon/ift6758-project/6997fdfbdc76426db60408591e58ac5a)
 3. [Logistic Regression on angle](https://www.comet.ml/jaihon/ift6758-project/934baca85c9448c997d8d0727845db65)
 
+
+
+### Question 4
+
+We added below a list of all of the features that we created, and we listed each feature by both the column name
+in the dataframe and a simple explanation. For the novel features, we describe what they are.
+At the end, we added a link to the experiment which stores the filtered DataFrame.
+
+
+| Feature      | Description |
+| ----------- | ----------- |
+| current_time_seconds | total sum of seconds elapsed in the game |
+| period | period of the game during which the shot happened |
+| coordinate_x | coordinates x  of the shot |
+| coordinate_y | coordinates y  of the shot |
+| distance_net | distance from the shot to the net |
+| angle_net | angle between the shot and the net |
+| shot_type | type of Shot (Wrist, Slap, Backhand, etc...) |
+| previous_event_type | type of the last event |
+| previous_event_x_coord | coordinates x of the last event |
+| previous_event_y_coord | coordinates y of the last event |
+| shot_last_event_delta | time elapsed since the last event |
+| shot_last_event_distance | distance calculated from the last event |
+| Rebound | Rebound of the last event (True if shot, otherwise False) |
+| Change_in_shot_angle | change in the shot angle if the shot is a rebound |
+| Speed | defined as the distance from the previous event, divided by the time since the previous event |
+| time_since_pp_started |  time in seconds since the penalty started |
+| current_friendly_on_ice | Number of friendly players on ice|
+| current_opposite_on_ice | Number of opposite players on ice|
+
+
+In the bonus question, we added a few more features like the time since the penalty started and the number of friendly and opposite players on ice. To compute the time since the penalty started, we started
+by generating all types of events in our game, by evaluating, at each event, if there was a 
+penalty and by checking on which side the team was. We then built a tidy event object that gave the time and coordinates details
+relative to the previous event. Finally, we got the current event time and subtracted
+the starting time of the penalty from the current time to have the time since the penalty started (two types of penalties generated).
+To get the number of friendly players on ice and the number of opposite players on ice, we first checked the side of the team to figure out who is friendly and who is not and
+then subtracted the number of players lost depending on the type of the
+penalty from 5.
+
+
+link to the experiment which stores the filtered DataFrame artifact
+(https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
+[wpg_v_wsh_2017021065.csv]

@@ -3,6 +3,9 @@ from EventGenerator import EventGenerator
 import pandas as pd
 import numpy as np
 import os
+from feat_eng2 import add_new_features
+
+DEBUG_MODE = False
 
 
 def main():
@@ -13,7 +16,12 @@ def main():
     '''
 
     # Downloa/Load data of each game
+
     seasons = [2015, 2016, 2017, 2018, 2019]
+
+    if DEBUG_MODE:
+        seasons = [2015]
+
     games_info = GamesInfo(seasons)
 
 
@@ -23,10 +31,10 @@ def main():
     dirpath = os.path.join(os.path.dirname(__file__))
     dirpath_games_data = os.path.join(dirpath, 'games_data')
 
-    for season in games_info.all_games:
+    for season in games_info.season:
         print(f'Creating  dataframe for {season} season...')
 
-        for data in games_info.all_games[season]:
+        for i, data in enumerate(games_info.get_regular_games()[season]):
             live_events = data['liveData']['plays']['allPlays']
             game_pk = data['gamePk']
             home = data['gameData']['teams']['home']['triCode']
@@ -44,10 +52,13 @@ def main():
                 temp_df = game.build()
                 dataframe = pd.concat([dataframe, temp_df])
 
+        if DEBUG_MODE:
+            break
 
-    print(len(dataframe))
-    print(dataframe.iloc[:11,:])
+
     dataframe.to_csv(f'{dirpath_games_data}/games_data_all_seasons.csv')
+    add_new_features()
+
 
 
 if __name__ == "__main__":
