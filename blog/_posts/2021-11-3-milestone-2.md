@@ -141,7 +141,7 @@ In the bonus question, we added a few more features like the time since the pena
 by generating all types of events in our game, by evaluating, at each event, if there was a 
 penalty and by checking on which side the team was. We then built a tidy event object that gave the time and coordinates details
 relative to the previous event. Finally, we got the current event time and subtracted
-the starting time of penalty from the current time to have the time since the penalty started (two types of penalties generated).
+the starting time of the penalty from the current time to have the time since the penalty started (two types of penalties generated).
 To get the number of friendly players on ice, and the number of opposite players on ice, we first checked the side of the team,
 then to calculate the number of friendly_players, we substract 5 minus the number of players lost depending of the type of
 penalty, and we did the same for the opposite players.
