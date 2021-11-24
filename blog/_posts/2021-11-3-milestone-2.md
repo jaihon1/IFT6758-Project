@@ -117,34 +117,38 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 
 | Feature      | Description |
 | ----------- | ----------- |
-| Game seconds | total sum of seconds elapsed in the game |
-| Game period | period of the game during which the shot happened |
-| Coordinates | coordinates(x, y) of the shot |
-| Shot distance | distance from the shot to the net |
-| Shot angle | angle between the shot and the net |
-| Shot type | type of Shot (Wrist, Slap, Backhand, etc...) |
-| Empty net| when the team scores a goal into a net with no goaltender present |
-| Last event type | type of the last event |
-| Coordinates of the last event | coordinates(x, y) of the last event |
-| Time from the last event | time elapsed since the last event |
-| Distance from the last event | distance calculated from the last event |
-| Rebound (bool) | Rebound of the last event (True if shot, otherwise False) |
-| Change in shot angle | change in the shot angle if the shot is a rebound |
+| current_time_seconds | total sum of seconds elapsed in the game |
+| period | period of the game during which the shot happened |
+| coordinate_x | coordinates x  of the shot |
+| coordinate_y | coordinates y  of the shot |
+| distance_net | distance from the shot to the net |
+| angle_net | angle between the shot and the net |
+| shot_type | type of Shot (Wrist, Slap, Backhand, etc...) |
+| previous_event_type | type of the last event |
+| previous_event_x_coord | coordinates x of the last event |
+| previous_event_y_coord | coordinates y of the last event |
+| shot_last_event_delta | time elapsed since the last event |
+| shot_last_event_distance | distance calculated from the last event |
+| Rebound | Rebound of the last event (True if shot, otherwise False) |
+| Change_in_shot_angle | change in the shot angle if the shot is a rebound |
 | Speed | defined as the distance from the previous event, divided by the time since the previous event |
-| Time since the power-play started (seconds) | time in seconds since the penalty started |
-| Number of friendly non-goalie skaters on the ice | Number of team skaters on the ice |
-| Number of opposing non-goalie skaters on the ice | Number of opposing skaters on the ice|
-| time_since_pp_started |  time since powerplay started |
+| time_since_pp_started |  time in seconds since the penalty started |
 | current_friendly_on_ice | Number of friendly players on ice|
 | current_opposite_on_ice | Number of opposite players on ice|
 
 
-### in the bonus question, we added also th number of friendly non-goalie skaters on the ice and the number of opposing non-goalie
-### skaters on the ice and for that we added 2 methods in TidyEvent Class that returns 2 other values in the final dictionary
+In the bonus question, we added a few more features. First, we added the time since the penalty started which we calculated
+with the following procedure: first we generated all types of events in our game, then at each event, we evaluated if there is
+penalty and after checking the side of the team, we built a tidy event object that gives the time and coordinates details
+relative to the previous event. Then after getting the current event time, and checking the side of the team, we subtracted
+the starting time of penalty from the current time to have the time since the penalty started (two types of penalties generated).
+To get the number of friendly players on ice, and the number of opposite players on ice, we first checked the side of the team,
+then to calculate the number of friendly_players, we substract 5 minus the number of players lost depending of the type of
+penalty, and we did the same for the opposite players.
 
 
-###  link to the experiment which stores the filtered DataFrame artifact
-###  (https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
+link to the experiment which stores the filtered DataFrame artifact
+(https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
 [wpg_v_wsh_2017021065.csv]
 
 
