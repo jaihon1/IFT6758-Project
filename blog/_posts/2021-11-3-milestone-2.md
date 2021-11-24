@@ -140,11 +140,11 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 In the bonus question, we added a few more features. First, we added the time since the penalty started which we calculated
 with the following procedure: first we generated all types of events in our game, then at each event, we evaluated if there is
 penalty and after checking the side of the team, we built a tidy event object that gives the time and coordinates details
-relative to the previous event. Then after getting the current event time, and checking teh side of the team, we subtracted
+relative to the previous event. Then after getting the current event time, and checking the side of the team, we subtracted
 the starting time of penalty from the current time to have the time since the penalty started (two types of penalties generated).
 To get the number of friendly players on ice, and the number of opposite players on ice, we first checked the side of the team,
 then to calculate the number of friendly_players, we substract 5 minus the number of players lost depending of the type of
-penalty, and we did the same for the opposite players. 
+penalty, and we did the same for the opposite players.
 
 
 link to the experiment which stores the filtered DataFrame artifact
