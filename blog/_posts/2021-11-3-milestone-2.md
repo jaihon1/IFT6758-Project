@@ -137,7 +137,7 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 | current_opposite_on_ice | Number of opposite players on ice|
 
 
-In the bonus question, we added a few more features. First, we added the time since the penalty started which we calculated
+In the bonus question, we added a few more features like the time since the penalty started and the number of friendly and opposite players on ice. To compute the time since the penalty started, we started
 with the following procedure: first we generated all types of events in our game, then at each event, we evaluated if there is
 penalty and after checking the side of the team, we built a tidy event object that gives the time and coordinates details
 relative to the previous event. Then after getting the current event time, and checking the side of the team, we subtracted
