@@ -137,14 +137,14 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 | current_opposite_on_ice | Number of opposite players on ice|
 
 
-In the bonus question, we added a few more features. First, we added the time since the penalty started which we calculated
-with the following procedure: first we generated all types of events in our game, then at each event, we evaluated if there is
-penalty and after checking the side of the team, we built a tidy event object that gives the time and coordinates details
-relative to the previous event. Then after getting the current event time, and checking the side of the team, we subtracted
-the starting time of penalty from the current time to have the time since the penalty started (two types of penalties generated).
-To get the number of friendly players on ice, and the number of opposite players on ice, we first checked the side of the team,
-then to calculate the number of friendly_players, we substract 5 minus the number of players lost depending of the type of
-penalty, and we did the same for the opposite players.
+In the bonus question, we added a few more features like the time since the penalty started and the number of friendly and opposite players on ice. To compute the time since the penalty started, we started
+by generating all types of events in our game, by evaluating, at each event, if there was a 
+penalty and by checking on which side the team was. We then built a tidy event object that gave the time and coordinates details
+relative to the previous event. Finally, we got the current event time and subtracted
+the starting time of the penalty from the current time to have the time since the penalty started (two types of penalties generated).
+To get the number of friendly players on ice and the number of opposite players on ice, we first checked the side of the team to figure out who is friendly and who is not and
+then subtracted the number of players lost depending on the type of the
+penalty from 5.
 
 
 link to the experiment which stores the filtered DataFrame artifact
