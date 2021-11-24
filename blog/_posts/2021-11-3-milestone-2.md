@@ -144,7 +144,7 @@ relative to the previous event. Finally, we got the current event time and subtr
 the starting time of the penalty from the current time to have the time since the penalty started (two types of penalties generated).
 To get the number of friendly players on ice and the number of opposite players on ice, we first checked the side of the team to figure out who is friendly and who is not and
 then subtracted the number of players lost depending on the type of the
-penalty, and we did the same for the opposite players.
+penalty from 5.
 
 
 link to the experiment which stores the filtered DataFrame artifact
