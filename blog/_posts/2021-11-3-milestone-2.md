@@ -163,5 +163,39 @@ Show all required graphs (4 graphs) for all interesting/best experiments done fo
 
 ##### 2. Neural Network
 
+Using standardization techniques, we can see that our neural network model performs better than without.
+
+Using very value of a small dropout technique to help prevent overfitting, we can see that our neural network model performs better with this regularization technique.
+
+Feature Selection technique: Domain knowledge
+Using feature selection, we selected the following features to train our neual network models:
+
+
+| Feature     | Encoding |
+| ----------- | ----------- |
+| side | one-hot |
+| shot_type | one-hot |
+| period | one-hot |
+| period_type | one-hot |
+| coordinate_x | no encoding |
+| coordinate_y | no encoding |
+| distance_net | no encoding |
+| angle_net | no encoding |
+| previous_event_type | one-hot |
+| previous_event_x_coord | no encoding |
+| previous_event_y_coord | no encoding |
+| previous_event_time_seconds | no encoding |
+| time_since_pp_started | no encoding |
+| current_time_seconds | no encoding |
+| current_friendly_on_ice | one-hot |
+| current_opposite_on_ice | one-hot |
+| shot_last_event_delta | no encoding |
+| shot_last_event_distance | no encoding |
+| Change_in_shot_angle | no encoding |
+| Speed | no encoding |
+| Rebound | one-hot |
+
+
+
 
 ##### 3. Random Forest

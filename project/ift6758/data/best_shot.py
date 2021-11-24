@@ -132,10 +132,11 @@ def plot_goal_rate(proba, true_y, label):
     y_valid_df['bins_percentile'] = pd.cut(proba, percentile_pred, duplicates='drop')
     goal_rate_by_percentile = y_valid_df.groupby(by=['bins_percentile']).apply(lambda g: g['is_goal'].sum()/len(g))
 
+
     if len(percentile_pred)-len(goal_rate_by_percentile) == 1:
         percentile = percentile[:-1]
     else:
-        percentile = percentile[:-2]
+        percentile = percentile[:-(len(percentile_pred)-len(goal_rate_by_percentile))]
 
     sns.set_theme()
     g = sns.lineplot(x=percentile, y=goal_rate_by_percentile*100, label=label)
@@ -158,7 +159,7 @@ def plot_cumulative_sum(true_y, y_valid_df, label):
     if len(percentile)-len(cum_sum_goals) == 1:
         percentile = percentile[:-1]
     else:
-        percentile = percentile[:-2]
+        percentile = percentile[:-(len(percentile)-len(cum_sum_goals))]
 
     g = sns.lineplot(x=percentile, y=cum_sum_goals*100, label=label)
     ax = g.axes
@@ -212,7 +213,7 @@ def train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch, lr):
         keras.layers.Dropout(0.05),
         keras.layers.Dense(32, activation='relu'),
         keras.layers.Dropout(0.05),
-        keras.layers.Dense(16, activation='relu'),
+        keras.layers.Dense(64, activation='relu'),
         keras.layers.Dropout(0.05),
         keras.layers.Dense(1, activation='sigmoid')
     ])
@@ -278,32 +279,40 @@ def main(data_train):
     x_train, x_valid, y_train, y_valid, features = prep_data(data_train)
 
 
-
     if TOGGLE_TRAIN:
         clf = train_nn(x_train, x_valid, y_train, y_valid, features, comet=True)
 
     else:
         # File path
-        filepath = 'nn_models/nn.epoch41-loss0.33.hdf5'
+        filepath = 'nn_models/nn.epoch25-loss0.32.hdf5'
 
         # Load the model
-        model = keras.models.load_model(filepath, compile = True)
+        model = keras.models.load_model('nn_models_best/best_shot_nn_final.hdf5', compile = True)
+        model1 = keras.models.load_model('nn_models_best/retail_perch_2770.hdf5', compile = True)
+        model2 = keras.models.load_model('nn_models_best/separate_alfalfa_7886.hdf5', compile = True)
 
         # Generate predictions for samples
         predictions = model.predict(x_valid)
+        predictions1 = model1.predict(x_valid)
+        predictions2 = model2.predict(x_valid)
 
 
         find_optimal_threshold(predictions, y_valid)
 
+
         # # ROC curve
-        # plot_roc_curve(predictions, y_valid.to_numpy(), '-', 'nn distance')
+        # plot_roc_curve(predictions, y_valid.to_numpy(), '-', 'best_shot_nn_final')
+        # plot_roc_curve(predictions1, y_valid.to_numpy(), '-', 'retail_perch_2770')
+        # plot_roc_curve(predictions2, y_valid.to_numpy(), '-', 'separate_alfalfa_7886')
         # plt.xlabel('False positive rate')
         # plt.ylabel('True positive rate')
         # plt.legend()
         # plt.show()
 
         # # Goal rate
-        # valid_goal_rate = plot_goal_rate(predictions.flatten(), y_valid, 'NN')
+        # valid_goal_rate = plot_goal_rate(predictions.flatten(), y_valid, 'best_shot_nn_final')
+        # valid_goal_rate1 = plot_goal_rate(predictions1.flatten(), y_valid, 'retail_perch_2770')
+        # valid_goal_rate2 = plot_goal_rate(predictions2.flatten(), y_valid, 'separate_alfalfa_7886')
 
         # plt.xlim(100, 0)
         # plt.ylim(0, 100)
@@ -313,7 +322,9 @@ def main(data_train):
 
 
         # # Cumulative goal rate
-        # plot_cumulative_sum(y_valid, valid_goal_rate, 'NN')
+        # plot_cumulative_sum(y_valid, valid_goal_rate, 'best_shot_nn_final')
+        # plot_cumulative_sum(y_valid, valid_goal_rate1, 'retail_perch_2770')
+        # plot_cumulative_sum(y_valid, valid_goal_rate2, 'separate_alfalfa_7886')
 
         # plt.xlim(100, 0)
         # plt.ylim(0, 100)
@@ -322,14 +333,16 @@ def main(data_train):
         # plt.show()
 
 
-        # calibration curve
-        sns.set_theme()
-        fig = plt.figure()
-        ax = plt.axes()
-        disp_random = CalibrationDisplay.from_predictions(y_valid, predictions, n_bins=25, ax=ax, name='Random classifier', ref_line=False)
-        plt.xlim(0,0.3)
-        plt.legend(loc=2)
-        plt.show()
+        # # calibration curve
+        # sns.set_theme()
+        # fig = plt.figure()
+        # ax = plt.axes()
+        # disp_random = CalibrationDisplay.from_predictions(y_valid, predictions, n_bins=25, ax=ax, name='best_shot_nn_final', ref_line=False)
+        # disp_random = CalibrationDisplay.from_predictions(y_valid, predictions1, n_bins=25, ax=ax, name='retail_perch_2770', ref_line=False)
+        # disp_random = CalibrationDisplay.from_predictions(y_valid, predictions2, n_bins=25, ax=ax, name='separate_alfalfa_7886', ref_line=False)
+        # plt.xlim(0,0.3)
+        # plt.legend(loc=2)
+        # plt.show()
 
 
 
@@ -342,3 +355,4 @@ def main(data_train):
 if __name__ == "__main__":
     main(train_data)
 # %%
+
