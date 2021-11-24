@@ -50,32 +50,79 @@ train_data, test_data = data[~data['game_pk'].str.startswith('2019')], data[data
 #     'shot_last_event_distance', 'Rebound', 'Change_in_shot_angle', 'Speed'
 # ]
 
-def prep_data(data_train):
-    # Set seleceted features
-    selected_features = [
-        'is_goal', 'side',
-        'shot_type', 'team_side', 'period',
-        'period_type', 'coordinate_x', 'coordinate_y',
-        'distance_net', 'angle_net', 'previous_event_type',
-        'previous_event_x_coord',
-        'previous_event_y_coord',
-        'previous_event_time_seconds', 'time_since_pp_started',
-        'current_time_seconds', 'current_friendly_on_ice',
-        'current_opposite_on_ice', 'shot_last_event_delta',
-        'shot_last_event_distance', 'Change_in_shot_angle', 'Speed', 'Rebound'
-    ]
-    data = data_train[selected_features]
+def prep_data(data_train, bonus):
+    if bonus:
+        # Set seleceted features
+        selected_features = [
+            'is_goal', 'side',
+            'shot_type', 'team_side', 'period',
+            'period_type', 'coordinate_x', 'coordinate_y',
+            'distance_net', 'angle_net', 'previous_event_type',
+            'previous_event_x_coord',
+            'previous_event_y_coord',
+            'previous_event_time_seconds', 'time_since_pp_started',
+            'current_time_seconds', 'current_friendly_on_ice',
+            'current_opposite_on_ice', 'shot_last_event_delta',
+            'shot_last_event_distance', 'Change_in_shot_angle', 'Speed', 'Rebound'
+        ]
+        data = data_train[selected_features]
 
-    # Drop rows with NaN values
-    data = data.dropna(subset = selected_features)
+        # Drop rows with NaN values
+        data = data.dropna(subset = selected_features)
 
-    # Encoding categorical features into a one-hot encoding
-    categorical_features = [
-        'side',
-        'shot_type', 'team_side', 'period',
-        'period_type', 'previous_event_type',
-        'current_friendly_on_ice', 'current_opposite_on_ice', 'Rebound'
-    ]
+        # Encoding categorical features into a one-hot encoding
+        categorical_features = [
+            'side',
+            'shot_type', 'team_side', 'period',
+            'period_type', 'previous_event_type',
+            'current_friendly_on_ice', 'current_opposite_on_ice', 'Rebound'
+        ]
+
+        features_standardizing = [
+            'coordinate_x', 'coordinate_y',
+            'distance_net', 'angle_net',
+            'previous_event_x_coord',
+            'previous_event_y_coord',
+            'previous_event_time_seconds', 'time_since_pp_started',
+            'current_time_seconds',
+            'shot_last_event_delta',
+            'shot_last_event_distance', 'Change_in_shot_angle', 'Speed'
+        ]
+
+    else:
+        # Set seleceted features
+        selected_features = [
+            'is_goal', 'side',
+            'shot_type', 'team_side', 'period',
+            'period_type', 'coordinate_x', 'coordinate_y',
+            'distance_net', 'angle_net', 'previous_event_type',
+            'previous_event_x_coord',
+            'previous_event_y_coord',
+            'previous_event_time_seconds', 'shot_last_event_delta',
+            'shot_last_event_distance', 'Change_in_shot_angle', 'Speed', 'Rebound'
+        ]
+        data = data_train[selected_features]
+
+        # Drop rows with NaN values
+        data = data.dropna(subset = selected_features)
+
+        # Encoding categorical features into a one-hot encoding
+        categorical_features = [
+            'side',
+            'shot_type', 'team_side', 'period',
+            'period_type', 'previous_event_type',
+            'Rebound'
+        ]
+
+        features_standardizing = [
+            'coordinate_x', 'coordinate_y',
+            'distance_net', 'angle_net',
+            'previous_event_x_coord',
+            'previous_event_y_coord',
+            'previous_event_time_seconds',
+            'shot_last_event_delta',
+            'shot_last_event_distance', 'Change_in_shot_angle', 'Speed'
+        ]
 
 
     # Ecoding the features
@@ -102,16 +149,6 @@ def prep_data(data_train):
     # Split the data into features and labels for train and validation
     x_train, x_valid, y_train, y_valid = train_test_split(data.drop(columns=['is_goal']), data['is_goal'], test_size=0.2, stratify=data['is_goal'])
 
-    features_standardizing = [
-        'coordinate_x', 'coordinate_y',
-        'distance_net', 'angle_net',
-        'previous_event_x_coord',
-        'previous_event_y_coord',
-        'previous_event_time_seconds', 'time_since_pp_started',
-        'current_time_seconds',
-        'shot_last_event_delta',
-        'shot_last_event_distance', 'Change_in_shot_angle', 'Speed'
-    ]
 
     # normalization/standardization to features
     scaler = StandardScaler()
@@ -276,7 +313,8 @@ def main(data_train):
 
     print(os.environ.get("COMET_API_KEY"))
 
-    x_train, x_valid, y_train, y_valid, features = prep_data(data_train)
+    x_train, x_valid, y_train, y_valid, features = prep_data(data_train, bonus=True)
+    x_train1, x_valid1, y_train1, y_valid1, features1 = prep_data(data_train, bonus=False)
 
 
     if TOGGLE_TRAIN:
@@ -288,37 +326,37 @@ def main(data_train):
 
         # Load the model
         model = keras.models.load_model('nn_models_best/best_shot_nn_final.hdf5', compile = True)
-        model1 = keras.models.load_model('nn_models_best/retail_perch_2770.hdf5', compile = True)
+        model1 = keras.models.load_model('nn_models_best/unnecessary_truss_2939.hdf5', compile = True)
         model2 = keras.models.load_model('nn_models_best/separate_alfalfa_7886.hdf5', compile = True)
 
         # Generate predictions for samples
         predictions = model.predict(x_valid)
-        predictions1 = model1.predict(x_valid)
+        predictions1 = model1.predict(x_valid1)
         predictions2 = model2.predict(x_valid)
 
 
-        find_optimal_threshold(predictions, y_valid)
+        # find_optimal_threshold(predictions1, y_valid1)
 
 
         # # ROC curve
         # plot_roc_curve(predictions, y_valid.to_numpy(), '-', 'best_shot_nn_final')
-        # plot_roc_curve(predictions1, y_valid.to_numpy(), '-', 'retail_perch_2770')
+        # plot_roc_curve(predictions1, y_valid1.to_numpy(), '-', 'nobonus')
         # plot_roc_curve(predictions2, y_valid.to_numpy(), '-', 'separate_alfalfa_7886')
         # plt.xlabel('False positive rate')
         # plt.ylabel('True positive rate')
         # plt.legend()
         # plt.show()
 
-        # # Goal rate
-        # valid_goal_rate = plot_goal_rate(predictions.flatten(), y_valid, 'best_shot_nn_final')
-        # valid_goal_rate1 = plot_goal_rate(predictions1.flatten(), y_valid, 'retail_perch_2770')
-        # valid_goal_rate2 = plot_goal_rate(predictions2.flatten(), y_valid, 'separate_alfalfa_7886')
+        # Goal rate
+        valid_goal_rate = plot_goal_rate(predictions.flatten(), y_valid, 'best_shot_nn_final')
+        valid_goal_rate1 = plot_goal_rate(predictions1.flatten(), y_valid1, 'unnecessary_truss_2939')
+        valid_goal_rate2 = plot_goal_rate(predictions2.flatten(), y_valid, 'separate_alfalfa_7886')
 
-        # plt.xlim(100, 0)
-        # plt.ylim(0, 100)
-        # plt.xlabel('Shot probability model percentile')
-        # plt.ylabel('Goals / (Shots + Goals)')
-        # plt.show()
+        plt.xlim(100, 0)
+        plt.ylim(0, 100)
+        plt.xlabel('Shot probability model percentile')
+        plt.ylabel('Goals / (Shots + Goals)')
+        plt.show()
 
 
         # # Cumulative goal rate
