@@ -8,11 +8,17 @@ import matplotlib.pyplot as plt
 from comet_ml import Experiment
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve, f1_score
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.neighbors import KNeighborsClassifier,KNeighborsRegressor
 from sklearn.model_selection import GridSearchCV as GS
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+import matplotlib.ticker as mtick
+from sklearn.calibration import CalibrationDisplay
+from sklearn.metrics import plot_confusion_matrix
+
+
+
 
 
 #%%
@@ -78,14 +84,14 @@ def prep_data(data_train):
     X_train[features_standardizing] = scaler.fit_transform(X_train[features_standardizing])
     X_valid[features_standardizing] = scaler.fit_transform(X_valid[features_standardizing])
     y_train = y_train.to_numpy()
-    y_valid = y_valid.to_numpy()
+    # y_valid = y_valid.to_numpy()
 
     return X_train,X_valid, y_train, y_valid, selected_features
 
 
 # %%
 
-def train_model(X_train, y_train, n_neighbors = [5, 6, 7,8], weights=['uniform', 'distance'], n_estimators=[100,200,300],criterion=['squared_error', 'absolute_error', 'poisson'],  comet=False, train_KNN=False, train_forest=False):
+def train_model(X_train, y_train, n_neighbors = [5, 6, 7,8], weights=['uniform', 'distance'], n_estimators=[100,200,300],criterion=['squared_error','poisson'],  comet=False, train_KNN=False, train_forest=False):
     if train_KNN is True:
         tuned_parameters = [
         {"n_neighbors": n_neighbors, "weights": weights}]
@@ -129,97 +135,211 @@ def train_model(X_train, y_train, n_neighbors = [5, 6, 7,8], weights=['uniform',
 
     return GS_model
 
-def plot_roc_curve(pred_prob, true_y, marker, label):
-    score = roc_auc_score(true_y, pred_prob)
-    fpr, tpr, _ = roc_curve(true_y, pred_prob)
+def plot_roc_curve(pred_probs, true_y, markers, labels, save_file=None):
     sns.set_theme()
     plt.grid(True)
-    plt.plot(fpr, tpr, linestyle=marker, label=label+f' (area={score:.2f})')
+    for proba, marker, label in zip(pred_probs, markers, labels):
+        score = roc_auc_score(true_y, proba)
+        fpr, tpr, _ = roc_curve(true_y, proba)
+        plt.plot(fpr, tpr, linestyle=marker, label=label+f' (area={score:.2f})')
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.legend()
+    if save_file is not None:
+        plt.savefig(save_file, format='png')
+    plt.show()
+
+
+def create_percentile_model(proba, actual_y):
+    percentile = np.arange(0, 102, 2)
+    percentile_pred = np.percentile(proba, percentile)
+    percentile_pred = np.unique(percentile_pred)
+    percentile_pred = np.concatenate([[0], percentile_pred])
+
+    y_valid_df = pd.DataFrame(actual_y)
+    percentile_pred = np.unique(percentile_pred)
+    y_valid_df['bins_percentile'] = pd.cut(proba, percentile_pred)
+    return percentile, percentile_pred, y_valid_df
+
+
+def plot_goal_rate(probas, actual_y,labels, save_file=None):
+    sns.set_theme()
+    for proba, label in zip(probas, labels):
+        percentile, percentile_pred, y_valid_df = create_percentile_model(proba, actual_y)
+        bins = np.linspace(0,100,len(y_valid_df['bins_percentile'].unique()))[1:]
+        goal_rate_by_percentile = y_valid_df.groupby(by=['bins_percentile']).apply(lambda g: g['is_goal'].sum()/len(g))
+        g = sns.lineplot(x=bins, y=goal_rate_by_percentile[:1]*100, label=label)
+        ax = g.axes
+        ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
+    plt.xlim(100, 0)
+    plt.ylim(0, 100)
+    plt.xlabel('Shot probability model percentile')
+    plt.ylabel('Goals / (Shots + Goals)')
+    if save_file is not None:
+        plt.savefig(save_file, format='png')
+    plt.show()
+
+
+def plot_cumulative_sum(probas, actual_y, labels, save_file=None):
+    sns.set_theme()
+    for proba, label in zip(probas, labels):
+        percentile, percentile_pred, y_valid_df = create_percentile_model(proba, actual_y)
+        bins = np.linspace(0,100,len(y_valid_df['bins_percentile'].unique()))[1:]
+        total_number_goal = (actual_y == 1).sum()
+        sum_goals_by_percentile = y_valid_df.groupby(by='bins_percentile').apply(lambda g: g['is_goal'].sum()/total_number_goal)
+        cum_sum_goals = sum_goals_by_percentile[::-1].cumsum(axis=0)[::-1]
+
+        g = sns.lineplot(x=bins, y=cum_sum_goals[1:]*100, label=label)
+        ax = g.axes
+        ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
+    plt.xlim(100, 0)
+    plt.ylim(0, 100)
+    plt.xlabel('Shot probability model percentile')
+    plt.ylabel('Proportion')
+    if save_file is not None:
+        plt.savefig(save_file, format='png')
+    plt.show()
+
+
+def plot_calibration(probas, actual_y, labels, save_file=None):
+    sns.set_theme()
+    fig = plt.figure()
+    ax = plt.axes()
+    for proba, label in zip(probas, labels):
+        disp = CalibrationDisplay.from_predictions(actual_y, proba, n_bins=25, ax=ax, name=label, ref_line=False)
+    plt.xlim(0,0.3)
+    plt.legend(loc=9)
+    if save_file is not None:
+        plt.savefig(save_file, format='png')
+    plt.show()
+
+def find_optimal_threshold(predictions, true_y):
+    scores = []
+    threshold = []
+
+    for i in range(0, 100):
+        # create a numpy array with the same shape as predictions
+        masked_predictions = np.zeros(predictions.shape)
+        for j, prediction in enumerate(predictions):
+            if prediction <= i/100:
+                masked_predictions[j] = 0
+            else:
+                masked_predictions[j] = 1
+
+        scores.append(f1_score(true_y, masked_predictions))
+        threshold.append(i/100)
+
+
+    print(np.max(scores), np.argmax(scores))
+
+    threshold = np.argmax(scores) / 100
+    masked_predictions = np.zeros(predictions.shape)
+
+    for i, prediction in enumerate(predictions):
+        if prediction <= threshold:
+            masked_predictions[i] = 0
+        else:
+            masked_predictions[i] = 1
+    print(classification_report(true_y, masked_predictions))
+    print(confusion_matrix(true_y, masked_predictions))
+    print(f'Best threshold is : {threshold} for an F1 value of {max(scores)}.')
+    return threshold
 
 X_train,X_valid, y_train, y_valid, selected_features = prep_data(train_data)
 def main(data_train):
 
-    TOGGLE_TRAIN = True
-    THRESHOLD_TWEAKING = True
+    TOGGLE_TRAIN = False
     TRAIN_FOREST = False
-    TRAIN_KNN = True
+    TRAIN_KNN = False
 
     X_train,X_valid, y_train, y_valid, selected_features = prep_data(data_train)
 
 
 
     if TOGGLE_TRAIN:
-        GS_model = train_model(X_train, y_train, comet=False, train_forest=TRAIN_FOREST, train_KNN=TRAIN_KNN)
-        predictions = GS_model.predict(X_valid)
-        if THRESHOLD_TWEAKING:
-            for i in np.linspace(0.1,1,10):
-                temp_predictions = GS_model.predict(X_valid)
-                threshold = i
-                temp_predictions[temp_predictions <= threshold] = 0
-                temp_predictions[temp_predictions > threshold] = 1
-                print(f'Displaying scores for threshold of {i}')
-                print(classification_report(y_valid, temp_predictions))
-                print(roc_auc_score(y_valid, temp_predictions))
-        best_KNN_threshold = None
-        best_Forest_threshold = None
+        GS_model = train_model(X_train, y_train, comet=True, train_forest=TRAIN_FOREST, train_KNN=TRAIN_KNN)
         if TRAIN_KNN:
-            threshold = best_KNN_threshold
-            predictions[predictions <= threshold] = 0
-            predictions[predictions > threshold] = 1      
-            print(predictions)
-            print(classification_report(y_valid, predictions))
-            conf_matrix = confusion_matrix(y_valid, predictions)
-        if TRAIN_FOREST:
-            threshold = best_Forest_threshold
-            predictions[predictions <= threshold] = 0
-            predictions[predictions > threshold] = 1      
-            print(predictions)
-            print(classification_report(y_valid, predictions))
-            conf_matrix = confusion_matrix(y_valid, predictions)                
+            joblib.dump(GS_model, 'KNN_model.pkl')
 
-        # ROC curve
-        if TRAIN_KNN:
-            plot_roc_curve(predictions, y_valid, '-', 'KNN distance')
         if TRAIN_FOREST:
-            plot_roc_curve(predictions, y_valid, '-', 'Forest distance')
-        plt.xlabel('False positive rate')
-        plt.ylabel('True positive rate')
-        plt.legend()
-        plt.show()
-
+            joblib.dump(GS_model, 'rngforest.pkl')
 
     else:
-        pass
         # File path
-        #filepath = './nn.epoch05-loss0.28.hdf5'
+        filepath_KNN = 'KNN_model.pkl'
+        filepath_forest = 'rngforest.pkl'
 
         # Load the model
-        #model = keras.models.load_model(filepath, compile = True)
+        model_KNN = joblib.load(filepath_KNN , mmap_mode ='r')
+        model_forest = joblib.load(filepath_forest , mmap_mode ='r')
+        selected_features = ['side', 'shot_type',
+       'period', 'period_type', 'coordinate_x', 'coordinate_y',
+       'distance_net', 'angle_net', 'previous_event_type',
+       'time_since_pp_started', 'current_time_seconds',
+       'current_friendly_on_ice', 'current_opposite_on_ice','shot_last_event_delta',
+        'shot_last_event_distance', 'Rebound', 'Change_in_shot_angle', 'Speed']
+
+        # REMOVE THIS##############
+        experiment = Experiment(
+            api_key=os.environ.get("COMET_API_KEY"),
+            project_name="ift6758-project",
+            workspace="jaihon"
+        )
+        best_params_KNN = model_KNN.best_params_
+        experiment.log_parameters({'model': 'KNN', 'feature': selected_features}.update(best_params_KNN))
+        model_name = 'KNN_Final_Final_model'
+        joblib.dump(model_KNN, model_name+'.joblib')
+        experiment.log_model(model_name, model_name+'.joblib')     
+
+        experiment = Experiment(
+            api_key=os.environ.get("COMET_API_KEY"),
+            project_name="ift6758-project",
+            workspace="jaihon"
+        )
+        best_params_forest = model_forest.best_params_
+        experiment.log_parameters({'model': 'RandomForestClassifier', 'feature': selected_features}.update(best_params_forest))
+        model_name = 'Randomforestclassifier_Final_model'
+        joblib.dump(model_forest, model_name+'.joblib')
+        experiment.log_model(model_name, model_name+'.joblib')     
+        # REMOVE THIS##############
+
+
 
         # Generate predictions for samples
-        #predictions = model.predict(x_valid)
-        # print(predictions)
-        # print(np.mean(predictions))
-        # print(np.std(predictions))
+        # predictions_KNN_prob = model_KNN.predict(X_train)
+        # predictions_forest_prob = model_forest.predict(X_train)
+
+        # best_KNN_threshold = find_optimal_threshold(predictions_KNN_prob, y_train)
+        # best_forest_threshold = find_optimal_threshold(predictions_forest_prob, y_train)
+        best_KNN_threshold=0.73
+        best_forest_threshold = 0.44
+        predictions_KNN_prob = model_KNN.predict(X_valid)
+        predictions_forest_prob = model_forest.predict(X_valid)
+        predictions_KNN = predictions_KNN_prob.copy()
+        predictions_forest = predictions_forest_prob.copy()
+        predictions_KNN[predictions_KNN <= best_KNN_threshold] = 0
+        predictions_KNN[predictions_KNN > best_KNN_threshold] = 1
+        predictions_forest[predictions_forest <= best_forest_threshold] = 0
+        predictions_forest[predictions_forest > best_forest_threshold] = 1
+
+        print(confusion_matrix(y_valid,predictions_KNN))
+        print(confusion_matrix(y_valid, predictions_forest))
+    
+
+        # Goal rate:
+        plot_goal_rate([predictions_KNN_prob,predictions_forest_prob], y_valid, ['KNN', 'Forest'], 'goal_rate')
+
+        #Cumsum
+        plot_cumulative_sum([predictions_KNN_prob,predictions_forest_prob], y_valid, ['KNN', 'Forest'], 'cum_sum')
+
+        #Calibration
+        plot_cumulative_sum([predictions_KNN_prob, predictions_forest_prob], y_valid, ['KNN', 'Forest'], 'calibration')
+        # ROC curve
+        plot_roc_curve([predictions_KNN_prob, predictions_forest_prob], y_valid, ['-', '-'], ['KNN', 'Forest'], 'roc_curve')
+    
 
 
-        # threshold = 0.28
-        # predictions[predictions <= threshold] = 0
-        # predictions[predictions > threshold] = 1
 
-        # y_valid = y_valid.to_numpy()
-
-
-        # print(classification_report(y_valid, predictions))
-        # print(confusion_matrix(y_valid, predictions))
-
-        # # correct = 0
-
-        # # for i, prediction in enumerate(predictions):
-        # #     if prediction == y_valid[i]:
-        # #         correct += 1
-
-        # # print(correct / len(predictions))
 
 
 if __name__ == "__main__":
