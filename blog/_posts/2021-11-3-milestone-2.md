@@ -143,7 +143,7 @@ penalty and by checking on which side the team was. We then built a tidy event o
 relative to the previous event. Finally, we got the current event time and subtracted
 the starting time of the penalty from the current time to have the time since the penalty started (two types of penalties generated).
 To get the number of friendly players on ice and the number of opposite players on ice, we first checked the side of the team to figure out who is friendly and who is not and
-then to calculate the number of friendly_players, we substract 5 minus the number of players lost depending of the type of
+then subtracted the number of players lost depending on the type of the
 penalty, and we did the same for the opposite players.
 
 
