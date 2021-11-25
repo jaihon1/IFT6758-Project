@@ -208,7 +208,7 @@ prediction_report(predictions, y_test, threshold=0.33)
 
 # %%
 '''
-XGBOOST MODELS
+BASELINE MODELS
 '''
 
 # Load the data
@@ -221,10 +221,11 @@ data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
 data = data[data['Speed'] < 300] # remove outliers with value = inf
 
 x_test, y_test = prepare(data, bonus=True, model_type='nn')
-x_test_nobonus, y_test_nobonus = prepare(data, bonus=False, model_type='nn')
 
 # Load the model
-model = keras.models.load_model('nn_models_best/best_shot_nn_final.hdf5', compile = True)
+model = joblib.load('baseline_models/regression_angle_net.joblib')
+result = model.score(x_test, y_test)
+
 
 # Generate predictions for samples
 predictions = model.predict(x_test)
