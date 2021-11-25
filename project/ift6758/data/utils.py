@@ -5,7 +5,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.calibration import CalibrationDisplay
 from sklearn.metrics import roc_auc_score, roc_curve
 from comet_ml import Experiment
@@ -101,13 +101,17 @@ def plot_calibration(probas, actual_y, labels):
     plt.show()
 
 
-def prep_data(data_train, selected_features, categorical_features):
+def prep_data(data_train, selected_features, categorical_features, norm=None):
 
     data = data_train[selected_features]
 
     # Drop rows with NaN values
     print('Number of rows dropped:', data[selected_features].isnull().any(axis=1).sum())
     data = data.dropna(subset=selected_features)
+
+    if norm is not None:
+        scaler = StandardScaler()
+        data[norm] = scaler.fit_transform(data[norm])
 
     # Encoding categorical features into a one-hot encoding
     for feature in categorical_features:
