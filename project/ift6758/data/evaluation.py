@@ -187,14 +187,14 @@ data = pd.read_csv("games_data/games_data_all_seasons.csv")
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
 data = data[data['Speed'] < 300] # remove outliers with value = inf
 
-x_test, y_test = prepare(data, bonus=True, model_type='nn', std=False)
-x_test_nobonus, y_test_nobonus = prepare(data, bonus=False, model_type='nn', std=False)
+x_test, y_test = prepare(data, bonus=True, model_type='nn', std=True)
+x_test_nobonus, y_test_nobonus = prepare(data, bonus=False, model_type='nn', std=True)
 
 
 # Load the model
-model = keras.models.load_model('nn_models_best/best_shot_nn_final.hdf5', compile = True)
-model1 = keras.models.load_model('nn_models_best/unnecessary_truss_2939.hdf5', compile = True)
-model2 = keras.models.load_model('nn_models_best/separate_alfalfa_7886.hdf5', compile = True)
+model = keras.models.load_model('../../models/nn_models_best/best_shot_nn_final.hdf5', compile = True)
+model1 = keras.models.load_model('../../models/nn_models_best/unnecessary_truss_2939.hdf5', compile = True)
+model2 = keras.models.load_model('../../models/nn_models_best/separate_alfalfa_7886.hdf5', compile = True)
 
 # Generate predictions for samples
 predictions = model.predict(x_test)
