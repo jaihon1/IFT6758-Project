@@ -314,7 +314,7 @@ def main(data_train):
     print(os.environ.get("COMET_API_KEY"))
 
     x_train, x_valid, y_train, y_valid, features = prep_data(data_train, bonus=True)
-    x_train1, x_valid1, y_train1, y_valid1, features1 = prep_data(data_train, bonus=False)
+    x_train_no_bonus, x_valid_no_bonus, y_train_no_bonus, y_valid_no_bonus, features_no_bonus = prep_data(data_train, bonus=False)
 
 
     if TOGGLE_TRAIN:
@@ -331,37 +331,37 @@ def main(data_train):
 
         # Generate predictions for samples
         predictions = model.predict(x_valid)
-        predictions1 = model1.predict(x_valid1)
+        predictions1 = model1.predict(x_valid_no_bonus)
         predictions2 = model2.predict(x_valid)
 
 
-        # find_optimal_threshold(predictions1, y_valid1)
+        find_optimal_threshold(predictions2, y_valid)
 
 
-        # # ROC curve
-        # plot_roc_curve(predictions, y_valid.to_numpy(), '-', 'best_shot_nn_final')
-        # plot_roc_curve(predictions1, y_valid1.to_numpy(), '-', 'nobonus')
-        # plot_roc_curve(predictions2, y_valid.to_numpy(), '-', 'separate_alfalfa_7886')
-        # plt.xlabel('False positive rate')
-        # plt.ylabel('True positive rate')
-        # plt.legend()
-        # plt.show()
-
-        # Goal rate
-        valid_goal_rate = plot_goal_rate(predictions.flatten(), y_valid, 'best_shot_nn_final')
-        valid_goal_rate1 = plot_goal_rate(predictions1.flatten(), y_valid1, 'unnecessary_truss_2939')
-        valid_goal_rate2 = plot_goal_rate(predictions2.flatten(), y_valid, 'separate_alfalfa_7886')
-
-        plt.xlim(100, 0)
-        plt.ylim(0, 100)
-        plt.xlabel('Shot probability model percentile')
-        plt.ylabel('Goals / (Shots + Goals)')
+        # ROC curve
+        plot_roc_curve(predictions, y_valid.to_numpy(), '-', 'best_shot_nn_final')
+        plot_roc_curve(predictions1, y_valid_no_bonus.to_numpy(), '-', 'unnecessary_truss_2939')
+        plot_roc_curve(predictions2, y_valid.to_numpy(), '-', 'separate_alfalfa_7886')
+        plt.xlabel('False positive rate')
+        plt.ylabel('True positive rate')
+        plt.legend()
         plt.show()
+
+        # # Goal rate
+        # valid_goal_rate = plot_goal_rate(predictions.flatten(), y_valid, 'best_shot_nn_final')
+        # valid_goal_rate1 = plot_goal_rate(predictions1.flatten(), y_valid_no_bonus, 'unnecessary_truss_2939')
+        # valid_goal_rate2 = plot_goal_rate(predictions2.flatten(), y_valid, 'separate_alfalfa_7886')
+
+        # plt.xlim(100, 0)
+        # plt.ylim(0, 100)
+        # plt.xlabel('Shot probability model percentile')
+        # plt.ylabel('Goals / (Shots + Goals)')
+        # plt.show()
 
 
         # # Cumulative goal rate
         # plot_cumulative_sum(y_valid, valid_goal_rate, 'best_shot_nn_final')
-        # plot_cumulative_sum(y_valid, valid_goal_rate1, 'retail_perch_2770')
+        # plot_cumulative_sum(y_valid_no_bonus, valid_goal_rate1, 'unnecessary_truss_2939')
         # plot_cumulative_sum(y_valid, valid_goal_rate2, 'separate_alfalfa_7886')
 
         # plt.xlim(100, 0)
@@ -376,7 +376,7 @@ def main(data_train):
         # fig = plt.figure()
         # ax = plt.axes()
         # disp_random = CalibrationDisplay.from_predictions(y_valid, predictions, n_bins=25, ax=ax, name='best_shot_nn_final', ref_line=False)
-        # disp_random = CalibrationDisplay.from_predictions(y_valid, predictions1, n_bins=25, ax=ax, name='retail_perch_2770', ref_line=False)
+        # disp_random = CalibrationDisplay.from_predictions(y_valid_no_bonus, predictions1, n_bins=25, ax=ax, name='retail_perch_2770', ref_line=False)
         # disp_random = CalibrationDisplay.from_predictions(y_valid, predictions2, n_bins=25, ax=ax, name='separate_alfalfa_7886', ref_line=False)
         # plt.xlim(0,0.3)
         # plt.legend(loc=2)

@@ -157,19 +157,20 @@ link to the experiment which stores the filtered DataFrame artifact
 Brief intro on what and why we decide to use in this part...
 
 ### Model Results and Analysis
-Show all required graphs (4 graphs) for all interesting/best experiments done for this model.
 
-##### 1. KNN
+#### 1. KNN
 
-##### 2. Neural Network
+#### 2. Neural Network
 
 Using standardization techniques, we can see that our neural network model performs better than without.
 
 Using very value of a small dropout technique to help prevent overfitting, we can see that our neural network model performs better with this regularization technique.
 
+Including features developed in the bonus question (current_time_seconds, time_since_pp_started, current_friendly_on_ice, current_opposite_on_ice), we can see that our neural network model performs better.
+
+##### Selected Features
 Feature Selection technique: Domain knowledge
 Using feature selection, we selected the following features to train our neual network models:
-
 
 | Feature     | Encoding |
 | ----------- | ----------- |
@@ -196,6 +197,117 @@ Using feature selection, we selected the following features to train our neual n
 | Rebound | one-hot |
 
 
+##### Results and Analysis
+
+Because the dataset was very unbalanced in nature, we decide to mainly use the F1 Score. In addition, we also used a custom made threshold technique to help us analyse the results of our models. Since our model's outputs were very small probability values, we decided that the 0.5 threshold for binay prediction wasn't the way to go. Instead, for each model we trained, we found a better threshold value that would give us the optimal F1 score at the end.
+
+<table>
+    <caption style="caption-side: bottom; font-size: small;">F1 score results for our Neural Network models</caption>
+    <tr>
+        <th scope="row">Model</th>
+        <th scope="col">F1 Score (Class 0)</th>
+        <th scope="col">F1 Score (Class 1)</th>
+    </tr>
+    <tr>
+        <td>best_shot_nn_final</td>
+        <td>0.90</td>
+        <td>0.32</td>
+    </tr>
+    <tr>
+        <td>unnecessary_truss_2939</td>
+        <td>0.90</td>
+        <td>0.31</td>
+    </tr>
+        <tr>
+        <td>separate_alfalfa_7886</td>
+        <td>0.89</td>
+        <td>0.31</td>
+    </tr>
+</table>
+
+<table>
+    <caption style="caption-side: bottom; font-size: small;">Confusion matrix results for best_shot_nn_final on validation set</caption>
+    <tr>
+        <th scope="row">Target/Prediction</th>
+        <th scope="col">Class 0 (not goal)</th>
+        <th scope="col">Class 1 (goal)</th>
+    </tr>
+    <tr>
+        <th scope="row">Class 0 (not goal)</th>
+        <td>46513</td>
+        <td>7228</td>
+    </tr>
+    <tr>
+        <th scope="row">Class 1 (goal)</th>
+        <td>2930</td>
+        <td>2413</td>
+    </tr>
+</table>
+
+<table>
+    <caption style="caption-side: bottom; font-size: small;">Confusion matrix results for unnecessary_truss_2939 on validation set</caption>
+    <tr>
+        <th scope="row">Target/Prediction</th>
+        <th scope="col">Class 0 (not goal)</th>
+        <th scope="col">Class 1 (goal)</th>
+    </tr>
+    <tr>
+        <th scope="row">Class 0 (not goal)</th>
+        <td>46712</td>
+        <td>7029</td>
+    </tr>
+    <tr>
+        <th scope="row">Class 1 (goal)</th>
+        <td>3091</td>
+        <td>2252</td>
+    </tr>
+</table>
+
+<table>
+    <caption style="caption-side: bottom; font-size: small;">Confusion matrix results for separate_alfalfa_7886 on validation set</caption>
+    <tr>
+        <th scope="row">Target/Prediction</th>
+        <th scope="col">Class 0 (not goal)</th>
+        <th scope="col">Class 1 (goal)</th>
+    </tr>
+    <tr>
+        <th scope="row">Class 0 (not goal)</th>
+        <td>45213</td>
+        <td>8528</td>
+    </tr>
+    <tr>
+        <th scope="row">Class 1 (goal)</th>
+        <td>2814</td>
+        <td>2529</td>
+    </tr>
+</table>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/best_shot_curves/best_shot_nn_roc.png" alt="best_shot_nn_roc">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Neural Network: ROC.</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/best_shot_curves/best_shot_nn_goal_rate.png" alt="best_shot_nn_goal_rate">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Neural Network: Goal rate.</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/best_shot_curves/best_shot_nn_cumulative.png" alt="best_shot_nn_cumulative">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Neural Network: Goal rate cumulative.</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/best_shot_curves/best_shot_nn_calib.png" alt="best_shot_nn_calib">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Neural Network: Calibration.</figcaption>
+</figure>
+
+##### Links to our models
+
+1. [Neural Network - best_shot_nn_final](https://www.comet.ml/jaihon/ift6758-project/f02e46ac553944f7ba18060044d873e9?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+2. [Neural Network - unnecessary_truss_2939](https://www.comet.ml/jaihon/ift6758-project/f22281d6264d462685c13628a0dd7daa?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+3. [Neural Network - separate_alfalfa_7886](https://www.comet.ml/jaihon/ift6758-project/b086d3049e1f47b7ae8aa569994983b4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
 
 
-##### 3. Random Forest
+
+#### 3. Random Forest
