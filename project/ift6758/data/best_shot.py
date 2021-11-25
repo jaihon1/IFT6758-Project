@@ -158,6 +158,7 @@ def prep_data(data_train, bonus):
 
     return x_train, x_valid, y_train, y_valid, selected_features
 
+
 #%%
 # Compute percentile
 def plot_goal_rate(proba, true_y, label):
@@ -294,8 +295,6 @@ def train_nn(x_train, x_valid, y_train, y_valid, features, comet=False):
         experiment.log_parameters({'model': 'nn', 'feature': features, 'class_weight': class_weight})
 
 
-    print('Input shape:', x_train.shape)
-
     clf = train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch=30, lr=0.001)
 
 
@@ -335,7 +334,7 @@ def main(data_train):
         predictions2 = model2.predict(x_valid)
 
 
-        find_optimal_threshold(predictions2, y_valid)
+        find_optimal_threshold(predictions1, y_valid_no_bonus)
 
 
         # ROC curve
