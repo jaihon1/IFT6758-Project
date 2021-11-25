@@ -36,20 +36,25 @@ selected_features = ['side', 'shot_type', 'period', 'period_type', 'coordinate_x
                     ]
 
 categorical_features = ['side', 'shot_type', 'period', 'period_type', 'team_side', 'previous_event_type']
+scale_features = ['coordinate_x', 'coordinate_y', 'distance_net', 'angle_net', 'time_since_pp_started',
+                  'previous_event_time_seconds', 'current_time_seconds', 'current_friendly_on_ice',
+                  'current_opposite_on_ice', 'previous_event_x_coord', 'previous_event_y_coord',
+                  'shot_last_event_delta', 'shot_last_event_distance', 'Change_in_shot_angle', 'Speed']
 
-train = prep_data(train, selected_features, categorical_features)
-
+train = prep_data(train, selected_features, categorical_features, norm=scale_features)
 #%%
 
-x_train, x_valid, y_train, y_valid = train_test_split(train[['distance_net', 'angle_net']], train['is_goal'], random_state=random_state, stratify=train['is_goal'])
+x_train, x_valid, y_train, y_valid = train_test_split(train.drop(columns=['is_goal']), train['is_goal'], random_state=random_state, stratify=train['is_goal'])
 
 #%%
-model = xgb.XGBClassifier(n_jobs=1)
+model = xgb.XGBClassifier(n_jobs=1, random_state=random_state, use_label_encoder=False)
 
-model.fit(x_train, y_train)
-pred = model.predict(x_valid)
-print(confusion_matrix(y_valid, pred))
-pred_proba = model.predict_proba(x_valid)
+model = model.fit(x_train[['distance_net', 'angle_net']], y_train)
+# %%
+pred = model.predict(x_valid[['distance_net', 'angle_net']])
+joblib.dump(model, 'default_xgb.joblib')
+print('Confusion matrix of default model:', confusion_matrix(y_valid, pred))
+pred_proba = model.predict_proba(x_valid[['distance_net', 'angle_net']])
 
 accuracy = np.sum(y_valid == pred)/len(pred)
 
