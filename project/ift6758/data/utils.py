@@ -21,8 +21,7 @@ def create_experiment(parameters):
     return experiment
 
 
-
-def plot_roc_curve(pred_probs, true_y, markers, labels):
+def plot_roc_curve(pred_probs, true_y, markers, labels, name_file=None):
     sns.set_theme()
     plt.grid(True)
     for proba, marker, label in zip(pred_probs, markers, labels):
@@ -32,6 +31,8 @@ def plot_roc_curve(pred_probs, true_y, markers, labels):
     plt.xlabel('False positive rate')
     plt.ylabel('True positive rate')
     plt.legend()
+    if name_file:
+        plt.savefig(name_file)
     plt.show()
 
 
@@ -48,7 +49,7 @@ def create_percentile_model(proba, actual_y):
     return percentile, percentile_pred, y_valid_df
 
 
-def plot_goal_rate(probas, actual_y,labels):
+def plot_goal_rate(probas, actual_y, labels, name_file=None):
     sns.set_theme()
     for proba, label in zip(probas, labels):
         percentile, percentile_pred, y_valid_df = create_percentile_model(proba, actual_y)
@@ -63,10 +64,12 @@ def plot_goal_rate(probas, actual_y,labels):
     plt.ylim(0, 100)
     plt.xlabel('Shot probability model percentile')
     plt.ylabel('Goals / (Shots + Goals)')
+    if name_file:
+        plt.savefig(name_file)
     plt.show()
 
 
-def plot_cumulative_sum(probas, actual_y, labels):
+def plot_cumulative_sum(probas, actual_y, labels, name_file=None):
     sns.set_theme()
     for proba, label in zip(probas, labels):
         percentile, percentile_pred, y_valid_df = create_percentile_model(proba, actual_y)
@@ -82,10 +85,12 @@ def plot_cumulative_sum(probas, actual_y, labels):
     plt.ylim(0, 100)
     plt.xlabel('Shot probability model percentile')
     plt.ylabel('Proportion')
+    if name_file:
+        plt.savefig(name_file)
     plt.show()
 
 
-def plot_calibration(probas, actual_y, labels):
+def plot_calibration(probas, actual_y, labels, name_file=None):
     sns.set_theme()
     fig = plt.figure()
     ax = plt.axes()
@@ -93,6 +98,8 @@ def plot_calibration(probas, actual_y, labels):
         disp = CalibrationDisplay.from_predictions(actual_y, proba, n_bins=25, ax=ax, name=label, ref_line=False)
     plt.xlim(0,0.3)
     plt.legend(loc=9)
+    if name_file:
+        plt.savefig(name_file)
     plt.show()
 
 
