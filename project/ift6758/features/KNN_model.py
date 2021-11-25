@@ -30,7 +30,6 @@ train_data, test_data = data[~data['game_pk'].str.startswith('2019')], data[data
 
 # Function (borrowed from Jaihon) to have control over desired features
 def prep_data(data_train):
-    feature_list = [i for i in train_data.columns]
     categorical_features = ['side', 'shot_type', 'period', 'period_type', 'previous_event_type', 'Rebound']
     num_features = [
     'coordinate_x', 'coordinate_y',
@@ -168,7 +167,7 @@ def plot_goal_rate(probas, actual_y,labels, save_file=None):
         percentile, percentile_pred, y_valid_df = create_percentile_model(proba, actual_y)
         bins = np.linspace(0,100,len(y_valid_df['bins_percentile'].unique()))[1:]
         goal_rate_by_percentile = y_valid_df.groupby(by=['bins_percentile']).apply(lambda g: g['is_goal'].sum()/len(g))
-        g = sns.lineplot(x=bins, y=goal_rate_by_percentile[:1]*100, label=label)
+        g = sns.lineplot(x=bins, y=goal_rate_by_percentile*100, label=label)
         ax = g.axes
         ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
     plt.xlim(100, 0)
@@ -189,7 +188,7 @@ def plot_cumulative_sum(probas, actual_y, labels, save_file=None):
         sum_goals_by_percentile = y_valid_df.groupby(by='bins_percentile').apply(lambda g: g['is_goal'].sum()/total_number_goal)
         cum_sum_goals = sum_goals_by_percentile[::-1].cumsum(axis=0)[::-1]
 
-        g = sns.lineplot(x=bins, y=cum_sum_goals[1:]*100, label=label)
+        g = sns.lineplot(x=bins, y=cum_sum_goals*100, label=label)
         ax = g.axes
         ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
     plt.xlim(100, 0)
@@ -245,7 +244,6 @@ def find_optimal_threshold(predictions, true_y):
     print(f'Best threshold is : {threshold} for an F1 value of {max(scores)}.')
     return threshold
 
-X_train,X_valid, y_train, y_valid, selected_features = prep_data(train_data)
 def main(data_train):
 
     TOGGLE_TRAIN = False
@@ -279,32 +277,6 @@ def main(data_train):
        'current_friendly_on_ice', 'current_opposite_on_ice','shot_last_event_delta',
         'shot_last_event_distance', 'Rebound', 'Change_in_shot_angle', 'Speed']
 
-        # REMOVE THIS##############
-        experiment = Experiment(
-            api_key=os.environ.get("COMET_API_KEY"),
-            project_name="ift6758-project",
-            workspace="jaihon"
-        )
-        best_params_KNN = model_KNN.best_params_
-        experiment.log_parameters({'model': 'KNN', 'feature': selected_features}.update(best_params_KNN))
-        model_name = 'KNN_Final_Final_model'
-        joblib.dump(model_KNN, model_name+'.joblib')
-        experiment.log_model(model_name, model_name+'.joblib')     
-
-        experiment = Experiment(
-            api_key=os.environ.get("COMET_API_KEY"),
-            project_name="ift6758-project",
-            workspace="jaihon"
-        )
-        best_params_forest = model_forest.best_params_
-        experiment.log_parameters({'model': 'RandomForestClassifier', 'feature': selected_features}.update(best_params_forest))
-        model_name = 'Randomforestclassifier_Final_model'
-        joblib.dump(model_forest, model_name+'.joblib')
-        experiment.log_model(model_name, model_name+'.joblib')     
-        # REMOVE THIS##############
-
-
-
         # Generate predictions for samples
         # predictions_KNN_prob = model_KNN.predict(X_train)
         # predictions_forest_prob = model_forest.predict(X_train)
@@ -324,18 +296,19 @@ def main(data_train):
 
         print(confusion_matrix(y_valid,predictions_KNN))
         print(confusion_matrix(y_valid, predictions_forest))
+
     
 
         # Goal rate:
-        plot_goal_rate([predictions_KNN_prob,predictions_forest_prob], y_valid, ['KNN', 'Forest'], 'goal_rate')
+        plot_goal_rate([predictions_KNN_prob,predictions_forest_prob], y_valid, ['k-NNRegressor', 'RandomForestRegressor'], 'goal_rate')
 
         #Cumsum
-        plot_cumulative_sum([predictions_KNN_prob,predictions_forest_prob], y_valid, ['KNN', 'Forest'], 'cum_sum')
+        plot_cumulative_sum([predictions_KNN_prob,predictions_forest_prob], y_valid, ['k-NNRegressor', 'RandomForestRegressor'], 'cum_sum')
 
         #Calibration
-        plot_cumulative_sum([predictions_KNN_prob, predictions_forest_prob], y_valid, ['KNN', 'Forest'], 'calibration')
+        plot_cumulative_sum([predictions_KNN_prob, predictions_forest_prob], y_valid, ['k-NNRegressor', 'RandomForestRegressor'], 'calibration')
         # ROC curve
-        plot_roc_curve([predictions_KNN_prob, predictions_forest_prob], y_valid, ['-', '-'], ['KNN', 'Forest'], 'roc_curve')
+        plot_roc_curve([predictions_KNN_prob, predictions_forest_prob], y_valid, ['-', '-'], ['k-NNRegressor', 'RandomForestRegressor'], 'roc_curve')
     
 
 
