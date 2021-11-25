@@ -125,3 +125,15 @@ def prep_data(data_train, selected_features, categorical_features, norm=None):
         data = pd.concat([data.reset_index(drop=True), df_encoded.reset_index(drop=True)], axis=1)
 
     return data
+
+
+def plot_relation(x, ys, labels, xlabel, ylabel, name_file=None):
+    sns.set_theme()
+    for y, label in zip(ys,labels):
+        plt.plot(x, y, label=label)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.legend()
+    if name_file:
+        plt.savefig(name_file)
+    plt.show()
