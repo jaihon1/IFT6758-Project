@@ -4,14 +4,10 @@ import joblib
 
 import pandas as pd
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
 from comet_ml import Experiment
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
-from sklearn.calibration import CalibrationDisplay
+from sklearn.metrics import confusion_matrix
 
 from project.ift6758.data.utils import *
 
