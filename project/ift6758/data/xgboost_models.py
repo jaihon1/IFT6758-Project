@@ -1,12 +1,18 @@
 import os
+import joblib
 
 import pandas as pd
 import numpy as np
 import xgboost as xgb
-from sklearn.model_selection import KFold, train_test_split
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV
+from sklearn.feature_selection import SelectFromModel, SelectKBest, mutual_info_classif
+from sklearn.linear_model import LassoCV
+from sklearn.metrics import accuracy_score, precision_score, f1_score
+from sklearn.pipeline import Pipeline
 from sklearn.metrics import confusion_matrix
 
-from project.ift6758.data.utils import plot_roc_curve, plot_goal_rate, plot_cumulative_sum, plot_calibration, prep_data
+from project.ift6758.data.utils import plot_roc_curve, plot_goal_rate, plot_cumulative_sum, plot_calibration, prep_data, plot_relation
 
 #%%
 random_state = np.random.RandomState(42)
@@ -15,6 +21,10 @@ random_state = np.random.RandomState(42)
 data = pd.read_csv(os.path.join(os.environ.get('PATH_DATA'), 'games_data_all_seasons.csv'))
 
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
+
+# impute infinity value in speed column
+max_speed = data['Speed'].replace([np.inf], -np.inf).max()
+data['Speed'] = data['Speed'].replace([np.inf], max_speed)
 
 train, test = data[~data['game_pk'].str.startswith('2019')], data[data['game_pk'].str.startswith('2019')]
 #%%
