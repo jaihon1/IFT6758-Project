@@ -36,8 +36,10 @@ def plot_roc_curve(pred_probs, true_y, markers, labels):
 
 
 def create_percentile_model(proba, actual_y):
-    percentile = np.arange(0, 100, 2)
+    percentile = np.arange(0, 102, 2)
     percentile_pred = np.percentile(proba, percentile)
+    percentile_pred = np.unique(percentile_pred)
+    percentile_pred = np.concatenate([[0], percentile_pred])
 
     y_valid_df = pd.DataFrame(actual_y)
 
@@ -50,14 +52,11 @@ def plot_goal_rate(probas, actual_y,labels):
     sns.set_theme()
     for proba, label in zip(probas, labels):
         percentile, percentile_pred, y_valid_df = create_percentile_model(proba, actual_y)
+        bins = np.linspace(0,100,len(y_valid_df['bins_percentile'].unique()))[1:]
+
         goal_rate_by_percentile = y_valid_df.groupby(by=['bins_percentile']).apply(lambda g: g['is_goal'].sum()/len(g))
 
-        if len(percentile_pred)-len(goal_rate_by_percentile) == 1:
-            percentile = percentile[:-1]
-        else:
-            percentile = percentile[:-2]
-
-        g = sns.lineplot(x=percentile, y=goal_rate_by_percentile*100, label=label)
+        g = sns.lineplot(x=bins, y=goal_rate_by_percentile[1:]*100, label=label)
         ax = g.axes
         ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
     plt.xlim(100, 0)
@@ -71,16 +70,12 @@ def plot_cumulative_sum(probas, actual_y, labels):
     sns.set_theme()
     for proba, label in zip(probas, labels):
         percentile, percentile_pred, y_valid_df = create_percentile_model(proba, actual_y)
-
+        bins = np.linspace(0,100,len(y_valid_df['bins_percentile'].unique()))[1:]
         total_number_goal = (actual_y == 1).sum()
         sum_goals_by_percentile = y_valid_df.groupby(by='bins_percentile').apply(lambda g: g['is_goal'].sum()/total_number_goal)
         cum_sum_goals = sum_goals_by_percentile[::-1].cumsum(axis=0)[::-1]
 
-        if len(percentile)-len(cum_sum_goals) == 1:
-            percentile = percentile[:-1]
-        else:
-            percentile = percentile[:-2]
-        g = sns.lineplot(x=percentile, y=cum_sum_goals*100, label=label)
+        g = sns.lineplot(x=bins, y=cum_sum_goals[1:]*100, label=label)
         ax = g.axes
         ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
     plt.xlim(100, 0)
