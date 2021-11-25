@@ -44,7 +44,7 @@ def create_percentile_model(proba, actual_y):
 
     y_valid_df = pd.DataFrame(actual_y)
 
-    y_valid_df['bins_percentile'] = pd.cut(proba, percentile_pred, duplicates='drop')
+    y_valid_df['bins_percentile'] = pd.cut(proba, percentile_pred)
 
     return percentile, percentile_pred, y_valid_df
 
@@ -53,7 +53,7 @@ def plot_goal_rate(probas, actual_y, labels, name_file=None):
     sns.set_theme()
     for proba, label in zip(probas, labels):
         percentile, percentile_pred, y_valid_df = create_percentile_model(proba, actual_y)
-        bins = np.linspace(0,100,len(y_valid_df['bins_percentile'].unique()))[1:]
+        bins = np.linspace(0, 100, len(y_valid_df['bins_percentile'].unique()))[1:]
 
         goal_rate_by_percentile = y_valid_df.groupby(by=['bins_percentile']).apply(lambda g: g['is_goal'].sum()/len(g))
 
@@ -73,7 +73,7 @@ def plot_cumulative_sum(probas, actual_y, labels, name_file=None):
     sns.set_theme()
     for proba, label in zip(probas, labels):
         percentile, percentile_pred, y_valid_df = create_percentile_model(proba, actual_y)
-        bins = np.linspace(0,100,len(y_valid_df['bins_percentile'].unique()))[1:]
+        bins = np.linspace(0, 100, len(y_valid_df['bins_percentile'].unique()))[1:]
         total_number_goal = (actual_y == 1).sum()
         sum_goals_by_percentile = y_valid_df.groupby(by='bins_percentile').apply(lambda g: g['is_goal'].sum()/total_number_goal)
         cum_sum_goals = sum_goals_by_percentile[::-1].cumsum(axis=0)[::-1]
