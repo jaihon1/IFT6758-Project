@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -9,8 +11,15 @@ from sklearn.metrics import roc_auc_score, roc_curve
 from comet_ml import Experiment
 
 
-def create_experiment():
-    pass
+def create_experiment(parameters):
+    experiment = Experiment(
+        api_key=os.environ.get("COMET_API_KEY"),
+        project_name="ift6758-project",
+        workspace="jaihon",
+    )
+    experiment.log_parameters(parameters)
+    return experiment
+
 
 
 def plot_roc_curve(pred_probs, true_y, markers, labels):
