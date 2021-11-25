@@ -184,7 +184,8 @@ clf = RandomizedSearchCV(model_xgb, hyperparams, n_iter=10, scoring=['accuracy',
                          random_state=np.random.RandomState(58), verbose=1, refit='roc_auc', cv=kfold_split)
 clf.fit(x_train[features_selected], y_train)
 joblib.dump(clf, 'xgb_lasso.joblib')
-pred_proba_lasso = clf.predict_proba(x_valid)
+x_valid.columns = list(map(str, x_valid.columns.values))
+pred_proba_lasso = clf.predict_proba(x_valid[features_selected])
 
 #%%
 # feature selection with mutual info
@@ -203,8 +204,7 @@ pred_proba_mutual = clf.predict_proba(x_valid)
 #%%
 labels = ['default_XGBoost', 'tuning_XGBoost', 'lasso_XGBoost', 'mutual_XGBoost']
 probas = [pred_proba[:, 1], pred_proba_random[:, 1], pred_proba_lasso[:, 1], pred_proba_mutual[:, 1]]
-# labels = ['default_XGBoost']
-# probas = [pred_proba[:,1]]
+
 #%%
 plot_roc_curve(probas, y_valid, ['-', '-', '-', '-'], labels)
 plot_goal_rate(probas, y_valid, labels)

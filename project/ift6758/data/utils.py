@@ -96,7 +96,7 @@ def plot_calibration(probas, actual_y, labels, name_file=None):
     ax = plt.axes()
     for proba, label in zip(probas, labels):
         disp = CalibrationDisplay.from_predictions(actual_y, proba, n_bins=25, ax=ax, name=label, ref_line=False)
-    plt.xlim(0,0.3)
+    plt.xlim(0, 1)
     plt.legend(loc=9)
     if name_file:
         plt.savefig(name_file)
