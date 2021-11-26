@@ -10,8 +10,6 @@ import matplotlib.ticker as mtick
 
 from comet_ml import Experiment
 
-# import keras
-from keras.callbacks import ModelCheckpoint
 from sklearn.calibration import CalibrationDisplay
 from tensorflow import keras
 
@@ -100,6 +98,25 @@ def prep_data(data_raw, bonus, model, std):
                 'shot_last_event_distance', 'Change_in_shot_angle', 'Speed'
             ]
 
+    elif model == 'logreg':
+        # Set seleceted features
+        selected_features = [
+            'game_pk',
+            'is_goal',
+            'distance_net', 'angle_net'
+        ]
+        data = data_raw[selected_features]
+
+        # Drop rows with NaN values
+        data = data.dropna(subset = selected_features)
+
+        # Encoding categorical features into a one-hot encoding
+        categorical_features = []
+
+        features_standardizing = [
+            'distance_net', 'angle_net'
+        ]
+
 
     # Ecoding features
     for feature in categorical_features:
@@ -132,7 +149,7 @@ def prep_data(data_raw, bonus, model, std):
 
 # %%
 
-def prediction_report(predictions, target, threshold):
+def prediction_report(predictions, target, threshold=0.5):
     masked_predictions = np.zeros(predictions.shape)
 
     for i, prediction in enumerate(predictions):
@@ -192,9 +209,9 @@ x_test_nobonus, y_test_nobonus = prepare(data, bonus=False, model_type='nn', std
 
 
 # Load the model
-model = keras.models.load_model('../../models/nn_models_best/best_shot_nn_final.hdf5', compile = True)
-model1 = keras.models.load_model('../../models/nn_models_best/unnecessary_truss_2939.hdf5', compile = True)
-model2 = keras.models.load_model('../../models/nn_models_best/separate_alfalfa_7886.hdf5', compile = True)
+model = keras.models.load_model('../../models/nn/best_shot_nn_final.hdf5', compile = True)
+model1 = keras.models.load_model('../../models/nn/unnecessary_truss_2939.hdf5', compile = True)
+model2 = keras.models.load_model('../../models/nn/separate_alfalfa_7886.hdf5', compile = True)
 
 # Generate predictions for samples
 predictions = model.predict(x_test)
@@ -210,27 +227,40 @@ prediction_report(predictions, y_test, threshold=0.33)
 '''
 BASELINE MODELS
 '''
-
 # Load the data
 # data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
 data = pd.read_csv("games_data/games_data_all_seasons.csv")
-
 
 # split into train and test
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
 data = data[data['Speed'] < 300] # remove outliers with value = inf
 
-x_test, y_test = prepare(data, bonus=True, model_type='nn')
+x_test, y_test = prepare(data, bonus=True, model_type='logreg', std=False)
 
 # Load the model
-model = joblib.load('baseline_models/regression_angle_net.joblib')
-result = model.score(x_test, y_test)
+model_angle = joblib.load('../../models/baseline/regression_angle_net.joblib')
+model_distance = joblib.load('../../models/baseline/regression_distance_net.joblib')
+model_angle_distance = joblib.load('../../models/baseline/regression_distance_net_angle_net.joblib')
 
+# Generate predictions for samples: Returns the probability of class_1
+prediction_angle = model_angle.predict_proba(x_test[['angle_net']].abs())[:, 1]
+prediction_distance = model_distance.predict_proba(x_test[['distance_net']])[:, 1]
+prediction_angle_distance = model_angle_distance.predict_proba(x_test[['angle_net', 'distance_net']].abs())[:, 1]
 
-# Generate predictions for samples
-predictions = model.predict(x_test)
+# Generate report and curves
+prediction_report(prediction_angle, y_test)
+prediction_report(prediction_distance, y_test)
+prediction_report(prediction_angle_distance, y_test)
 
-prediction_report(predictions, y_test, threshold=0.33)
+plot_roc_curve(prediction_angle, y_test.to_numpy(), '-', 'angle')
+plot_roc_curve(prediction_distance, y_test.to_numpy(), '-', 'distance')
+plot_roc_curve(prediction_angle_distance, y_test.to_numpy(), '-', 'angle_distance')
+
+plt.xlabel('False positive rate')
+plt.ylabel('True positive rate')
+plt.legend()
+plt.show()
+
 
 
 # %%
