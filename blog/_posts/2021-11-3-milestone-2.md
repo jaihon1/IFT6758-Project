@@ -3,6 +3,9 @@ layout: post
 title: IFT6758 Milestone 2
 ---
 
+### Question 1
+We have made many experiences in this milestone. They are available through out the experiment tracking of the entire milestone.
+
 ### Question 2
 
 Using our work from the previous milestone, we have extended our features by adding the following ones presented in the table below:
@@ -59,7 +62,7 @@ We can observe in Figure 6 that the goals scored on a non-empty net from a dista
 ### Question 3
 
 #### Results
-For our baseline, we trained a Logistric Regression model using only the *distance* feature that we have previously extracted from the raw data, and it gave us a **90.59%** accuracy when we ran it on our validation dataset. We also generated the following confusion matrix to have a better look at our model's results:
+For our baseline, we trained a Logistic Regression model using only the *distance* feature that we have previously extracted from the raw data, and it gave us a **90.59%** accuracy when we ran it on our validation dataset. We also generated the following confusion matrix to have a better look at our model's results:
 
 | Target/Prediction | **Class 0 (not goal)** | **Class 1 (goal)** |
 | :-------: | :-------: | :-------: |
@@ -138,13 +141,12 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 
 
 In the bonus question, we added a few more features like the time since the penalty started and the number of friendly and opposite players on ice. To compute the time since the penalty started, we started
-by generating all types of events in our game, by evaluating, at each event, if there was a 
+by generating all types of events in our game, by evaluating, at each event, if there was a
 penalty and by checking on which side the team was. We then built a tidy event object that gave the time and coordinates details
 relative to the previous event. Finally, we got the current event time and subtracted
 the starting time of the penalty from the current time to have the time since the penalty started (two types of penalties generated).
 To get the number of friendly players on ice and the number of opposite players on ice, we first checked the side of the team to figure out who is friendly and who is not and
-then subtracted the number of players lost depending on the type of the
-penalty from 5.
+then subtracted the number of players lost depending on the type of the penalty from 5.
 
 
 link to the experiment which stores the filtered DataFrame artifact
@@ -154,11 +156,41 @@ link to the experiment which stores the filtered DataFrame artifact
 
 ## Question 6: Best Shot
 
-Brief intro on what and why we decide to use in this part...
+After using a logistic regression model and a XGBoost model, we decided to try some other algorithms to find the best model
+for our task of binary classification with our collected dataset.
+We decided to try k-Nearest Neighbors, Random Forest and a feed-forward neural network.
+Classification requires that the algorithm learns how to assign a class label to examples from the problem domain.
+Classification accuracy is usually a popular metric used to evaluate the performance of a model based on the predicted class labels.
+Since our datas is imbalanced(the distribution of examples in the training dataset across the classes is not equal), classification
+accuracy and its complement error rate, might be a bad idea to use, because it will be an unreliable measure of model performance.
+Since we have an "Accuracy Paradox", a good performance on the minority class(Goal) will be preferred over a good performance on both class.
+Finally, alternative performance metrics may be required as reporting the classification accuracy may be misleading, like using
+the Precision, the Recall or the F-Measure.
+All our models have been stratified and crossvalidated. And our neural network has been optimized to use the best hyperparamters.
 
 ### Model Results and Analysis
 
 #### 1. KNN
+
+The first curve is a ROC curve that explains the results of our KNN. Area Under the Curve” (AUC) of “Receiver Characteristic Operator” (ROC)
+is a plot of True Positive Rate vs False Positive Rate
+The AUC-ROC curve helps us visualize how well our machine learning classifier is performing.
+Our calculated AUC on graph is actually 0.94 for the KNN, (0.5<AUC<1), so there is a high chance that the classifier will be able to distinguish
+the positive class values from the negative class values.
+
+![roc_curve.png](/public/roc_curve.png)
+
+The ROC is a probability curve that plots the TPR against FPR at various threshold values and essentially separates the ‘signal’ from the ‘noise’.
+The Area Under the Curve (AUC) is the measure of the ability of a classifier to distinguish between classes and is used as a summary of
+the ROC curve. The higher the AUC, the better the performance of the model at distinguishing between the positive and negative classes.
+
+This is so because the classifier is able to detect more numbers of True positives and True negatives than False negatives and False positives.
+ROC curves can present an overly optimistic view of an algorithm’s performance if there is a large skew in the class distribution.
+
+![cum_sum.png](/public/cum_sum.png)
+![goal_.rate](/public/cum_sum.png)
+
+
 
 #### 2. Neural Network
 
@@ -170,7 +202,7 @@ Including features developed in the bonus question (current_time_seconds, time_s
 
 ##### Selected Features
 Feature Selection technique: Domain knowledge
-Using feature selection, we selected the following features to train our neual network models:
+Using feature selection, we selected the following features to train our neural network models:
 
 | Feature     | Encoding |
 | ----------- | ----------- |
@@ -199,7 +231,10 @@ Using feature selection, we selected the following features to train our neual n
 
 ##### Results and Analysis
 
-Because the dataset was very unbalanced in nature, we decide to mainly use the F1 Score. In addition, we also used a custom made threshold technique to help us analyse the results of our models. Since our model's outputs were very small probability values, we decided that the 0.5 threshold for binay prediction wasn't the way to go. Instead, for each model we trained, we found a better threshold value that would give us the optimal F1 score at the end.
+Because the dataset was very unbalanced in nature, we decide to mainly use the F1 Score. In addition, we also used a
+custom made threshold technique to help us analyse the results of our models. Since our model's outputs were very small
+probability values, we decided that the 0.5 threshold for binary prediction wasn't the way to go. Instead, for each model
+we trained, we found a better threshold value that would give us the optimal F1 score at the end.
 
 <table>
     <caption style="caption-side: bottom; font-size: small;">F1 score results for our Neural Network models</caption>
@@ -308,6 +343,22 @@ Because the dataset was very unbalanced in nature, we decide to mainly use the F
 2. [Neural Network - unnecessary_truss_2939](https://www.comet.ml/jaihon/ift6758-project/f22281d6264d462685c13628a0dd7daa?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
 3. [Neural Network - separate_alfalfa_7886](https://www.comet.ml/jaihon/ift6758-project/b086d3049e1f47b7ae8aa569994983b4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
 
+For the ROC curve, all the hyperparameters of the 3 models are the same, because those parameters have been optimized
+previously. So mainly, the lr is 0.001, Adam 0.9, and we used 30 epochs. The main difference is that the 'unnecessary truss' have no bonus feature,
+while the 'separate_alfalfa' has no dropout, while the retail_perch is not normalised.
+
+The best AUC on graph is actually the best_shot_nn_final with an AUC of 0.77 which corresponded to the
+model trained with the bonus_features, with the dropout, and with normalization. The performance was pretty equal
+to the other two models (unnecessary truss with AUC 0.76) trained with no bonus features, and equal to separate_alfalfa (AUC=0.76)
+trained with no dropout and pretty much the same as retail_perch (AUC 0.76) that was trained with no normalisation.
+So we can see that at a high level,our models had pretty much the same performances.
 
 
 #### 3. Random Forest
+It is evident from the plot that the AUC for the RandomForest ROC curve is higher than that for the KNN ROC curve.
+Therefore, we can say that logistic regression did a better job of classifying the positive class in the dataset.
+Building a random forest starts by generating a high number of individual decision trees.
+Random forest models are accurate and non-linear models and robust to over-fitting.
+
+
+In conclusion, the XGboost and the Neural Network were the two best models with overall same performance. 
