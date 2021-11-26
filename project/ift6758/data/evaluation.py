@@ -17,6 +17,7 @@ from sklearn.metrics import classification_report, confusion_matrix, roc_auc_sco
 from sklearn.preprocessing import StandardScaler
 
 
+
 # %%
 def prep_data(data_raw, bonus, model, std):
     if model == 'nn':
@@ -311,7 +312,7 @@ def plot_calibration(probas, actual_y, labels, save_file=None):
     plt.show()
 
 # %%
-PLAYOFF_TOGGLE = False
+PLAYOFF_TOGGLE = True
 
 # %%
 '''
@@ -353,13 +354,17 @@ model2 = keras.models.load_model('Documents/Dev/Code/IFT6758_group_project/IFT67
 # Generate predictions for samples
 predictions_NN = model.predict(x_test_NN)
 predictions_NN_unlisted =[i[0] for i in predictions_NN]
-predictions1 = model1.predict(x_test_nobonus_NN)
-predictions2 = model2.predict(x_test_NN)
+# predictions1 = model1.predict(x_test_nobonus_NN)
+# predictions2 = model2.predict(x_test_NN)
 
+print('Printing prediction report for Neural Network model...')
 prediction_report(predictions_NN, y_test_NN, threshold=0.33)
 # prediction_report(predictions1, y_test_nobonus, threshold=0.33)
 # prediction_report(predictions2, y_test, threshold=0.33)
-
+predictions_NN_unlisted_int = predictions_NN.copy()
+predictions_NN_unlisted_int[predictions_NN_unlisted_int <= 0.33] = 0
+predictions_NN_unlisted_int[predictions_NN_unlisted_int > 0.33] = 1
+confusion_matrix_NN = confusion_matrix(y_test_NN, predictions_NN_unlisted_int)
 
 # %%
 '''
@@ -399,9 +404,26 @@ predictions_distance = model_distance.predict_proba(x_test_reg[['distance_net']]
 predictions_angle_distance = model_angle_distance.predict_proba(x_test_reg[['angle_net', 'distance_net']].abs())[:, 1]
 
 # Generate report and curves
+print('Printing prediction report for logistic regressor models...')
 prediction_report(predictions_angle_net, y_test_reg)
 prediction_report(predictions_distance, y_test_reg)
 prediction_report(predictions_angle_distance, y_test_reg)
+predictions_angle_net_int = predictions_angle_net.copy()
+predictions_angle_net_int[predictions_angle_net_int <= 0.5] = 0
+predictions_angle_net_int[predictions_angle_net_int > 0.5] = 1
+
+predictions_distance_int = predictions_distance.copy()
+predictions_distance_int[predictions_distance_int <= 0.5] = 0
+predictions_distance_int[predictions_distance_int > 0.5] = 1
+
+predictions_angle_distance_int = predictions_angle_distance.copy()
+predictions_angle_distance_int[predictions_angle_distance_int <= 0.5] = 0
+predictions_angle_distance_int[predictions_angle_distance_int > 0.5] = 1
+
+confusion_matrix_reg_1 = confusion_matrix(y_test_reg, predictions_angle_net_int)
+confusion_matrix_reg_2 = confusion_matrix(y_test_reg, predictions_distance_int)
+confusion_matrix_reg_3 = confusion_matrix(y_test_reg, predictions_angle_distance_int)
+
 
 # %%
 '''
@@ -437,7 +459,12 @@ model = joblib.load('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/pr
 predictions_xg = model.predict_proba(x_test_XG)[:, 1]
 
 # Generate report and curves
+print('Printing prediction report xgboost model...')
 prediction_report(predictions_xg, y_test_XG)
+predictions_xg_int = predictions_xg.copy()
+predictions_xg_int[predictions_xg_int <= 0.5] = 0
+predictions_xg_int[predictions_xg_int > 0.5] = 1
+confusion_matrix_xg = confusion_matrix(y_test_XG, predictions_xg_int)
 
 
 # %%
@@ -445,35 +472,35 @@ prediction_report(predictions_xg, y_test_XG)
 KNN MODELS
 '''
 # Load the data
-if PLAYOFF_TOGGLE:
-    data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons_full.csv")
+# if PLAYOFF_TOGGLE:
+#     data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons_full.csv")
 
-    # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
-    data['period'] = data['period'].replace({5: 4, 6: 4, 7: 4, 8: 4})
+#     # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
+#     data['period'] = data['period'].replace({5: 4, 6: 4, 7: 4, 8: 4})
 
-    period_type = 'P'
+#     period_type = 'P'
 
-    # Select data period type by
-    data = data[data['game_type'] == period_type]
-    data.drop(columns=['game_type'], inplace=True)
+#     # Select data period type by
+#     data = data[data['game_type'] == period_type]
+#     data.drop(columns=['game_type'], inplace=True)
 
-else:
-    data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons.csv")
+# else:
+#     data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons.csv")
 
-# split into train and test
-data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
-data = data[data['Speed'] < 300] # remove outliers with value = inf
+# # split into train and test
+# data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
+# data = data[data['Speed'] < 300] # remove outliers with value = inf
 
-x_test_KNN, y_test_KNN = prepare(data, bonus=True, model_type='knn', std=True)
+# x_test_KNN, y_test_KNN = prepare(data, bonus=True, model_type='knn', std=True)
 
 # Load the model
-model = joblib.load('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/KNN_model.pkl' , mmap_mode ='r')
+# model = joblib.load('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/KNN_model.pkl' , mmap_mode ='r')
 
 # Generate predictions for samples: Returns the probability of class_1
-predictions8 = model.predict(x_test_KNN)
+# predictions8 = model.predict(x_test_KNN)
 
 # Generate report and curves
-prediction_report(predictions8, y_test_KNN, threshold=0.73)
+# prediction_report(predictions8, y_test_KNN, threshold=0.73)
 
 
 # %%
@@ -481,39 +508,39 @@ prediction_report(predictions8, y_test_KNN, threshold=0.73)
 RANDOM FOREST MODELS
 '''
 # Load the data
-if PLAYOFF_TOGGLE:
-    data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons_full.csv")
+# if PLAYOFF_TOGGLE:
+#     data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons_full.csv")
 
-    # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
-    data['period'] = data['period'].replace({5: 4, 6: 4, 7: 4, 8: 4})
+#     # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
+#     data['period'] = data['period'].replace({5: 4, 6: 4, 7: 4, 8: 4})
 
-    period_type = 'P'
+#     period_type = 'P'
 
-    # Select data period type by
-    data = data[data['game_type'] == period_type]
-    data.drop(columns=['game_type'], inplace=True)
+#     # Select data period type by
+#     data = data[data['game_type'] == period_type]
+#     data.drop(columns=['game_type'], inplace=True)
 
-else:
-    data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons.csv")
+# else:
+#     data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons.csv")
 
-# split into train and test
-data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
-data = data[data['Speed'] < 300] # remove outliers with value = inf
+# # split into train and test
+# data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
+# data = data[data['Speed'] < 300] # remove outliers with value = inf
 
-x_test_forest, y_test_forest = prepare(data, bonus=True, model_type='rndf', std=True)
+# x_test_forest, y_test_forest = prepare(data, bonus=True, model_type='rndf', std=True)
 
 # Load the model
-model_forest = joblib.load('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/rngforest.pkl' , mmap_mode ='r')
+# model_forest = joblib.load('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/rngforest.pkl' , mmap_mode ='r')
 
 
-# Generate predictions for samples: Returns the probability of class_1
-predictions_forest_prob = model_forest.predict(x_test_forest)
-best_forest_threshold = 0.44
-predictions_forest = predictions_forest_prob.copy()
-predictions_forest[predictions_forest <= best_forest_threshold] = 0
-predictions_forest[predictions_forest > best_forest_threshold] = 1
+# # Generate predictions for samples: Returns the probability of class_1
+# predictions_forest_prob = model_forest.predict(x_test_forest)
+# best_forest_threshold = 0.44
+# predictions_forest = predictions_forest_prob.copy()
+# predictions_forest[predictions_forest <= best_forest_threshold] = 0
+# predictions_forest[predictions_forest > best_forest_threshold] = 1
 
-prediction_report(predictions_forest, y_test_forest, threshold=best_forest_threshold)
+# prediction_report(predictions_forest, y_test_forest, threshold=best_forest_threshold)
 
 
 
@@ -529,3 +556,42 @@ plot_calibration([predictions_NN_unlisted, predictions_angle_distance, predictio
 # ROC curve
 plot_roc_curve([predictions_NN_unlisted, predictions_angle_distance, predictions_angle_net, predictions_distance, predictions_xg], [y_test_NN, y_test_reg, y_test_reg, y_test_reg, y_test_XG],['-', '-','-', '-','-'], ['NeuralNetwork', 'LogisticRegression 1', 'LogisticRegression 2', 'LogisticRegression 3', 'XGBoost' ])
 
+cm_1 = pd.DataFrame(confusion_matrix_NN, index=[0,1], columns=[0,1])
+# sns.heatmap(cm, annot=True, cmap=sns.color_palette("light:b", as_cmap=True), fmt='g')
+# plt.xlabel('Predictions')
+# plt.ylabel('True labels')
+# plt.show()
+cm_2 = pd.DataFrame(confusion_matrix_xg, index=[0,1], columns=[0,1])
+# sns.heatmap(cm, annot=True, cmap=sns.color_palette("light:b", as_cmap=True), fmt='g')
+# plt.xlabel('Predictions')
+# plt.ylabel('True labels')
+# plt.show()
+cm_3 = pd.DataFrame(confusion_matrix_reg_1, index=[0,1], columns=[0,1])
+# sns.heatmap(cm, annot=True, cmap=sns.color_palette("light:b", as_cmap=True), fmt='g')
+# plt.xlabel('Predictions')
+# plt.ylabel('True labels')
+# plt.show()
+cm_4 = pd.DataFrame(confusion_matrix_reg_2, index=[0,1], columns=[0,1])
+# sns.heatmap(cm, annot=True, cmap=sns.color_palette("light:b", as_cmap=True), fmt='g')
+# plt.xlabel('Predictions')
+# plt.ylabel('True labels')
+# plt.show()
+cm_5 = pd.DataFrame(confusion_matrix_reg_3, index=[0,1], columns=[0,1])
+# sns.heatmap(cm, annot=True, cmap=sns.color_palette("light:b", as_cmap=True), fmt='g')
+# plt.xlabel('Predictions')
+# plt.ylabel('True labels')
+# plt.show()
+
+cm= [cm_1, cm_2, cm_3, cm_4, cm_5]
+titel = ['Neural Network', 'Logistic Regression 1', 'Logistic Regression 2', 'Logistic Regression 3', 'XG Boost']
+iterator=0
+fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(15,10))
+for matrice, ax in zip(cm, axes.flatten()):
+    sns.heatmap(matrice, annot=True, cmap=sns.color_palette("light:b", as_cmap=True), fmt='g', ax=ax)
+    ax.set_xlabel('Predictions')
+    ax.set_ylabel('True labels')
+    ax.title.set_text(titel[iterator])
+    iterator += 1
+fig.delaxes(axes[2][1])
+plt.tight_layout()  
+plt.show()
