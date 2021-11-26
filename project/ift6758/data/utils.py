@@ -108,7 +108,6 @@ def prep_data(data_train, selected_features, categorical_features, norm=None):
     data = data_train[selected_features]
 
     # Drop rows with NaN values
-    print('Number of rows dropped:', data[selected_features].isnull().any(axis=1).sum())
     data = data.dropna(subset=selected_features)
 
     if norm is not None:
