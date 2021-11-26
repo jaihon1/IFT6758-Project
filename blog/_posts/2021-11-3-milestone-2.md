@@ -102,41 +102,54 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 
 #### Links to our models
 
-1. [Logistic Regression on distance and angle](https://www.comet.ml/jaihon/ift6758-project/1b1de38b80df44ec8c09922378dfc68f)
-2. [Logistic Regression on distance](https://www.comet.ml/jaihon/ift6758-project/eb73704e51df424e93d719790cbb9f86?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
-3. [Logistic Regression on angle](https://www.comet.ml/jaihon/ift6758-project/3687694f67cc43d8a0e1bc93fce2953a?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+1. [Logistic Regression on distance and angle](https://www.comet.ml/jaihon/ift6758-project/88c175fd9d3c4892acf334fcfdb4a6d0)
+2. [Logistic Regression on distance](https://www.comet.ml/jaihon/ift6758-project/6997fdfbdc76426db60408591e58ac5a)
+3. [Logistic Regression on angle](https://www.comet.ml/jaihon/ift6758-project/934baca85c9448c997d8d0727845db65)
 
 
 
 ### Question 4
 
+We added below a list of all of the features that we created, and we listed each feature by both the column name
+in the dataframe and a simple explanation. For the novel features, we describe what they are.
+At the end, we added a link to the experiment which stores the filtered DataFrame.
+
+
 | Feature      | Description |
 | ----------- | ----------- |
-| Game seconds | total sum of seconds elapsed in the game |
-| Game period | date of the game |
-| Coordinates | coordinates(x, y) of the shot |
-| Shot distance | distance from the shot to the net |
-| Shot angle | angle from between the shot and the net |
-| Shot type | type of Shot (Wrist, Slap, Backhand, etc...) |
-| Empty net| when the team scores a goal into a net with no goaltender present |
-| Last event type | last type of event |
-| Coordinates of the last event | coordinates(x, y) of the last event |
-| Time from the last event | time elapsed from the last event |
-| Distance from the last event | distance calculated from the last event |
-| Rebound (bool) | Rebound of the last event (True if shot, otherwise False) |
-| Change in shot angle | change in the shot angle if the shot is a rebound |
+| current_time_seconds | total sum of seconds elapsed in the game |
+| period | period of the game during which the shot happened |
+| coordinate_x | coordinates x  of the shot |
+| coordinate_y | coordinates y  of the shot |
+| distance_net | distance from the shot to the net |
+| angle_net | angle between the shot and the net |
+| shot_type | type of Shot (Wrist, Slap, Backhand, etc...) |
+| previous_event_type | type of the last event |
+| previous_event_x_coord | coordinates x of the last event |
+| previous_event_y_coord | coordinates y of the last event |
+| shot_last_event_delta | time elapsed since the last event |
+| shot_last_event_distance | distance calculated from the last event |
+| Rebound | Rebound of the last event (True if shot, otherwise False) |
+| Change_in_shot_angle | change in the shot angle if the shot is a rebound |
 | Speed | defined as the distance from the previous event, divided by the time since the previous event |
-| Time since the power-play started (seconds) | time in seconds since the penalty started |
-| Number of friendly non-goalie skaters on the ice | Number of team skaters on the ice |
-| Number of opposing non-goalie skaters on the ice | Number of opposing skaters on the ice|
-| time_since_pp_started | ...|
-| current_friendly_on_ice | ...|
-| current_opposite_on_ice | ...|
+| time_since_pp_started |  time in seconds since the penalty started |
+| current_friendly_on_ice | Number of friendly players on ice|
+| current_opposite_on_ice | Number of opposite players on ice|
 
 
+In the bonus question, we added a few more features like the time since the penalty started and the number of friendly and opposite players on ice. To compute the time since the penalty started, we started
+by generating all types of events in our game, by evaluating, at each event, if there was a
+penalty and by checking on which side the team was. We then built a tidy event object that gave the time and coordinates details
+relative to the previous event. Finally, we got the current event time and subtracted
+the starting time of the penalty from the current time to have the time since the penalty started (two types of penalties generated).
+To get the number of friendly players on ice and the number of opposite players on ice, we first checked the side of the team to figure out who is friendly and who is not and
+then subtracted the number of players lost depending on the type of the
+penalty from 5.
 
-###  link to the experiment which stores the filtered DataFrame artifac
-https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets
+
+link to the experiment which stores the filtered DataFrame artifact
+(https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
+[wpg_v_wsh_2017021065.csv]
 
 ### Question 5
 > The code for this section can be found in xgboost_models.py

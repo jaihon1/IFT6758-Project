@@ -1,15 +1,34 @@
 #%%
+import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import numpy as np
 
 #%%
+data_path = os.path.join(os.environ.get('PATH_DATA'), "games_data_all_seasons.csv")
+data = pd.read_csv(data_path)
 
-data = pd.read_csv('../../../project/ift6758/data/games_data/games_data_all_seasons.csv')
+data['game_pk'] = data['game_pk'].apply(lambda i : str(i))
+data = data[~data['game_pk'].str.startswith('2019')]
+
+#%%
+# plot histogram of goal (empty net and non-empty net) according to distance from net
+data_goals = data.loc[data['is_goal'] == 1]
+
+hist_distance_goals = sns.histplot(data=data_goals, x='distance_net', hue='empty_net', bins=15, multiple='layer', element='step',
+                                   hue_order=[1, 0], palette=['C1', 'C0'])
+
+plt.xlabel('Distance from net (feet)')
+plt.ylabel('Number of goals')
+plt.legend(labels=['non-empty net', 'empty net'])
+plt.tight_layout()
+plt.grid(True)
+plt.show()
 
 #%%
 # plot histogram of goal or no goal according to distance from net
+sns.set_theme()
 hist_distance = sns.histplot(data=data, x='distance_net', hue='is_goal', bins=15, multiple='layer', element='step',
                              hue_order=[1, 0], palette=['C1', 'C0'])
 
@@ -21,6 +40,7 @@ plt.show()
 
 #%%
 # plot histogram of goal or no goal according to angle from net
+sns.set_theme()
 hist_angle = sns.histplot(data=data, x='angle_net', hue='is_goal', bins=15, multiple='layer', element='step',
                           hue_order=[1, 0], palette=['C1', 'C0'])
 
@@ -66,24 +86,10 @@ fig = plt.figure(figsize=(12, 10))
 sns.set(font_scale=2)
 
 sns.barplot(data=data, x=label, y=goal_rate_by_distance)
-plt.xlabel('angle from net (feet)')
+plt.xlabel('angle from net (degrees)')
 plt.ylabel('goal rate')
 plt.xticks(fontsize=20, rotation=70)
 plt.tight_layout()
 plt.show()
 
-# %%
-# plot histogram of goal (empty net and non-empty net) according to distance from net
-data_goals = data.loc[data['is_goal'] == 1]
 
-hist_distance_goals = sns.histplot(data=data_goals, x='distance_net', hue='empty_net', bins=15, multiple='layer', element='step',
-                             hue_order=[1, 0], palette=['C1', 'C0'])
-
-plt.xlabel('Distance from net (feet)')
-plt.ylabel('Number of goals')
-plt.legend(labels=['non-empty net', 'empty net'])
-plt.tight_layout()
-plt.grid()
-plt.show()
-
-# %%

@@ -13,7 +13,7 @@ from project.ift6758.data.utils import *
 
 # %%
 
-data = pd.read_csv('project/ift6758/data/games_data/games_data_all_seasons.csv')
+data = pd.read_csv(os.path.join(os.environ.get('PATH_DATA'), 'games_data_all_seasons.csv'))
 
 data = data[~(data['distance_net'].isna())]
 
