@@ -89,14 +89,14 @@ In order to have a deeper analysis of the behavior of our binary classifiers, us
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
     <img src="/public/roc_curve_baseline.png" alt="roc_curve_baseline">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Logistic Regression: ROC rate.</figcaption>
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Logistic Regression: ROC curve.</figcaption>
 </figure>
 
 Given the calibration curve shown in Figure 10, we can easily see that our trained models did learn some valuable representations of our data. Comparing all our current models, the model that was trained on both features (distance and angle) has the closest calibration values to the *perfectly* calibrated model. Again, as mentioned before, it confirms that overall this model is the model that gives us the best results so far.
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
     <img src="/public/calibration_curve_baseline.png" alt="calibration_curve_baseline">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 10: Logistic Regression: Calibration cruve.</figcaption>
+    <figcaption style="font-size: 12px;text-align: center;">Figure 10: Logistic Regression: Calibration curve.</figcaption>
 </figure>
 
 
@@ -137,3 +137,164 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 
 ###  link to the experiment which stores the filtered DataFrame artifac
 https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets
+
+### Question 5
+> The code for this section can be found in xgboost_models.py
+
+The first XGBoost model was trained on the distance and angle from the net features just like the regression in
+section 3. We trained the model on approximately 75% of the training data from seasons 2015 to 2018 (inclusive). Since
+the data is very unbalanced, we made sure that the splitting into training/validation kept the proportion of goal and
+no goal by using a stratified option. We also standardized both features to have them in a comparable range centered
+around 0. The resulting model performed somewhat better than the regression models as shown on figures 11 to 14. This model is
+represented by the blue curve in the figures. If we compare this curve and the ones from figures 7 to 10, we first notice
+that the area under the curve of the ROC curve is slightly larger than the one from the regression models with a value of 0.71
+compared to the highest one of 0.70 in the regressions. For the goal rate and cumulative sum of goals in function with
+the shot probability model percentile, the curves are fairly similar for the xgboost model and the regression model trained
+on distance and angle. They have the same shape and in the case of the goal rate one, they are in the same range also.
+The real difference comes from the calibration curve where we see that the probabilities from the xgboost model ranges
+from 0 to about 0.85 as opposed to the regression models which go only up to 0.25. This tells us that the xgboost models
+is better calibrated and that the probabilities are more telling and "accurate" than the ones from the regression models
+as it tends to be closer to the perfectly calibrated curve.
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/roc_curve_xgboost.png" alt="roc_curve_xgboost">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 11: XGBoost: ROC curve.</figcaption>
+</figure>
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/goal_rate_xgboost.png" alt="goal_rate_xgboost">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 12: XGBoost: goal rate.</figcaption>
+</figure>
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/cumulative_goals_xgboost.png" alt="cumulative_sum_xgboost">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 13: XGBoost: cumulative sum.</figcaption>
+</figure>
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/calibration_xgboost.png" alt="calibration_xgboost">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 14: XGBoost: calibration curve.</figcaption>
+</figure>
+
+For the next xgboost model, we started by standardizing all the numerical features and remove the rows which had nan values.
+For the particular case of the *Speed* column, we had to impute a new value for the rows which had infinity values. To do so,
+we simply changed the infinity with the maximum value (beside infinity) in the column. We then transformed all our categorical
+data into one-hot encoding. This is only after doing this that
+we did some hyperparameter optimization. Before tuning anything, we started by finding the relations between
+different hyperparameters and metrics. These are shown on figures 15, 16 and 17 where we evaluated our model on
+accuracy, precision and F1 score for a range of values on the number of estimators (trees), the maximum depth of each tree
+and the l2 regularisation coefficient lambda. We found that the accuracy stayed constant around 0.907 for all parameters.
+For both the number of estimators and the maximum depth, we noticed that increasing them decreased the precision, but
+increased the F1 score. This probably meant that the recall was increasing while the precision was decreasing. Since we
+care both about precision and recall, and even though generally speaking a higher F1 score is better, it is difficult
+to say if increasing the number of estimators and the maximum depth is really better. Also, the precision decreases more
+rapidly than the F1 score increases. For the regularisation coefficient on figure 17, it seems that the higher the coefficient,
+the better since the precision increases while the F1 score and accuracy stays pretty much constant.
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/n_estimators_vs_metrics_xgboost.png" alt="number_of_estimators_vs_metrics">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 15: Relation between the number of estimators and different metrics.</figcaption>
+</figure>
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/max_depth_vs_metrics_xgboost.png" alt="max_depth_vs_metrics">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 16: Relation between the max depth of a tree and different metrics.</figcaption>
+</figure>
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/reg_lambda_vs_metrics_xgboost.png" alt="reg_lambda_vs_metrics">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 17: Relation between the regularisation coefficient lambda (l2) and different metrics.</figcaption>
+</figure>
+
+Once we finished exploring some hyperparameters, we did a randomized search over the hyperparameters space focusing
+on the same parameters as before as well as the learning rate. We did not do a grid search because it would have taken
+too long to search all the parameters we wanted to try, but also because the hyperparameters do not have such a big influence
+on the results as was shown on the figures above. Since the accuracy is almost constant for all parameters, we decided to
+focus on the ROC area under the curve. The best model was selected with the highest ROC AUC. The resulting model was
+found to have the following hyperparameters:
+
+|      Hyperparameter     | Value |
+|:-----------------------:|:-----:|
+|     # of estimators     |  300  |
+|      Maximum depth      |   5   |
+| Regularisation &lambda; |   0   |
+|      Learning rate      |  0.03 |
+
+It is the orange curve on the figures 11 to 14. Even if this is the *best* model, the one right below in terms of performance
+was very close to it with a ROC AUC of 0.75 compared to the model presented here which has 0.76.
+
+As for our last experience, we tried some feature selection. We tried two different methods: lasso and mutual information.
+For the lasso one, we evaluated a lasso linear model on our training dataset and selected the features that had the highest
+coefficient of importance, i.e. they were higher than the median. The features selected are shown in red on figure 18 which
+presents the importance coefficient according to the lasso model for all of our features. The features that are in parentheses
+are the categorical data that was encoded using one-hot vectors. We can see that some values in categorical data seem to be
+"useless" like the type of period in which the shot happens (overtime vs regular). Interestingly, we noticed that knowing the side of the
+team that is shooting (right vs left) seems to be more important when it is left. Not too surprisingly, some type of shots seem to
+have a bigger impact like *deflected* or *tip-in* or *wrap-around* compared to wrist shot. If we recall from the previous milestone,
+we concluded that *deflected* and *tip-in* were among the most dangerous shots which seems to agree with this. These are some of
+the interesting observations that we found from this figure.
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:100%;height:100%;">
+    <img src="/public/importance_feature_lasso_xgboost.png" alt="importance_feature_xgboost">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 18: Importance of each feature according to lasso.</figcaption>
+</figure>
+
+Anyway, once we selected the features in red, we trained our model using a randomized search again on the same hyperparameters as before.
+We found a model that was performing similarly as our best one trained on all features as we can see by comparing the green (lasso trained one) and orange
+curves on figures 11 to 14.
+
+For the mutual information model, we did a randomized search on the same hyperparameters as before, but with the addition of
+choosing a number of features according to the mutual information. Our best model using this trained on 15 features. A comparison
+of the chosen features between the lasso model and mutual information score is shown in the following table where only
+the features selected by either one of them is presented:
+
+|           Feature           | Lasso | Mutual |
+|:---------------------------:|:-----:|:------:|
+|         coordinate_x        |   x   |    x   |
+|         coordinate_y        |       |    x   |
+|         distance_net        |   x   |    x   |
+|          angle_net          |       |    x   |
+|    time_since_pp_started    |       |    x   |
+| previous_event_time_seconds |   x   |        |
+|   current_friendly_on_ice   |       |    x   |
+|   current_opposite_on_ice   |   x   |    x   |
+|    shot_last_event_delta    |   x   |    x   |
+|           Rebound           |   x   |        |
+|            Speed            |   x   |    x   |
+|             away            |       |    x   |
+|             home            |       |    x   |
+|           Backhand          |   x   |        |
+|          Deflected          |   x   |        |
+|          Slap Shot          |   x   |        |
+|          Snap Shot          |   x   |        |
+|            Tip-In           |   x   |        |
+|         Wrap-around         |   x   |        |
+|          Wrist Shot         |       |    x   |
+|              1              |   x   |        |
+|              3              |   x   |        |
+|              4              |   x   |        |
+|           REGULAR           |       |    x   |
+|             left            |   x   |    x   |
+|            right            |       |    x   |
+|           FACEOFF           |   x   |        |
+|           GIVEAWAY          |   x   |        |
+|             HIT             |   x   |        |
+|           TAKEAWAY          |   x   |        |
+
+*the numbers 1,3,4 are the period.
+
+From this table, we can observe that both method seem to agree on some features like the coordinate x, the distance or the
+speed. However, the interesting features are the one selected by the mutual information, but not the lasso since the lasso took
+more. Among those are the types of shots, lasso take all of the types except the wrist shot, but mutual information does the complete
+opposite and select only the wrist shot. Mutual information also takes the period type regular into account whereas lasso
+completely ignore them.
+
+The model resulting from training with mutual information is shown in red in the figures 11 to 14. We can see that it does not
+perform as well as the models trained on all features and on the lasso selected features on figures 11 to 13 where the curves are
+closer to the default XGBoost model.
+
+We want to note that all of the curves on figure 14 start of pretty linear which is good because it follows the perfectly
+calibrated model.
+
+After inspecting figures 11 to 14, we concluded that the best model was the one trained on all features because it has the
+highest ROC AUC, but also because its calibration curve seems to be the most linear one. Indeed, we can see that the orange
+curve varies less than the others after around 0.5 probabilty.
+
+The links to the different experiments shown in this section can be found here:
+1. [XGBoost trained on distance and angle with default hyperparameters](https://www.comet.ml/jaihon/ift6758-project/20c76cb9d81541b5ae0d2b320e59f59f)
+2. [XGBoost with hyperparameter tuning and trained on all features](https://www.comet.ml/jaihon/ift6758-project/05c804186d274b0c8955cbb14b1a66b3)
+3. [XGBoost with hyperparameter tuning and trained on subset of features selected by Lasso](https://www.comet.ml/jaihon/ift6758-project/74f19b8137e14336ba1e49c198dfd3e6)
