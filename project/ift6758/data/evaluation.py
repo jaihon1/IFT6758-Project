@@ -1,19 +1,13 @@
 #%%
 import joblib
-
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 
-from comet_ml import Experiment
-
 from sklearn.calibration import CalibrationDisplay
 from tensorflow import keras
-import pickle
-
-
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
@@ -244,13 +238,29 @@ def plot_roc_curve(pred_prob, true_y, marker, label):
     plt.grid(True)
     plt.plot(fpr, tpr, linestyle=marker, label=label+f' (area={score:.2f})')
 
+
+# %%
+PLAYOFF_TOGGLE = True
+
 # %%
 '''
 NEURAL NETWORK MODELS
 '''
 # Load the data
-# data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
-data = pd.read_csv("games_data/games_data_all_seasons.csv")
+if PLAYOFF_TOGGLE:
+    data = pd.read_csv("games_data/games_data_all_seasons_full.csv")
+
+    # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
+    data['period'] = data['period'].replace({6: 4, 7: 4, 8: 4})
+
+    period_type = 'P'
+
+    # Select data period type by
+    data = data[data['game_type'] == period_type]
+    data.drop(columns=['game_type'], inplace=True)
+
+else:
+    data = pd.read_csv("games_data/games_data_all_seasons.csv")
 
 
 # split into train and test
@@ -275,14 +285,34 @@ prediction_report(predictions, y_test, threshold=0.33)
 # prediction_report(predictions1, y_test_nobonus, threshold=0.33)
 # prediction_report(predictions2, y_test, threshold=0.33)
 
+plot_roc_curve(predictions, y_test.to_numpy(), '-', 'best_shot_nn_final')
+
+plt.xlabel('False positive rate')
+plt.ylabel('True positive rate')
+plt.legend()
+plt.show()
+
 
 # %%
 '''
 BASELINE MODELS
 '''
 # Load the data
-# data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
-data = pd.read_csv("games_data/games_data_all_seasons.csv")
+if PLAYOFF_TOGGLE:
+    data = pd.read_csv("games_data/games_data_all_seasons_full.csv")
+
+    # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
+    data['period'] = data['period'].replace({6: 4, 7: 4, 8: 4})
+
+    period_type = 'P'
+
+    # Select data period type by
+    data = data[data['game_type'] == period_type]
+    data.drop(columns=['game_type'], inplace=True)
+
+else:
+    data = pd.read_csv("games_data/games_data_all_seasons.csv")
+
 
 # split into train and test
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
@@ -314,14 +344,26 @@ plt.ylabel('True positive rate')
 plt.legend()
 plt.show()
 
-
 # %%
 '''
 XGBOOST MODELS
 '''
 # Load the data
-# data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
-data = pd.read_csv("games_data/games_data_all_seasons.csv")
+if PLAYOFF_TOGGLE:
+    data = pd.read_csv("games_data/games_data_all_seasons_full.csv")
+
+    # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
+    data['period'] = data['period'].replace({6: 4, 7: 4, 8: 4})
+
+    period_type = 'P'
+
+    # Select data period type by
+    data = data[data['game_type'] == period_type]
+    data.drop(columns=['game_type'], inplace=True)
+
+else:
+    data = pd.read_csv("games_data/games_data_all_seasons.csv")
+
 
 # split into train and test
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
@@ -350,8 +392,20 @@ plt.show()
 KNN MODELS
 '''
 # Load the data
-# data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
-data = pd.read_csv("games_data/games_data_all_seasons.csv")
+if PLAYOFF_TOGGLE:
+    data = pd.read_csv("games_data/games_data_all_seasons_full.csv")
+
+    # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
+    data['period'] = data['period'].replace({5: 4, 6: 4, 7: 4, 8: 4})
+
+    period_type = 'P'
+
+    # Select data period type by
+    data = data[data['game_type'] == period_type]
+    data.drop(columns=['game_type'], inplace=True)
+
+else:
+    data = pd.read_csv("games_data/games_data_all_seasons.csv")
 
 # split into train and test
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
@@ -380,8 +434,20 @@ plt.show()
 RANDOM FOREST MODELS
 '''
 # Load the data
-# data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
-data = pd.read_csv("games_data/games_data_all_seasons.csv")
+if PLAYOFF_TOGGLE:
+    data = pd.read_csv("games_data/games_data_all_seasons_full.csv")
+
+    # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
+    data['period'] = data['period'].replace({5: 4, 6: 4, 7: 4, 8: 4})
+
+    period_type = 'P'
+
+    # Select data period type by
+    data = data[data['game_type'] == period_type]
+    data.drop(columns=['game_type'], inplace=True)
+
+else:
+    data = pd.read_csv("games_data/games_data_all_seasons.csv")
 
 # split into train and test
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
