@@ -1,5 +1,4 @@
 #%%
-import os
 import joblib
 
 import numpy as np
@@ -12,6 +11,8 @@ from comet_ml import Experiment
 
 from sklearn.calibration import CalibrationDisplay
 from tensorflow import keras
+import pickle
+
 
 
 from sklearn.model_selection import train_test_split
@@ -117,6 +118,59 @@ def prep_data(data_raw, bonus, model, std):
             'distance_net', 'angle_net'
         ]
 
+    elif model == 'knn' or model == 'rndf':
+        # Set seleceted features
+        selected_features = [
+            'game_pk',
+            'side', 'shot_type',
+            'period', 'period_type', 'coordinate_x', 'coordinate_y',
+            'is_goal', 'distance_net', 'angle_net', 'previous_event_type',
+            'time_since_pp_started', 'current_time_seconds',
+            'current_friendly_on_ice', 'current_opposite_on_ice','shot_last_event_delta',
+            'shot_last_event_distance', 'Rebound', 'Change_in_shot_angle', 'Speed'
+        ]
+        data = data_raw[selected_features]
+
+        # Drop rows with NaN values
+        data = data.dropna(subset = selected_features)
+
+        # Encoding categorical features into a one-hot encoding
+        categorical_features = ['side', 'shot_type', 'period', 'period_type', 'previous_event_type', 'Rebound']
+
+        features_standardizing = [
+            'coordinate_x', 'coordinate_y',
+            'distance_net', 'angle_net', 'time_since_pp_started', 'current_time_seconds', 'current_friendly_on_ice', 'current_opposite_on_ice', 'Change_in_shot_angle',
+            'shot_last_event_delta', 'shot_last_event_distance', 'Speed'
+        ]
+
+    elif model == 'xgboost':
+        # Set seleceted features
+        selected_features = [
+            'game_pk',
+            'side', 'shot_type', 'period', 'period_type', 'coordinate_x', 'coordinate_y', 'is_goal',
+            'team_side', 'distance_net', 'angle_net', 'previous_event_type', 'time_since_pp_started',
+            'previous_event_time_seconds', 'current_time_seconds', 'current_friendly_on_ice',
+            'current_opposite_on_ice', 'previous_event_x_coord', 'previous_event_y_coord',
+            'shot_last_event_delta', 'shot_last_event_distance', 'Rebound', 'Change_in_shot_angle', 'Speed'
+        ]
+        data = data_raw[selected_features]
+
+        # Drop rows with NaN values
+        data = data.dropna(subset = selected_features)
+
+        # Encoding categorical features into a one-hot encoding
+        categorical_features = ['side', 'shot_type', 'period', 'period_type', 'team_side', 'previous_event_type']
+
+        features_standardizing = [
+            'coordinate_x', 'coordinate_y', 'distance_net', 'angle_net', 'time_since_pp_started',
+            'previous_event_time_seconds', 'current_time_seconds', 'current_friendly_on_ice',
+            'current_opposite_on_ice', 'previous_event_x_coord', 'previous_event_y_coord',
+            'shot_last_event_delta', 'shot_last_event_distance', 'Change_in_shot_angle', 'Speed'
+        ]
+
+    else:
+        raise ValueError('Model not supported')
+
 
     # Ecoding features
     for feature in categorical_features:
@@ -194,7 +248,6 @@ def plot_roc_curve(pred_prob, true_y, marker, label):
 '''
 NEURAL NETWORK MODELS
 '''
-
 # Load the data
 # data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
 data = pd.read_csv("games_data/games_data_all_seasons.csv")
@@ -235,7 +288,7 @@ data = pd.read_csv("games_data/games_data_all_seasons.csv")
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
 data = data[data['Speed'] < 300] # remove outliers with value = inf
 
-x_test, y_test = prepare(data, bonus=True, model_type='logreg', std=False)
+x_test, y_test = prepare(data, bonus=True, model_type='logreg', std=True)
 
 # Load the model
 model_angle = joblib.load('../../models/baseline/regression_angle_net.joblib')
@@ -243,18 +296,18 @@ model_distance = joblib.load('../../models/baseline/regression_distance_net.jobl
 model_angle_distance = joblib.load('../../models/baseline/regression_distance_net_angle_net.joblib')
 
 # Generate predictions for samples: Returns the probability of class_1
-prediction_angle = model_angle.predict_proba(x_test[['angle_net']].abs())[:, 1]
-prediction_distance = model_distance.predict_proba(x_test[['distance_net']])[:, 1]
-prediction_angle_distance = model_angle_distance.predict_proba(x_test[['angle_net', 'distance_net']].abs())[:, 1]
+predictions_angle = model_angle.predict_proba(x_test[['angle_net']].abs())[:, 1]
+predictions_distance = model_distance.predict_proba(x_test[['distance_net']])[:, 1]
+predictions_angle_distance = model_angle_distance.predict_proba(x_test[['angle_net', 'distance_net']].abs())[:, 1]
 
 # Generate report and curves
-prediction_report(prediction_angle, y_test)
-prediction_report(prediction_distance, y_test)
-prediction_report(prediction_angle_distance, y_test)
+prediction_report(predictions_angle, y_test)
+prediction_report(predictions_distance, y_test)
+prediction_report(predictions_angle_distance, y_test)
 
-plot_roc_curve(prediction_angle, y_test.to_numpy(), '-', 'angle')
-plot_roc_curve(prediction_distance, y_test.to_numpy(), '-', 'distance')
-plot_roc_curve(prediction_angle_distance, y_test.to_numpy(), '-', 'angle_distance')
+plot_roc_curve(predictions_angle, y_test.to_numpy(), '-', 'angle')
+plot_roc_curve(predictions_distance, y_test.to_numpy(), '-', 'distance')
+plot_roc_curve(predictions_angle_distance, y_test.to_numpy(), '-', 'angle_distance')
 
 plt.xlabel('False positive rate')
 plt.ylabel('True positive rate')
@@ -262,5 +315,93 @@ plt.legend()
 plt.show()
 
 
+# %%
+'''
+XGBOOST MODELS
+'''
+# Load the data
+# data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
+data = pd.read_csv("games_data/games_data_all_seasons.csv")
 
+# split into train and test
+data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
+data = data[data['Speed'] < 300] # remove outliers with value = inf
+
+x_test, y_test = prepare(data, bonus=True, model_type='xgboost', std=True)
+
+# Load the model
+model = joblib.load('../../models/xgb_tuning_best.joblib')
+
+# Generate predictions for samples: Returns the probability of class_1
+predictions = model.predict_proba(x_test)[:, 1]
+
+# Generate report and curves
+prediction_report(predictions, y_test)
+
+plot_roc_curve(predictions, y_test.to_numpy(), '-', 'xgboost')
+
+plt.xlabel('False positive rate')
+plt.ylabel('True positive rate')
+plt.legend()
+plt.show()
+
+# %%
+'''
+KNN MODELS
+'''
+# Load the data
+# data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
+data = pd.read_csv("games_data/games_data_all_seasons.csv")
+
+# split into train and test
+data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
+data = data[data['Speed'] < 300] # remove outliers with value = inf
+
+x_test, y_test = prepare(data, bonus=True, model_type='knn', std=True)
+
+# Load the model
+model = joblib.load('../../models/KNN_model.pkl' , mmap_mode ='r')
+
+# Generate predictions for samples: Returns the probability of class_1
+predictions = model.predict(x_test)
+
+# Generate report and curves
+prediction_report(predictions, y_test)
+
+plot_roc_curve(predictions, y_test.to_numpy(), '-', 'knn')
+
+plt.xlabel('False positive rate')
+plt.ylabel('True positive rate')
+plt.legend()
+plt.show()
+
+# %%
+'''
+RANDOM FOREST MODELS
+'''
+# Load the data
+# data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
+data = pd.read_csv("games_data/games_data_all_seasons.csv")
+
+# split into train and test
+data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
+data = data[data['Speed'] < 300] # remove outliers with value = inf
+
+x_test, y_test = prepare(data, bonus=True, model_type='rndf', std=True)
+
+# Load the model
+model = joblib.load('../../models/rngforest.pkl' , mmap_mode ='r')
+
+# Generate predictions for samples: Returns the probability of class_1
+predictions = model.predict(x_test)
+
+# Generate report and curves
+prediction_report(predictions, y_test)
+
+plot_roc_curve(predictions, y_test.to_numpy(), '-', 'random_forest')
+
+plt.xlabel('False positive rate')
+plt.ylabel('True positive rate')
+plt.legend()
+plt.show()
 # %%

@@ -187,3 +187,6 @@ __pycache__/
 .ipynb_checkpoints/
 
 Gemfile.lock
+
+# Not including .pkl files because ours are too hugeeeee
+*.pkl
