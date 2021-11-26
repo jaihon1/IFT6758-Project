@@ -159,8 +159,8 @@ link to the experiment which stores the filtered DataFrame artifact
 After using a logistic regression model and a XGBoost model, we decided to try some other algorithms to find the best model
 for our task of binary classification with our collected dataset.
 We decided to try k-Nearest Neighbors, Random Forest and a feed-forward neural network.
-Classification requires that the algorithm learns how to assign a class label to examples from the problem domain.
-Classification accuracy is usually a popular metric used to evaluate the performance of a model based on the predicted class labels.
+Classification requires that the algorithm learns how to assign a class label to examples from the problem domain. (2)
+Classification accuracy is usually a popular metric used to evaluate the performance of a model based on the predicted class labels.(2)
 Since our datas is imbalanced(the distribution of examples in the training dataset across the classes is not equal), classification
 accuracy and its complement error rate, might be a bad idea to use, because it will be an unreliable measure of model performance.
 Since we have an "Accuracy Paradox", a good performance on the minority class(Goal) will be preferred over a good performance on both class.
@@ -174,15 +174,15 @@ All our models have been stratified and crossvalidated. And our neural network h
 
 The first curve is a ROC curve that explains the results of our KNN. Area Under the Curve” (AUC) of “Receiver Characteristic Operator” (ROC)
 is a plot of True Positive Rate vs False Positive Rate
-The AUC-ROC curve helps us visualize how well our machine learning classifier is performing.
+The AUC-ROC curve helps us visualize how well our machine learning classifier is performing. (1)
 Our calculated AUC on graph is actually 0.94 for the KNN, (0.5<AUC<1), so there is a high chance that the classifier will be able to distinguish
 the positive class values from the negative class values.
 
 ![roc_curve.png](/public/roc_curve.png)
 
-The ROC is a probability curve that plots the TPR against FPR at various threshold values and essentially separates the ‘signal’ from the ‘noise’.
+The ROC is a probability curve that plots the TPR against FPR at various threshold values and essentially separates the ‘signal’ from the ‘noise’.(1)
 The Area Under the Curve (AUC) is the measure of the ability of a classifier to distinguish between classes and is used as a summary of
-the ROC curve. The higher the AUC, the better the performance of the model at distinguishing between the positive and negative classes.
+the ROC curve.(1) The higher the AUC, the better the performance of the model at distinguishing between the positive and negative classes. (1)
 
 This is so because the classifier is able to detect more numbers of True positives and True negatives than False negatives and False positives.
 ROC curves can present an overly optimistic view of an algorithm’s performance if there is a large skew in the class distribution.
@@ -358,7 +358,15 @@ So we can see that at a high level,our models had pretty much the same performan
 It is evident from the plot that the AUC for the RandomForest ROC curve is higher than that for the KNN ROC curve.
 Therefore, we can say that logistic regression did a better job of classifying the positive class in the dataset.
 Building a random forest starts by generating a high number of individual decision trees.
-Random forest models are accurate and non-linear models and robust to over-fitting.
+Random forest models are accurate and non-linear models and robust to over-fitting. (4)
 
 
-In conclusion, the XGboost and the Neural Network were the two best models with overall same performance. 
+In conclusion, the XGboost and the Neural Network were the two best models with overall same performance.
+
+
+Bibliography:
+
+1- Jason Brownlee , "How to Use ROC Curves and Precision-Recall Curves for Classification in Python", "https://machinelearningmastery.com/roc-curves-and-precision-recall-curves-for-classification-in-python/", January 13, 2021
+2- Bhandari, Aniruddha , "AUC-ROC Curve in Machine Learning Clearly Explained" "https://www.analyticsvidhya.com/blog/2020/06/auc-roc-curve-machine-learning/", June 16, 2020
+3- Takaya Saito, "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets",  "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4349800/"
+4- Author Derrick Mwiti, October 26th, 2021; Random forest models are accurate and non-linear models and robust to over-fitting' 'https://neptune.ai/blog/random-forest-regression-when-does-it-fail-and-why'
