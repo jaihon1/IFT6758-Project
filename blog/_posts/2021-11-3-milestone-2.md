@@ -162,7 +162,7 @@ They are all available on comet_ml.
 <br>
 We decided to try K-Nearest Neighbors, Random Forest and a feed-forward neural network.
 As already pointed out in section 2, our dataset is very unbalanced. Therefore, classification accuracy and its complement, the error
-rate, might be a bad idea to use because it will be an unreliable measure of the model performance. We have have what is called an "Accuracy paradox"(5). In that case, a good performance on the minority class (Goal) will be preferred over a good performance on both class.
+rate, might be a bad idea to use because it will be an unreliable measure of the model performance. We have have what is called an "Accuracy paradox"(3). In that case, a good performance on the minority class (Goal) will be preferred over a good performance on both class.
 In order to do so, alternative performance metrics, like precision, recall or the F-measure, may be required since reporting the classification accuracy may be misleading.
 In the following section, we will explain how the features were processed for each model, how they were trained and which metrics were used. All our models have been split into training (80%) and validation (20%) set using a stratified strategy and have been optimized using cross-validation to find the best hyperparameters. The figures shown in this section have been obtained after evaluating our models on the validation set.
 </div>
@@ -193,15 +193,18 @@ than the others tried as of now (except for the linear regression of course). St
 However, we considered the feature current_friendly_on_ice and current_opposite_on_ice as categorical features as opposed to the other models which supposed they were numerical and therefore were standardized which does not make much sense for a number of people on the ice that ranges from 1 to 5.
 As the other models, we standardized the numerical features.
 <br>
+<br>
 The other two models tried with the Neural Network differed on the used of dropouts. They both trained with all of the features created in section 4 (including the bonus), but one of them used dropout and the other didn't.
 For the training, we did some manual cross validation over different hyperparameters like the learning rate, the coefficient for the adam optimizer and the number of epochs. All the hyperparameters of the 3 models are the same, because those parameters had been optimized
-previously. So mainly, the learning rate is 0.001, the Adam coefficient is 0.9, and we trained for 30 epochs. So, to reiterate, the main difference is that the 'nn_no_bonus_feature' has no feature developped during the bonus part (section 4),
+previously. So mainly, the learning rate is 0.001, the Adam coefficient is 0.9, and we trained for 30 epochs. So, to reiterate, the main difference is that the 'nn_no_bonus_feature' has no feature developed during the bonus part (section 4),
 the 'nn_no_dropout' has no dropout and the "best_shot_nn_final" has all of the features and dropout.
 <br>
+<br>
 Not presented here, but we did train a model without standardizing the numerical features, but found that the performance was better if standardization was done.
-</div>
-
+<br>
+<br>
 Here is a list of the features selected to train our neural network which we selected based on our domain knowledge:
+</div>
 
 ##### Selected Features of the Neural Networks
 
@@ -243,33 +246,69 @@ of our models on the training set for different threshold and took the one that 
 
 <div style="text-align: justify">
 The following figures present the different curves (ROC, goal rate, proportion and calibration) obtained on the models presented
-in this section.
+in this section as well as their confusion matrices.
+<br>
+<br>
+We can see right away on all figures that the Random Forest and KNN seems to strangely be extremely good at predicting goals. Indeed, our calculated AUC on graph is actually 0.94 for the KNN,
+which tells us that there is a high chance that the classifier will be able to distinguish the positive class values from the negative class values. (1) This comes as
+a surprise to us since the KNN performed poorly during training and the Random Forest was no better than the best XGBoost model.
+This is very suspicious behaviour. We tried to investigate and see if we made a mistake, but did not find any obvious one. Even if they seem
+to perform extremely well on the validation set, we doubt their actual performance generalizes well considering the training.
+<br>
+<br>
+For the neural networks, the best AUC on graph is actually the NeuralNetwork with an AUC of 0.77 which corresponds to the
+model trained with the bonus_features, the dropout and standardization. However, the performance was pretty equal
+to the other two models (NeuralNetwork_no_bonus with AUC 0.75) trained with no bonus features, and NeuralNetwork_no_dropout (AUC=0.76)
+trained with no dropout. This means that we could think that using the dropout technique is slightly helpful, but we can't be certain as the values and curves are very close to each other.
+The same can be said about including or not the features from the bonus section. Thus, we can see that at a high level, our models had pretty much the same performances.
+Nevertheless, we conclude that our best model for this section is the neural network trained using all the features developed in section 4 as well as dropout and leave the Random Forest and KNN model for the reasons mentioned before.
+
+<i>For more information about the performance of our Neural Networks, we put the F1 score in a table in the annex.</i>
 </div>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:100%;height:100%;">
+    <img src="/public/confusion_matrix_val.png" alt="confusion_matrix_validation">
+    <figcaption style="font-size: 15px;text-align: center;">Figure 19: Confusion matrices on the validation set.</figcaption>
+</figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
     <img src="/public/roc_curve_val.png" alt="roc_curve_validation">
-    <figcaption style="font-size: 15px;text-align: center;">Figure 19: ROC curve on the validation set.</figcaption>
+    <figcaption style="font-size: 15px;text-align: center;">Figure 20: ROC curve on the validation set.</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
     <img src="/public/goal_rate_percentile_val.png" alt="goal_rate_percentile_validation">
-    <figcaption style="font-size: 15px;text-align: center;">Figure 20: Goal Rate on the validation set.</figcaption>
+    <figcaption style="font-size: 15px;text-align: center;">Figure 21: Goal Rate on the validation set.</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
     <img src="/public/proportion_percentile_val.png" alt="proportion_percentile_validation">
-    <figcaption style="font-size: 15px;text-align: center;">Figure 21: Goal proportion on the validation set.</figcaption>
+    <figcaption style="font-size: 15px;text-align: center;">Figure 22: Goal proportion on the validation set.</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
     <img src="/public/calibration_val.png" alt="calibration_validation">
-    <figcaption style="font-size: 15px;text-align: center;">Figure 22: Calibration on the validation set.</figcaption>
+    <figcaption style="font-size: 15px;text-align: center;">Figure 23: Calibration on the validation set.</figcaption>
 </figure>
 
-Using the dropout technique to help prevent over-fitting, we can see that our neural network model performs better with this regularization technique.
+##### Links to our models
 
-Including features developed in the bonus question (current_time_seconds, time_since_pp_started, current_friendly_on_ice, current_opposite_on_ice), we can see that our neural network model performs better.
+1. [Neural Network - best_shot_nn_final](https://www.comet.ml/jaihon/ift6758-project/f02e46ac553944f7ba18060044d873e9?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+2. [Neural Network - nn_no_bonus_feature](https://www.comet.ml/jaihon/ift6758-project/f22281d6264d462685c13628a0dd7daa?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+3. [Neural Network - nn_no_dropout](https://www.comet.ml/jaihon/ift6758-project/b086d3049e1f47b7ae8aa569994983b4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+4. [Random Forest](https://www.comet.ml/jaihon/ift6758-project/f4b6196482dc4e1c9c6ab32034bf2278)
+5. [KNN](https://www.comet.ml/jaihon/ift6758-project/fc093cf3ac61416391c5f3fca4416117)
 
+### Question 7: Best Shot
+
+
+# Bibliography:
+
+1. Bhandari, Aniruddha , "AUC-ROC Curve in Machine Learning Clearly Explained" <a href="https://www.analyticsvidhya.com/blog/2020/06/auc-roc-curve-machine-learning/">https://www.analyticsvidhya.com/blog/2020/06/auc-roc-curve-machine-learning/</a>, June 16, 2020
+2. Takaya Saito, "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets",  <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4349800/">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4349800/</a>
+3. Jason Brownlee, January 1, 2020 , "Failure of Classification Accuracy for Imbalanced Class Distributions", <a href="https://machinelearningmastery.com/failure-of-accuracy-for-imbalanced-class-distributions/">https://machinelearningmastery.com/failure-of-accuracy-for-imbalanced-class-distributions/</a>
+
+# Annex
 <table>
     <caption style="caption-side: bottom; font-size: small;">F1 score results for our Neural Network models</caption>
     <tr>
@@ -278,127 +317,18 @@ Including features developed in the bonus question (current_time_seconds, time_s
         <th scope="col">F1 Score (Class 1)</th>
     </tr>
     <tr>
-        <td>best_shot_nn_final</td>
+        <td>NeuralNetwork</td>
         <td>0.90</td>
         <td>0.32</td>
     </tr>
     <tr>
-        <td>unnecessary_truss_2939</td>
+        <td>NeuralNetwork_no_dropout</td>
         <td>0.90</td>
         <td>0.31</td>
     </tr>
         <tr>
-        <td>separate_alfalfa_7886</td>
+        <td>NeuralNetwork_no_bonus</td>
         <td>0.89</td>
         <td>0.31</td>
     </tr>
 </table>
-
-<table>
-    <caption style="caption-side: bottom; font-size: small;">Confusion matrix results for best_shot_nn_final on validation set</caption>
-    <tr>
-        <th scope="row">Target/Prediction</th>
-        <th scope="col">Class 0 (not goal)</th>
-        <th scope="col">Class 1 (goal)</th>
-    </tr>
-    <tr>
-        <th scope="row">Class 0 (not goal)</th>
-        <td>46513</td>
-        <td>7228</td>
-    </tr>
-    <tr>
-        <th scope="row">Class 1 (goal)</th>
-        <td>2930</td>
-        <td>2413</td>
-    </tr>
-</table>
-
-<table>
-    <caption style="caption-side: bottom; font-size: small;">Confusion matrix results for unnecessary_truss_2939 on validation set</caption>
-    <tr>
-        <th scope="row">Target/Prediction</th>
-        <th scope="col">Class 0 (not goal)</th>
-        <th scope="col">Class 1 (goal)</th>
-    </tr>
-    <tr>
-        <th scope="row">Class 0 (not goal)</th>
-        <td>46712</td>
-        <td>7029</td>
-    </tr>
-    <tr>
-        <th scope="row">Class 1 (goal)</th>
-        <td>3091</td>
-        <td>2252</td>
-    </tr>
-</table>
-
-<table>
-    <caption style="caption-side: bottom; font-size: small;">Confusion matrix results for separate_alfalfa_7886 on validation set</caption>
-    <tr>
-        <th scope="row">Target/Prediction</th>
-        <th scope="col">Class 0 (not goal)</th>
-        <th scope="col">Class 1 (goal)</th>
-    </tr>
-    <tr>
-        <th scope="row">Class 0 (not goal)</th>
-        <td>45213</td>
-        <td>8528</td>
-    </tr>
-    <tr>
-        <th scope="row">Class 1 (goal)</th>
-        <td>2814</td>
-        <td>2529</td>
-    </tr>
-</table>
-
-
-##### Links to our models
-
-1. [Neural Network - best_shot_nn_final](https://www.comet.ml/jaihon/ift6758-project/f02e46ac553944f7ba18060044d873e9?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
-2. [Neural Network - nn_no_bonus_feature](https://www.comet.ml/jaihon/ift6758-project/f22281d6264d462685c13628a0dd7daa?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
-3. [Neural Network - nn_no_dropout](https://www.comet.ml/jaihon/ift6758-project/b086d3049e1f47b7ae8aa569994983b4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
-
-
-
-The best AUC on graph is actually the best_shot_nn_final with an AUC of 0.77 which corresponds to the
-model trained with the bonus_features, the dropout and normalization. The performance was pretty equal
-to the other two models (nn_no_bonus_feature with AUC 0.76) trained with no bonus features, and equal to nn+dropout (AUC=0.76)
-trained with no dropout and pretty much the same nn_no_normalization (AUC 0.76) that was trained with no normalization.
-So we can see that at a high level,our models had pretty much the same performances.
-
-
-
-The first curve is a ROC curve that explains the results of our KNN. Area Under the Curve” (AUC) of “Receiver Characteristic Operator” (ROC)
-is a plot of True Positive Rate vs False Positive Rate.
-The AUC-ROC curve helps us visualize how well our machine learning classifier is performing.(2)
-Quite surprisingly, our calculated AUC on graph is actually 0.94 for the KNN, (0.5<AUC<1) which tells us that there is a high chance that the classifier will be able to distinguish the positive class values from the negative class values.  This comes as a surprised for us because the results that we got on the gridsearch were less than optimal. We had AUC (of ROC) of about 0.63 for pretty much all our cross-validation trials.
-
-![roc_curve.png](/public/roc_curve.png)
-
-The Area Under the Curve (AUC) is the measure of the ability of a classifier to distinguish between classes and is used as a summary of
-the ROC curve.(2) The higher the AUC, the better the performance of the model at distinguishing between the positive and negative classes. (2)
-This is so because the classifier is able to detect more numbers of True positives and True negatives than False negatives and False positives.
-ROC curves can present an overly optimistic view of an algorithm’s performance if there is a large skew in the class distribution.
-
-![cum_sum.png](/public/cum_sum.png)
-![goal_.rate](/public/cum_sum.png)
-
-It is evident from the plot that the AUC for the RandomForest ROC curve is higher than that for the KNN ROC curve.
-Therefore, we can say that logistic regression did a better job of classifying the positive class in the dataset.
-Building a random forest starts by generating a high number of individual decision trees.
-Random forest models are accurate and non-linear models and robust to over-fitting. (4)
-
-### Question 7: Best Shot
-
-
-
-In conclusion, the XGboost and the Neural Network were the two best models with overall same performance.
-
-
-Bibliography:
-
-1. Jason Brownlee , "How to Use ROC Curves and Precision-Recall Curves for Classification in Python", "https://machinelearningmastery.com/roc-curves-and-precision-recall-curves-for-classification-in-python/", January 13, 2021
-2. Bhandari, Aniruddha , "AUC-ROC Curve in Machine Learning Clearly Explained" "https://www.analyticsvidhya.com/blog/2020/06/auc-roc-curve-machine-learning/", June 16, 2020
-3. Takaya Saito, "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets",  "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4349800/"
-4. Author Derrick Mwiti, October 26th, 2021; Random forest models are accurate and non-linear models and robust to over-fitting' 'https://neptune.ai/blog/random-forest-regression-when-does-it-fail-and-why'
-5. Jason Brownlee, January 1, 2020 , "Failure of Classification Accuracy for Imbalanced Class Distributions", "https://machinelearningmastery.com/failure-of-accuracy-for-imbalanced-class-distributions/"
