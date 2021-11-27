@@ -185,9 +185,6 @@ def prep_data(data_raw, bonus, model, std):
         data.drop(columns=[feature], inplace=True)
 
         data = pd.concat([data.reset_index(drop=True), df_encoded.reset_index(drop=True)], axis=1)
-        # print("encoding:")
-        # print(data.shape)
-        # print(df_encoded.shape)
 
 
     # normalization/standardization to features
@@ -344,9 +341,6 @@ x_test_nobonus_NN, y_test_nobonus_NN = prepare(data, bonus=False, model_type='nn
 
 
 # Load the model
-# model = keras.models.load_model('../../models/nn/best_shot_nn_final.hdf5', compile = True)
-# model1 = keras.models.load_model('../../models/nn/unnecessary_truss_2939.hdf5', compile = True)
-# model2 = keras.models.load_model('../../models/nn/separate_alfalfa_7886.hdf5', compile = True)
 model = keras.models.load_model('../../models/nn/best_shot_nn_final.hdf5', compile = True)
 model1 = keras.models.load_model('../../models/nn/unnecessary_truss_2939.hdf5', compile = True)
 model2 = keras.models.load_model('../../models/nn/separate_alfalfa_7886.hdf5', compile = True)
@@ -354,13 +348,11 @@ model2 = keras.models.load_model('../../models/nn/separate_alfalfa_7886.hdf5', c
 # Generate predictions for samples
 predictions_NN = model.predict(x_test_NN)
 predictions_NN_unlisted =[i[0] for i in predictions_NN]
-# predictions1 = model1.predict(x_test_nobonus_NN)
-# predictions2 = model2.predict(x_test_NN)
+
 
 print('Printing prediction report for Neural Network model...')
 prediction_report(predictions_NN, y_test_NN, threshold=0.33)
-# prediction_report(predictions1, y_test_nobonus, threshold=0.33)
-# prediction_report(predictions2, y_test, threshold=0.33)
+
 predictions_NN_unlisted_int = predictions_NN.copy()
 predictions_NN_unlisted_int[predictions_NN_unlisted_int <= 0.33] = 0
 predictions_NN_unlisted_int[predictions_NN_unlisted_int > 0.33] = 1
@@ -465,84 +457,6 @@ predictions_xg_int = predictions_xg.copy()
 predictions_xg_int[predictions_xg_int <= 0.5] = 0
 predictions_xg_int[predictions_xg_int > 0.5] = 1
 confusion_matrix_xg = confusion_matrix(y_test_XG, predictions_xg_int)
-
-
-# %%
-'''
-KNN MODELS
-'''
-# Load the data
-# if PLAYOFF_TOGGLE:
-#     data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons_full.csv")
-
-#     # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
-#     data['period'] = data['period'].replace({5: 4, 6: 4, 7: 4, 8: 4})
-
-#     period_type = 'P'
-
-#     # Select data period type by
-#     data = data[data['game_type'] == period_type]
-#     data.drop(columns=['game_type'], inplace=True)
-
-# else:
-#     data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons.csv")
-
-# # split into train and test
-# data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
-# data = data[data['Speed'] < 300] # remove outliers with value = inf
-
-# x_test_KNN, y_test_KNN = prepare(data, bonus=True, model_type='knn', std=True)
-
-# Load the model
-# model = joblib.load('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/KNN_model.pkl' , mmap_mode ='r')
-
-# Generate predictions for samples: Returns the probability of class_1
-# predictions8 = model.predict(x_test_KNN)
-
-# Generate report and curves
-# prediction_report(predictions8, y_test_KNN, threshold=0.73)
-
-
-# %%
-'''
-RANDOM FOREST MODELS
-'''
-# Load the data
-# if PLAYOFF_TOGGLE:
-#     data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons_full.csv")
-
-#     # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
-#     data['period'] = data['period'].replace({5: 4, 6: 4, 7: 4, 8: 4})
-
-#     period_type = 'P'
-
-#     # Select data period type by
-#     data = data[data['game_type'] == period_type]
-#     data.drop(columns=['game_type'], inplace=True)
-
-# else:
-#     data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons.csv")
-
-# # split into train and test
-# data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
-# data = data[data['Speed'] < 300] # remove outliers with value = inf
-
-# x_test_forest, y_test_forest = prepare(data, bonus=True, model_type='rndf', std=True)
-
-# Load the model
-# model_forest = joblib.load('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/rngforest.pkl' , mmap_mode ='r')
-
-
-# # Generate predictions for samples: Returns the probability of class_1
-# predictions_forest_prob = model_forest.predict(x_test_forest)
-# best_forest_threshold = 0.44
-# predictions_forest = predictions_forest_prob.copy()
-# predictions_forest[predictions_forest <= best_forest_threshold] = 0
-# predictions_forest[predictions_forest > best_forest_threshold] = 1
-
-# prediction_report(predictions_forest, y_test_forest, threshold=best_forest_threshold)
-
-
 
 #Generating curves for 
 # Goal rate:
