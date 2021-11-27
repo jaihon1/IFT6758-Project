@@ -4,6 +4,7 @@ title: IFT6758 Milestone 2
 ---
 
 ### Question 2
+> The code for this section can be found in visualizations/plot_feature_engineer_1.py
 
 Using our work from the previous milestone, we have extended our features by adding the following ones presented in the table below:
 
@@ -14,89 +15,122 @@ Using our work from the previous milestone, we have extended our features by add
 | is_goal | Whether or not the shot was a goal or not |
 | empty_net | Whether or not the shot/goal was at an empty net |
 
+From these new features, we created different figures to analyse them:
 
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
     <img src="/public/histogram_goals_nogoals_vs_distance.png" alt="histogram_goals_nogoals_vs_angle">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 1: Goals and no goals vs distance.</figcaption>
+    <figcaption style="font-size: 15px;text-align: center;">Figure 1: Goals and no goals vs distance.</figcaption>
 </figure>
 
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
     <img src="/public/histogram_goals_nogoals_vs_angle.png" alt="histogram_goals_nogoals_vs_angle">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 2: Goals and no goals vs angle.</figcaption>
+    <figcaption style="font-size: 15px;text-align: center;">Figure 2: Goals and no goals vs angle.</figcaption>
 </figure>
 
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
     <img src="/public/angle_vs_distance.png" alt="angle_vs_distance">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 3: angle vs distance.</figcaption>
+    <figcaption style="font-size: 15px;text-align: center;">Figure 3: angle vs distance.</figcaption>
 </figure>
 
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
     <img src="/public/goal_rate_vs_distance.png" alt="goal_rate_vs_distance">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 4: Goal rate vs distance.</figcaption>
+    <figcaption style="font-size: 15px;text-align: center;">Figure 4: Goal rate vs distance.</figcaption>
 </figure>
+<div style="text-align: justify"> All the figures above give us interesting information about shots and goals in the NHL. For example, figure 1 shows us that both goals and no goals happened more often closer to the net and that goals (in blue) are much less frequent than no goal (in orange). Figure 2, on the other hand, shows us that most shots (goal or not) are usually more aligned with the net since the angle is centered around 0. As for figure 3, it tells us that shots that are done farther from the net, generally have less of an angle with it (smaller angle). It also tells us that the two features are somewhat correlated with each other. Finally, if we analyse Figure 4, we can observe that when attacking players are very close to the opponent's net, the chance that they score is much higher which intuitively makes sense. However, it is surprising that the goal rate is so high for the farthest distances. This might be explained by a lower number of shots from this distance which could make the ratio of goal higher. This could also be due to a higher rate of empty net. It is sensible to think that it is easier to make a goal when a the net is empty, therefore, we evaluated the ratio of empty net each bins of distance and found that the farther the goal was made, the higher the ratio of empty net is (by a factor of about 10 between closer and farther bins).
+ </div>
 
-All the figures above give us interesting information about shots and goals in the NHL. For example, figure 1 shows us that both goals and no goals happened more often closer to the net and that goals are much less frequent than goal. Figure 3 tells us that shots that are done farther from the net, generally are more aligned with it (smaller angle). Finally, if we analyze Figure 4, we can observe that when attacking players are very close to the opponent's net, the chance that they score is much higher which intuitively makes sense.
-
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
     <img src="/public/goal_rate_vs_angle.png" alt="goal_rate_vs_angle">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 5: Goal rate vs angle.</figcaption>
+    <figcaption style="font-size: 15px;text-align: center;">Figure 5: Goal rate vs angle.</figcaption>
 </figure>
-
+<div style="text-align: justify">
 From Figure 5 above, we can see that the goal rate is much higher when the shot is coming from the left and right side compared to when the shot comes from the center of the ice. This makes sense as goalies are much more vulnerable when shots come from the top of the circles (both left and right circles near the goalie).
-
-Another interesting thing about Figure 5 is when we compare the goal rate from the left side to the right side. One reason why the goal rate is higher on the right side could be because the majority of NHL goalies have their glove on their left hand (maybe it's easier to stop shots with the glove in contrast to the blocker hand). Another reason might simply be because players shooting from the right side are much better than the ones shooting from the left side, and therefore have a higher goal rate.
-
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+<br>
+Another interesting thing about Figure 5 is when we compare the goal rate from the left side to the right side. One reason why the goal rate is higher on the right side could be because the majority of NHL goalies have their glove on their left hand (maybe it's easier to stop shots with the glove in contrast to the blocker hand). Another reason might simply be because players shooting from the right side are much better than the ones shooting from the left side and, therefore, have a higher goal rate.
+</div>
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
     <img src="/public/histogram_goals.png" alt="Goals (empty net and non-empty net) vs distance">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 6: Goals (empty net and non-empty net) vs distance from net.</figcaption>
+    <figcaption style="font-size: 15px;text-align: center;">Figure 6: Goals (empty net and non-empty net) vs distance from net.</figcaption>
 </figure>
 
+<div style="text-align: justify">
 Looking at the data from Figure 6, we can observe many interesting facts. Firstly, the vast majority of goals are on non-empty net which is logical since goalies are in the net most of the time. Secondly, we can observe that most of the goals are being scored within 60 feet from the net, which is inside the opponents' half of the rink. These two observations are aligned with our domain knowledge, and it makes perfect sense that the further you are from the opponents' net, the harder it is to score when there is a goalie in front of the net. With that said, the goals that were made from a distance of 150 feet when there was a goalie sound a bit unlikely.
-
+<br>
 We can observe in Figure 6 that the goals scored on a non-empty net from a distance of 150-170 feet are quite high. It could be that it has been originally misclassified as "non-empty net goals" as opposed to "empty-net goals". Another reason could be that these goals were scored by the other team that was then misclassified.
-
+</div>
 
 ### Question 3
+> The code for this section is in features/baseline_models.py
+
+#### Preparation of the data
+<div style="text-align: justify">
+After removing the test set from our data, we split the dataset into training and validation set using a stratified strategy, meaning that we kept
+the same proportion of the classes into both sets. We kept 80% of the data for training and 20% for validation. We did not shuffle the
+data, which means that the validation set is mostly composed of the later seasons (2018). We also removed all of the rows that had nan values in either <i>distance_net</i> or
+<i>angle_net</i> columns.
+</div>
 
 #### Results
-For our baseline, we trained a Logistric Regression model using only the *distance* feature that we have previously extracted from the raw data, and it gave us a **90.59%** accuracy when we ran it on our validation dataset. We also generated the following confusion matrix to have a better look at our model's results:
+<div style="text-align: justify">
+For our baseline, we trained a Logistic Regression model using only the <i>distance</i> feature that we have previously extracted from the raw data, and it gave us a <b>90.59</b> accuracy when we ran it on our validation set. We also generated the following confusion matrix to have a better look at our model's results:
+</div>
 
 | Target/Prediction | **Class 0 (not goal)** | **Class 1 (goal)** |
 | :-------: | :-------: | :-------: |
 | **Class 0 (not goal)** | 70748 | 0 |
 | **Class 1 (goal)** | 7344 | 0 |
 
-This confusion matrix clearly shows us that there is a major issue with our predictions. We are only getting high accuracy performance because the majority of our data points are classified as a *not goal*. By always predicting *not goal* our model does a pretty good job if we only look at the overall accuracy.
-
+<div style="text-align: justify">
+This confusion matrix clearly shows us that there is a major issue with our predictions. We are only getting high accuracy performance because the majority of our data points are classified as a <b>not goal</b>. By always predicting <b>not goal</b> our model does a pretty good job if we only look at the overall accuracy. This is due to the fact that our dataset is extremely unbalanced with 99% of the data as a non goal and only 1% as goals.
+<br>
+Following this, we tried 2 other models: one with the angle feature and the other with both angle and distance. These did not give us better results as we shall see in the next section.
+</div>
 
 #### Analysis
-From Figure 7 below, the main thing we can observe is that shots that have a higher probability represents a much greater proportion of the total goals scored compared to shots with lower probabilities. Another important aspect is how this proportion metric is different for our different models. Even though the model trained on the distance feature and the model trained on the angle feature are better than the random baseline, the model that we trained on both features (distance and angle) gave us better results. Meaning it is much better at predicting the probability that a shot would turn to be a goal.
+<div style="text-align: justify">
+To give us an idea of the performance of our baselines, we added a curve to all of the following figures of a random model which randomly decides a probability between 0 and 1 for the example.
+<br>
+Figure 7 shows the ROC curve for all of the baseline models which is the receiver operating characteristic curve (ROC). A ROC curve plots the true positive rate against the false positive rate for different threshold of probabilities. For example, if we were to select a threshold of 0.3, we would compute how many true positive and false positive our models gives when setting 0.3 as its threshold for deciding the label. This would be one data point on the curve. The whole ROC curve is then generated for many threshold between 0 and 1. An ideal model would have a curve that tends to be closer to the upper left corner of the plot. The AUC also presented in the legend is the area under the curve of the ROC. The higher it is, the better. <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">ROC Wikipedia</a>
+<br>
+As we can see in Figure 7 below, the random classifier gives a perfect diagonal as expected. We can also observe that our model trained on both of our features gives the best curve. Our ROC score is also higher (<b>area=0.70</b>) when we trained our model on both features compared to training solely on angle. However, the difference isn't big with only distance. This means that the logistic regression does not learn much from the angle feature.
+</div>
 
-
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
-    <img src="/public/cumulative_sum_goal_baseline.png" alt="cumulative_sum_goal_baseline">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 7: Logistic Regression: Goal proportion.</figcaption>
-</figure>
-
-The results shown in Figure 8 is also about shot probabilities. It shows us that our trained models perform much better that the random classifier at predicting the shot probability. As in our previous analysis, our model that was trained on both features (distance and angle) does give us better results that models trained on the features separately.
-
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
-    <img src="/public/goal_rate_curve_baseline.png" alt="goal_rate_curve_baseline">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 8: Logistic Regression: Goal rate.</figcaption>
-</figure>
-
-In order to have a deeper analysis of the behavior of our binary classifiers, using our results we generated a receiver operating characteristic curve (ROC). As we can see in Figure 9 above, the random classifier gives a perfect diagonal as expected. We can also observe that our model trained on both of our features gives the better curve compared to our models that were trained separately on the features. Our ROC score is also much higher (*area=0.68*) when we trained our model on both features.
-
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
     <img src="/public/roc_curve_baseline.png" alt="roc_curve_baseline">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Logistic Regression: ROC curve.</figcaption>
+    <figcaption style="font-size: 15px;text-align: center;">Figure 7: Logistic Regression: ROC curve.</figcaption>
 </figure>
 
-Given the calibration curve shown in Figure 10, we can easily see that our trained models did learn some valuable representations of our data. Comparing all our current models, the model that was trained on both features (distance and angle) has the closest calibration values to the *perfectly* calibrated model. Again, as mentioned before, it confirms that overall this model is the model that gives us the best results so far.
+<div style="text-align: justify">
+The results shown in Figure 8 is about shot probabilities. It shows the goal rate for different percentiles of the probability. The way to interpret this plot is the higher the percentile, the higher the goal rate should be since a higher percentile means a higher probability and a higher probability means a higher chance that the event is a goal. If our model was good, a high probability should mean a higher confidence that this is in fact a goal.
+<br>
+Knowing this, the plot shows us that our trained models perform much better that the random classifier at predicting the shot probability. As in our previous analysis, because of the shape of the curve which is higher at higher percentile, our model that was trained on both features (distance and angle) does give us better results than models trained on the features separately. Once again, the model trained solely on the angle feature performs poorly since the curve is somewhat constant.
+</div>
 
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/goal_rate_curve_baseline.png" alt="goal_rate_curve_baseline">
+    <figcaption style="font-size: 15px;text-align: center;">Figure 8: Logistic Regression: Goal rate.</figcaption>
+</figure>
+
+<div style="text-align: justify">
+Figure 9 shows the cumulative sum of goal against the probability model percentile (the same one as for the last plot). For this plot, we should pay attention the slope of the curve. The slope should be very steep in the beginning and slowly get flatter near the lowest percentile. If we want to have confidence in our model, most of the goals should have a high probability and therefore be associated with a higher percentile and this is why we want a steep then gentle slope.
+<br>
+Fortunately, the main thing we can observe is that shots that have a higher probability represents a much greater proportion of the total goals scored compared to shots with lower probabilities. Once again, even though the model trained on the distance feature and the model trained on the angle feature are better than the random baseline, the model that we trained on both features (distance and angle) gave us better results. Meaning that it is much better at predicting the probability that a shot would turn out to be a goal.
+</div>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/cumulative_sum_goal_baseline.png" alt="cumulative_sum_goal_baseline">
+    <figcaption style="font-size: 15px;text-align: center;">Figure 9: Logistic Regression: Goal proportion.</figcaption>
+</figure>
+
+<div style="text-align: justify">
+Finally, the last plot shows us the calibration curve. A good calibration curve should be linear and should have a slope of 1. The interpretation is that if your model gives you a probability of 0.8 for a shot to be a goal, then 80% of the example that have a probability of 0.8 should be positives. <a href="https://scikit-learn.org/stable/modules/calibration.html#probability-calibration"> Explaination of calibration curve from scikit-learn </a>
+<br>
+Given the calibration curve shown in Figure 10, we can easily see that our trained models did learn some valuable representations of our data. Comparing all our current models, the model that was trained on both features (distance and angle) has the closest calibration values to the <b>perfectly</b> calibrated model. Again, as mentioned before, it confirms that overall this model is the model that gives us the best results so far. However, it is important to note that the curve do not go beyond 0.25 which is due to the fact that the probability predicted by our models are all below 0.25%. This means that our models are not very confident about their predictions.
+</div>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
     <img src="/public/calibration_curve_baseline.png" alt="calibration_curve_baseline">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 10: Logistic Regression: Calibration curve.</figcaption>
+    <figcaption style="font-size: 15px;text-align: center;">Figure 10: Logistic Regression: Calibration curve.</figcaption>
 </figure>
 
 
@@ -109,11 +143,13 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 
 
 ### Question 4
+> The code for this section is in EventGenerator.py and feat_eng2.py
 
-We added below a list of all of the features that we created, and we listed each feature by both the column name
+<div style="text-align: justify">
+We added below a list of all of the features that we created for this section, and we listed each feature by both the column name
 in the dataframe and a simple explanation. For the novel features, we describe what they are.
 At the end, we added a link to the experiment which stores the filtered DataFrame.
-
+</div>
 
 | Feature      | Description |
 | ----------- | ----------- |
@@ -127,6 +163,8 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 | previous_event_type | type of the last event |
 | previous_event_x_coord | coordinates x of the last event |
 | previous_event_y_coord | coordinates y of the last event |
+| previous_event_period | period of the game during which the last event happened |
+| previous_event_period_time | total sum of seconds elapsed in the game for the last event |
 | shot_last_event_delta | time elapsed since the last event |
 | shot_last_event_distance | distance calculated from the last event |
 | Rebound | Rebound of the last event (True if shot, otherwise False) |
@@ -136,20 +174,21 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 | current_friendly_on_ice | Number of friendly players on ice|
 | current_opposite_on_ice | Number of opposite players on ice|
 
+Some of these features above were mostly used to generate other features like previous_event_period.
 
-In the bonus question, we added a few more features like the time since the penalty started and the number of friendly and opposite players on ice. To compute the time since the penalty started, we started
-by generating all types of events in our game, by evaluating, at each event, if there was a
-penalty and by checking on which side the team was. We then built a tidy event object that gave the time and coordinates details
-relative to the previous event. Finally, we got the current event time and subtracted
-the starting time of the penalty from the current time to have the time since the penalty started (two types of penalties generated).
+<div style="text-align: justify">
+In the bonus question, we added a few more features like the time since the penalty started and the number of friendly and opposite players on ice. For all of these, we started
+by generating all types of events in our game. For each event, we evaluated if there was a
+penalty and checked on which side the team was. We then built a tidy event object that gave the time and coordinates details
+relative to the previous event. To compute the time since the penalty started, we got the current event time and subtracted
+the starting time of the penalty from the current time (two types of penalties generated).
 To get the number of friendly players on ice and the number of opposite players on ice, we first checked the side of the team to figure out who is friendly and who is not and
-then subtracted the number of players lost depending on the type of the
-penalty from 5.
+then subtracted the number of players lost depending on the type of the penalty from 5.
+</div>
 
 
-link to the experiment which stores the filtered DataFrame artifact
-(https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
-[wpg_v_wsh_2017021065.csv]
+#### Link to the experiment which stores the filtered DataFrame artifact:
+[wpg_v_wsh_2017021065.csv](https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
 
 ### Question 5
 > The code for this section can be found in xgboost_models.py
