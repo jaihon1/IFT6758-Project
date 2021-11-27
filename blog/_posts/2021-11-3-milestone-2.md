@@ -154,7 +154,7 @@ link to the experiment which stores the filtered DataFrame artifact
 
 ## Question 6: Best Shot
 
-After using a logistic regression model and a XGBoost model, we decided to try some other algorithms to find the best model
+After using a logistic regression and XGBoost model, we decided to try other algorithms to find the best model
 for our task of binary classification with our collected dataset. We have made many experiences in this milestone.
 They are available through out the experiment tracking of the entire milestone.
 We decided to try k-Nearest Neighbors, Random Forest and a feed-forward neural network.
@@ -164,9 +164,8 @@ predicted class labels. (2)
 Since our datas is imbalanced as we've seen with the previous models, classification accuracy and its complement error
 rate, might be a bad idea to use, because it will be an unreliable measure of model performance.
 We have have what is called an "Accuracy paradox"(5), a good performance on the minority class(Goal) will be preferred over a good performance on both class.
-Finally, alternative performance metrics may be required as reporting the classification accuracy may be misleading, like using
-the Precision, the Recall or the F-Measure.
-All our models have been stratified and crossvalidated. And our neural network has been optimized to use the best hyperparamters.
+In order to do so, alternative performance metrics, like precision, recall or the F-measure, may be required since reporting the classification accuracy may be misleading.
+Our different models may have different preprocessing. We will explain how the features were processed in each section. However, all our models have been split into training (80%) and validation (20%) set using a stratified strategy and have been optimized using cross-validation to find the best hyperparameters. The figures shown in this section have been obtained after evaluating our models on the validation set.
 
 ### Model Results and Analysis
 
@@ -175,8 +174,7 @@ All our models have been stratified and crossvalidated. And our neural network h
 The first curve is a ROC curve that explains the results of our KNN. Area Under the Curve” (AUC) of “Receiver Characteristic Operator” (ROC)
 is a plot of True Positive Rate vs False Positive Rate.
 The AUC-ROC curve helps us visualize how well our machine learning classifier is performing.(2)
-Our calculated AUC on graph is actually 0.94 for the KNN, (0.5<AUC<1), so there is a high chance that the classifier will be able to distinguish
-the positive class values from the negative class values.
+Quite surprisingly, our calculated AUC on graph is actually 0.94 for the KNN, (0.5<AUC<1) which tells us that there is a high chance that the classifier will be able to distinguish the positive class values from the negative class values.  This comes as a surprised for us because the results that we got on the gridsearch were less than optimal. We had AUC (of ROC) of about 0.63 for pretty much all our cross-validation trials.
 
 ![roc_curve.png](/public/roc_curve.png)
 
@@ -199,8 +197,7 @@ Using very value of a small dropout technique to help prevent overfitting, we ca
 Including features developed in the bonus question (current_time_seconds, time_since_pp_started, current_friendly_on_ice, current_opposite_on_ice), we can see that our neural network model performs better.
 
 ##### Selected Features
-Feature Selection technique: Domain knowledge
-Using feature selection, we selected the following features to train our neural network models:
+Using our domain knowledge, we selected the following features to train our neural network models:
 
 | Feature     | Encoding |
 | ----------- | ----------- |
@@ -323,14 +320,14 @@ we trained, we fo und a better threshold value that would give us the optimal F1
 3. [Neural Network - nn+dropout](https://www.comet.ml/jaihon/ift6758-project/b086d3049e1f47b7ae8aa569994983b4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
 4. [Neural Network - nn_no_normalisation](https://www.comet.ml/jaihon/ift6758-project/aa84b2bc14f24a48aa4c232a92ecabf0?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
 
-5. For the ROC curve, all the hyperparameters of the 3 models are the same, because those parameters have been optimized
+For the ROC curve, all the hyperparameters of the 3 models are the same, because those parameters have been optimized
 previously. So mainly, the lr is 0.001, Adam 0.9, and we used 30 epochs. The main difference is that the 'nn_no_bonus_feature' have no bonus feature,
 while the 'nn+dropout' has no dropout, while the "nn_no_normalisation" is not normalised.
 
-The best AUC on graph is actually the best_shot_nn_final with an AUC of 0.77 which corresponded to the
+The best AUC on graph is actually the best_shot_nn_final with an AUC of 0.77 which corresponds to the
 model trained with the bonus_features, with the dropout, and with normalization. The performance was pretty equal
 to the other two models (nn_no_bonus_feature with AUC 0.76) trained with no bonus features, and equal to nn+dropout (AUC=0.76)
-trained with no dropout and pretty much the same nn_no_normalisation (AUC 0.76) that was trained with no normalisation.
+trained with no dropout and pretty much the same nn_no_normalization (AUC 0.76) that was trained with no normalization.
 So we can see that at a high level,our models had pretty much the same performances.
 
 
@@ -349,8 +346,8 @@ In conclusion, the XGboost and the Neural Network were the two best models with 
 
 Bibliography:
 
-1- Jason Brownlee , "How to Use ROC Curves and Precision-Recall Curves for Classification in Python", "https://machinelearningmastery.com/roc-curves-and-precision-recall-curves-for-classification-in-python/", January 13, 2021
-2- Bhandari, Aniruddha , "AUC-ROC Curve in Machine Learning Clearly Explained" "https://www.analyticsvidhya.com/blog/2020/06/auc-roc-curve-machine-learning/", June 16, 2020
-3- Takaya Saito, "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets",  "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4349800/"
-4- Author Derrick Mwiti, October 26th, 2021; Random forest models are accurate and non-linear models and robust to over-fitting' 'https://neptune.ai/blog/random-forest-regression-when-does-it-fail-and-why'
-5- Jason Brownlee, January 1, 2020 , "Failure of Classification Accuracy for Imbalanced Class Distributions", "https://machinelearningmastery.com/failure-of-accuracy-for-imbalanced-class-distributions/"
+1. Jason Brownlee , "How to Use ROC Curves and Precision-Recall Curves for Classification in Python", "https://machinelearningmastery.com/roc-curves-and-precision-recall-curves-for-classification-in-python/", January 13, 2021
+2. Bhandari, Aniruddha , "AUC-ROC Curve in Machine Learning Clearly Explained" "https://www.analyticsvidhya.com/blog/2020/06/auc-roc-curve-machine-learning/", June 16, 2020
+3. Takaya Saito, "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets",  "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4349800/"
+4. Author Derrick Mwiti, October 26th, 2021; Random forest models are accurate and non-linear models and robust to over-fitting' 'https://neptune.ai/blog/random-forest-regression-when-does-it-fail-and-why'
+5. Jason Brownlee, January 1, 2020 , "Failure of Classification Accuracy for Imbalanced Class Distributions", "https://machinelearningmastery.com/failure-of-accuracy-for-imbalanced-class-distributions/"
