@@ -228,10 +228,10 @@ def prepare(data, bonus, model_type, std):
     test_data.drop(columns=['game_pk'], inplace=True)
 
     # Split test data into input and target
-    x_test, y_test = test_data.drop(columns=['is_goal']), test_data['is_goal']
-    # x_train, y_train = train_data.drop(columns=['is_goal']), train_data['is_goal']
+    # x_test, y_test = test_data.drop(columns=['is_goal']), test_data['is_goal']
+    x_train, y_train = train_data.drop(columns=['is_goal']), train_data['is_goal']
 
-    return x_test, y_test
+    return x_train, y_train
 
 #%%
 def plot_roc_curve(pred_probs, true_y, markers, labels, save_file=None):
@@ -312,7 +312,7 @@ def plot_calibration(probas, actual_y, labels, save_file=None):
     plt.show()
 
 # %%
-PLAYOFF_TOGGLE = True
+PLAYOFF_TOGGLE = False
 
 # %%
 '''

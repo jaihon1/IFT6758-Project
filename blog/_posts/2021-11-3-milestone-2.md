@@ -311,3 +311,66 @@ Because the dataset was very unbalanced in nature, we decide to mainly use the F
 
 
 #### 3. Random Forest
+
+
+
+
+
+
+## Question 7: Evaluation
+
+### Selected models
+
+| Models | **  ** | **Class 1 (goal)** |
+| :-------: | :-------: | :-------: |
+| **Class 0 (not goal)** | 70748 | 0 |
+| **Class 1 (goal)** | 7344 | 0 |
+
+### Results and Analysis
+
+#### Regular Season Games
+
+
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/roc_regular.png" alt="best_shot_nn_calib">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: ROC Regular Season (2019-2020)</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/goal_rate_vs_percentile_regular.png" alt="best_shot_nn_calib">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Goal rate Regular Season (2019-2020)</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/proportion_goal_percentile_regular.png" alt="best_shot_nn_calib">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Goal rate cumulative Regular Season (2019-2020)</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/calibration_regular.png" alt="best_shot_nn_calib">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Calibration results Regular Season (2019-2020)</figcaption>
+</figure>
+
+#### Playoff Games
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/roc_playoffs.png" alt="best_shot_nn_calib">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: ROC Playoffs season (2019-2020)</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/goal_rate_vs_percentile_playoff.png" alt="best_shot_nn_calib">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Goal rate Playoffs season (2019-2020)</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/proportion_goal_percentile_playoffs.png" alt="best_shot_nn_calib">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Goal rate cumulative Playoffs season (2019-2020)</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
+    <img src="/public/calibration_curve_playoffs.png" alt="best_shot_nn_calib">
+    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Calibration results season (2019-2020)</figcaption>
+</figure>
+
+
