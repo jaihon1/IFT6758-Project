@@ -320,7 +320,7 @@ NEURAL NETWORK MODELS
 '''
 # Load the data
 if PLAYOFF_TOGGLE:
-    data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons_full.csv")
+    data = pd.read_csv("games_data/games_data_all_seasons_full.csv")
 
     # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
     data['period'] = data['period'].replace({6: 4, 7: 4, 8: 4})
@@ -332,7 +332,7 @@ if PLAYOFF_TOGGLE:
     data.drop(columns=['game_type'], inplace=True)
 
 else:
-    data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons.csv")
+    data = pd.read_csv("games_data/games_data_all_seasons.csv")
 
 
 # split into train and test
@@ -347,9 +347,9 @@ x_test_nobonus_NN, y_test_nobonus_NN = prepare(data, bonus=False, model_type='nn
 # model = keras.models.load_model('../../models/nn/best_shot_nn_final.hdf5', compile = True)
 # model1 = keras.models.load_model('../../models/nn/unnecessary_truss_2939.hdf5', compile = True)
 # model2 = keras.models.load_model('../../models/nn/separate_alfalfa_7886.hdf5', compile = True)
-model = keras.models.load_model('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/nn/best_shot_nn_final.hdf5', compile = True)
-model1 = keras.models.load_model('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/nn/unnecessary_truss_2939.hdf5', compile = True)
-model2 = keras.models.load_model('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/nn/separate_alfalfa_7886.hdf5', compile = True)
+model = keras.models.load_model('../../models/nn/best_shot_nn_final.hdf5', compile = True)
+model1 = keras.models.load_model('../../models/nn/unnecessary_truss_2939.hdf5', compile = True)
+model2 = keras.models.load_model('../../models/nn/separate_alfalfa_7886.hdf5', compile = True)
 
 # Generate predictions for samples
 predictions_NN = model.predict(x_test_NN)
@@ -372,7 +372,7 @@ BASELINE MODELS
 '''
 # Load the data
 if PLAYOFF_TOGGLE:
-    data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons_full.csv")
+    data = pd.read_csv("games_data/games_data_all_seasons_full.csv")
 
     # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
     data['period'] = data['period'].replace({6: 4, 7: 4, 8: 4})
@@ -384,7 +384,7 @@ if PLAYOFF_TOGGLE:
     data.drop(columns=['game_type'], inplace=True)
 
 else:
-    data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons.csv")
+    data = pd.read_csv("games_data/games_data_all_seasons.csv")
 
 
 # split into train and test
@@ -394,9 +394,9 @@ data = data[data['Speed'] < 300] # remove outliers with value = inf
 x_test_reg, y_test_reg = prepare(data, bonus=True, model_type='logreg', std=True)
 
 # Load the model
-model_angle = joblib.load('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/baseline/regression_angle_net.joblib')
-model_distance = joblib.load('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/baseline/regression_distance_net.joblib')
-model_angle_distance = joblib.load('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/baseline/regression_distance_net_angle_net.joblib')
+model_angle = joblib.load('../../models/baseline/regression_angle_net.joblib')
+model_distance = joblib.load('../../models/baseline/regression_distance_net.joblib')
+model_angle_distance = joblib.load('../../models/baseline/regression_distance_net_angle_net.joblib')
 
 # Generate predictions for samples: Returns the probability of class_1
 predictions_angle_net = model_angle.predict_proba(x_test_reg[['angle_net']].abs())[:, 1]
@@ -431,7 +431,7 @@ XGBOOST MODELS
 '''
 # Load the data
 if PLAYOFF_TOGGLE:
-    data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons_full.csv")
+    data = pd.read_csv("games_data/games_data_all_seasons_full.csv")
 
     # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
     data['period'] = data['period'].replace({6: 4, 7: 4, 8: 4})
@@ -443,7 +443,7 @@ if PLAYOFF_TOGGLE:
     data.drop(columns=['game_type'], inplace=True)
 
 else:
-    data = pd.read_csv("Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/games_data_all_seasons.csv")
+    data = pd.read_csv("games_data/games_data_all_seasons.csv")
 
 
 # split into train and test
@@ -453,7 +453,7 @@ data = data[data['Speed'] < 300] # remove outliers with value = inf
 x_test_XG, y_test_XG = prepare(data, bonus=True, model_type='xgboost', std=True)
 
 # Load the model
-model = joblib.load('Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/models/xgb_tuning_best.joblib')
+model = joblib.load('../../models/xgb_tuning_best.joblib')
 
 # Generate predictions for samples: Returns the probability of class_1
 predictions_xg = model.predict_proba(x_test_XG)[:, 1]
@@ -557,30 +557,14 @@ plot_calibration([predictions_NN_unlisted, predictions_angle_distance, predictio
 plot_roc_curve([predictions_NN_unlisted, predictions_angle_distance, predictions_angle_net, predictions_distance, predictions_xg], [y_test_NN, y_test_reg, y_test_reg, y_test_reg, y_test_XG],['-', '-','-', '-','-'], ['NeuralNetwork', 'LogisticRegression 1', 'LogisticRegression 2', 'LogisticRegression 3', 'XGBoost' ])
 
 cm_1 = pd.DataFrame(confusion_matrix_NN, index=[0,1], columns=[0,1])
-# sns.heatmap(cm, annot=True, cmap=sns.color_palette("light:b", as_cmap=True), fmt='g')
-# plt.xlabel('Predictions')
-# plt.ylabel('True labels')
-# plt.show()
+
 cm_2 = pd.DataFrame(confusion_matrix_xg, index=[0,1], columns=[0,1])
-# sns.heatmap(cm, annot=True, cmap=sns.color_palette("light:b", as_cmap=True), fmt='g')
-# plt.xlabel('Predictions')
-# plt.ylabel('True labels')
-# plt.show()
+
 cm_3 = pd.DataFrame(confusion_matrix_reg_1, index=[0,1], columns=[0,1])
-# sns.heatmap(cm, annot=True, cmap=sns.color_palette("light:b", as_cmap=True), fmt='g')
-# plt.xlabel('Predictions')
-# plt.ylabel('True labels')
-# plt.show()
+
 cm_4 = pd.DataFrame(confusion_matrix_reg_2, index=[0,1], columns=[0,1])
-# sns.heatmap(cm, annot=True, cmap=sns.color_palette("light:b", as_cmap=True), fmt='g')
-# plt.xlabel('Predictions')
-# plt.ylabel('True labels')
-# plt.show()
+
 cm_5 = pd.DataFrame(confusion_matrix_reg_3, index=[0,1], columns=[0,1])
-# sns.heatmap(cm, annot=True, cmap=sns.color_palette("light:b", as_cmap=True), fmt='g')
-# plt.xlabel('Predictions')
-# plt.ylabel('True labels')
-# plt.show()
 
 cm= [cm_1, cm_2, cm_3, cm_4, cm_5]
 titel = ['Neural Network', 'Logistic Regression 1', 'Logistic Regression 2', 'Logistic Regression 3', 'XG Boost']
