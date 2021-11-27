@@ -154,7 +154,7 @@ link to the experiment which stores the filtered DataFrame artifact
 
 ## Question 6: Best Shot
 
-<div style="text-align: right">
+<div style="text-align: justify">
 After using a logistic regression and XGBoost model, we decided to try other algorithms to find the best model
 for our task of binary classification with our collected dataset. We have made many experiences in this milestone.
 They are all available on comet_ml.
@@ -170,7 +170,7 @@ In the following section, we will explain how the features were processed for ea
 
 #### 1. KNN
 
-<div style="text-align: right">
+<div style="text-align: justify">
 KNN was trained on all the features created in section 4. For the preprocessing, we started by changing all of the categorical features into one-hot encoding. We then dropped the rows that had nan values and
 removed the ones that had infinity values (like the Speed Column). Once this was done, we split the dataset into training and validation set as specified above.
 We trained our KNN using a GridSearch on different hyperparameters: the number of neighbors and the weights used (distance vs uniform). The best model found by the GridSearch used 8 neighbors and distance for weights.
@@ -178,14 +178,14 @@ However, even if the GridSearch did find a "best estimator", it was only able to
 </div>
 
 #### 2. Random Forest
-<div style="text-align: right">
+<div style="text-align: justify">
 The Random Forest had a similar preprocessing as the KNN, i.e. we used the same features with the one-hot encoding for the categorical features, etc.
 We also trained the Random Forest using a GridSearch over 2 hyperparameters: the criterion which is the function used to measure the quality of a split in a tree and the number of estimators. [<a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html?highlight=randomforestregressor#sklearn.ensemble.RandomForestRegressor">Random Forest from Scikit-Learn</a>]
 Once again, the model seemed to perform poorly as it only had AUC of 0.63 for the cross-validation results of the GridSearch.
 </div>
 
 #### 3. Neural Network
-<div style="text-align: right">
+<div style="text-align: justify">
 For the neural network, different methods were used for the preprocessing. We tried first a model that did not use our
 features created in the bonus part of section 4 (everything related to penalty). This mean that our model had less features
 than the others tried as of now. Still, for all neural networks models, we transformed the categorical data into one-hot vectors.
@@ -229,10 +229,12 @@ Here is a list of the features selected to train our neural network which we sel
 
 #### Threshold selection
 
+<div style="text-align: justify">
 Because the dataset was very unbalanced in nature, we decided to mainly use the F1 Score. In addition, we also used a
 custom-made threshold technique to help us analyse the results of our models. Since our models' outputs were very small
 probability values, we decided that the 0.5 threshold for binary prediction wasn't the way to go. Instead, for each model
 we trained, we found a better threshold value that would give us the optimal F1 score at the end.
+</div>
 
 #### Results and Analysis
 
