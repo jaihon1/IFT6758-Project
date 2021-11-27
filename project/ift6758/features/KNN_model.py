@@ -277,7 +277,7 @@ def main(data_train):
        'current_friendly_on_ice', 'current_opposite_on_ice','shot_last_event_delta',
         'shot_last_event_distance', 'Rebound', 'Change_in_shot_angle', 'Speed']
 
-        # Generate predictions for samples
+        # Generate predictions for samples (Uncommented this to generated predictions and to find optimal threshold)
         # predictions_KNN_prob = model_KNN.predict(X_train)
         # predictions_forest_prob = model_forest.predict(X_train)
 
