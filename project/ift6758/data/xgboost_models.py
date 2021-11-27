@@ -166,6 +166,7 @@ importance = np.abs(lasso.coef_)
 plt.figure(figsize=(8, 6), dpi=200)
 plt.bar(height=importance, x=feature_names)
 plt.xticks(lasso.feature_names_in_, rotation='vertical', fontsize=9)
+plt.ylabel('Importance')
 plt.tight_layout()
 plt.show()
 
