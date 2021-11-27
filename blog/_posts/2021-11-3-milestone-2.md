@@ -320,12 +320,12 @@ we trained, we fo und a better threshold value that would give us the optimal F1
 3. [Neural Network - nn+dropout](https://www.comet.ml/jaihon/ift6758-project/b086d3049e1f47b7ae8aa569994983b4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
 4. [Neural Network - nn_no_normalisation](https://www.comet.ml/jaihon/ift6758-project/aa84b2bc14f24a48aa4c232a92ecabf0?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
 
-For the ROC curve, all the hyperparameters of the 3 models are the same, because those parameters have been optimized
+All the hyperparameters of the 3 models are the same, because those parameters have been optimized
 previously. So mainly, the lr is 0.001, Adam 0.9, and we used 30 epochs. The main difference is that the 'nn_no_bonus_feature' have no bonus feature,
 while the 'nn+dropout' has no dropout, while the "nn_no_normalisation" is not normalised.
 
 The best AUC on graph is actually the best_shot_nn_final with an AUC of 0.77 which corresponds to the
-model trained with the bonus_features, with the dropout, and with normalization. The performance was pretty equal
+model trained with the bonus_features, the dropout and normalization. The performance was pretty equal
 to the other two models (nn_no_bonus_feature with AUC 0.76) trained with no bonus features, and equal to nn+dropout (AUC=0.76)
 trained with no dropout and pretty much the same nn_no_normalization (AUC 0.76) that was trained with no normalization.
 So we can see that at a high level,our models had pretty much the same performances.
