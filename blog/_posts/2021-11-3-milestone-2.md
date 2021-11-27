@@ -159,6 +159,7 @@ After using a logistic regression and XGBoost model, we decided to try other alg
 for our task of binary classification with our collected dataset. We have made many experiences in this milestone.
 They are all available on comet_ml.
 <br>
+<br>
 We decided to try K-Nearest Neighbors, Random Forest and a feed-forward neural network.
 As already pointed out in section 2, our dataset is very unbalanced. Therefore, classification accuracy and its complement, the error
 rate, might be a bad idea to use because it will be an unreliable measure of the model performance. We have have what is called an "Accuracy paradox"(5). In that case, a good performance on the minority class (Goal) will be preferred over a good performance on both class.
@@ -173,30 +174,31 @@ In the following section, we will explain how the features were processed for ea
 <div style="text-align: justify">
 KNN was trained on all the features created in section 4. For the preprocessing, we started by changing all of the categorical features into one-hot encoding. We then dropped the rows that had nan values and
 removed the ones that had infinity values (like the Speed Column). Once this was done, we split the dataset into training and validation set as specified above.
-We trained our KNN using a GridSearch on different hyperparameters: the number of neighbors and the weights used (distance vs uniform). The best model found by the GridSearch used 8 neighbors and distance for weights.
-However, even if the GridSearch did find a "best estimator", it was only able to reach an AUC of 0.63 which is lower than the XGBoost model.
+We trained our KNN using a GridSearch on different hyperparameters: the number of neighbors and the weights used for prediction (distance vs uniform). The best model found by the GridSearch used 8 neighbors and distance for weights.
+However, even if the GridSearch did find a "best estimator", it was only able to reach an AUC of 0.63 which is lower than the XGBoost model and our best regression model from section 3.
 </div>
 
 #### 2. Random Forest
 <div style="text-align: justify">
 The Random Forest had a similar preprocessing as the KNN, i.e. we used the same features with the one-hot encoding for the categorical features, etc.
 We also trained the Random Forest using a GridSearch over 2 hyperparameters: the criterion which is the function used to measure the quality of a split in a tree and the number of estimators. [<a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html?highlight=randomforestregressor#sklearn.ensemble.RandomForestRegressor">Random Forest from Scikit-Learn</a>]
-Once again, the model seemed to perform poorly as it only had AUC of 0.63 for the cross-validation results of the GridSearch.
+This time, the GridSearch finished with an AUC of 0.72 for the cross-validation results which is similar to what our XGBoost could do, but a little bit lower.
 </div>
 
 #### 3. Neural Network
 <div style="text-align: justify">
 For the neural network, different methods were used for the preprocessing. We tried first a model that did not use our
-features created in the bonus part of section 4 (everything related to penalty). This mean that our model had less features
-than the others tried as of now. Still, for all neural networks models, we transformed the categorical data into one-hot vectors.
-Moreover, we considered the feature current_friendly_on_ice and current_opposite_on_ice as categorical feature as opposed to the other models which supposed they were numerical and therefore were standardized which does not make much sense for a number of people on the ice that ranges from 1 to 5.
+features created in the bonus part of section 4 (everything related to penalty). This means that our model had less features
+than the others tried as of now (except for the linear regression of course). Still, for all neural networks models, we transformed the categorical data into one-hot vectors just like we did we XGBoost, KNN and Random Forest.
+However, we considered the feature current_friendly_on_ice and current_opposite_on_ice as categorical features as opposed to the other models which supposed they were numerical and therefore were standardized which does not make much sense for a number of people on the ice that ranges from 1 to 5.
 As the other models, we standardized the numerical features.
-The other two models differed on the used of dropouts. They both trained with all of the features created in section 4 (including the bonus), but one of them used dropout and the other didn't.
-For the training, we did some cross validation over different hyperparameters like the learning rate, the coefficient for the adam optimizer and the number of epochs. All the hyperparameters of the 3 models are the same, because those parameters had been optimized
+<br>
+The other two models tried with the Neural Network differed on the used of dropouts. They both trained with all of the features created in section 4 (including the bonus), but one of them used dropout and the other didn't.
+For the training, we did some manual cross validation over different hyperparameters like the learning rate, the coefficient for the adam optimizer and the number of epochs. All the hyperparameters of the 3 models are the same, because those parameters had been optimized
 previously. So mainly, the learning rate is 0.001, the Adam coefficient is 0.9, and we trained for 30 epochs. So, to reiterate, the main difference is that the 'nn_no_bonus_feature' has no feature developped during the bonus part (section 4),
 the 'nn_no_dropout' has no dropout and the "best_shot_nn_final" has all of the features and dropout.
-
-Not presented here, but we did train a model without standardizing the numerical feature, but found that the performance was better if standardization was done.
+<br>
+Not presented here, but we did train a model without standardizing the numerical features, but found that the performance was better if standardization was done.
 </div>
 
 Here is a list of the features selected to train our neural network which we selected based on our domain knowledge:
@@ -230,13 +232,39 @@ Here is a list of the features selected to train our neural network which we sel
 #### Threshold selection
 
 <div style="text-align: justify">
-Because the dataset was very unbalanced in nature, we decided to mainly use the F1 Score. In addition, we also used a
-custom-made threshold technique to help us analyse the results of our models. Since our models' outputs were very small
+Because the dataset was very unbalanced in nature, we decided to mainly use the F1 Score for all models as well as the AUC.
+In addition, we also used a custom-made threshold technique to help us analyse the results of our models. Since our models' outputs had very small
 probability values, we decided that the 0.5 threshold for binary prediction wasn't the way to go. Instead, for each model
-we trained, we found a better threshold value that would give us the optimal F1 score at the end.
+we trained, we found a better threshold value that would give us the optimal F1 score at the end. To do so, we simply checked the performance of the F1 score
+of our models on the training set for different threshold and took the one that gave the highest one.
 </div>
 
 #### Results and Analysis
+
+<div style="text-align: justify">
+The following figures present the different curves (ROC, goal rate, proportion and calibration) obtained on the models presented
+in this section.
+</div>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/roc_curve_val.png" alt="roc_curve_validation">
+    <figcaption style="font-size: 15px;text-align: center;">Figure 19: ROC curve on the validation set.</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/goal_rate_percentile_val.png" alt="goal_rate_percentile_validation">
+    <figcaption style="font-size: 15px;text-align: center;">Figure 20: Goal Rate on the validation set.</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/proportion_percentile_val.png" alt="proportion_percentile_validation">
+    <figcaption style="font-size: 15px;text-align: center;">Figure 21: Goal proportion on the validation set.</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/calibration_val.png" alt="calibration_validation">
+    <figcaption style="font-size: 15px;text-align: center;">Figure 22: Calibration on the validation set.</figcaption>
+</figure>
 
 Using the dropout technique to help prevent over-fitting, we can see that our neural network model performs better with this regularization technique.
 
