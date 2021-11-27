@@ -3,8 +3,6 @@ layout: post
 title: IFT6758 Milestone 2
 ---
 
-### Question 1
-We have made many experiences in this milestone. They are available through out the experiment tracking of the entire milestone.
 
 ### Question 2
 
@@ -145,25 +143,27 @@ by generating all types of events in our game, by evaluating, at each event, if 
 penalty and by checking on which side the team was. We then built a tidy event object that gave the time and coordinates details
 relative to the previous event. Finally, we got the current event time and subtracted
 the starting time of the penalty from the current time to have the time since the penalty started (two types of penalties generated).
-To get the number of friendly players on ice and the number of opposite players on ice, we first checked the side of the team to figure out who is friendly and who is not and
-then subtracted the number of players lost depending on the type of the penalty from 5.
+To get the number of friendly players on ice and the number of opposite players on ice, we first checked the side of the team to figure out
+who is friendly and who is not and then subtracted the number of players lost depending on the type of the penalty from 5.
 
 
 link to the experiment which stores the filtered DataFrame artifact
-(https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
-[wpg_v_wsh_2017021065.csv]
+[wpg_v_wsh_2017021065.csv](https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
+
 
 
 ## Question 6: Best Shot
 
 After using a logistic regression model and a XGBoost model, we decided to try some other algorithms to find the best model
-for our task of binary classification with our collected dataset.
+for our task of binary classification with our collected dataset. We have made many experiences in this milestone.
+They are available through out the experiment tracking of the entire milestone.
 We decided to try k-Nearest Neighbors, Random Forest and a feed-forward neural network.
-Classification requires that the algorithm learns how to assign a class label to examples from the problem domain. (2)
-Classification accuracy is usually a popular metric used to evaluate the performance of a model based on the predicted class labels.(2)
-Since our datas is imbalanced(the distribution of examples in the training dataset across the classes is not equal), classification
-accuracy and its complement error rate, might be a bad idea to use, because it will be an unreliable measure of model performance.
-Since we have an "Accuracy Paradox", a good performance on the minority class(Goal) will be preferred over a good performance on both class.
+Classification requires that the algorithm learns how to assign a class label to examples from the problem domain.(2)
+Classification accuracy is usually a popular metric used to evaluate the performance of a model based on the
+predicted class labels. (2)
+Since our datas is imbalanced as we've seen with the previous models, classification accuracy and its complement error
+rate, might be a bad idea to use, because it will be an unreliable measure of model performance.
+We have have what is called an "Accuracy paradox"(5), a good performance on the minority class(Goal) will be preferred over a good performance on both class.
 Finally, alternative performance metrics may be required as reporting the classification accuracy may be misleading, like using
 the Precision, the Recall or the F-Measure.
 All our models have been stratified and crossvalidated. And our neural network has been optimized to use the best hyperparamters.
@@ -173,17 +173,15 @@ All our models have been stratified and crossvalidated. And our neural network h
 #### 1. KNN
 
 The first curve is a ROC curve that explains the results of our KNN. Area Under the Curve” (AUC) of “Receiver Characteristic Operator” (ROC)
-is a plot of True Positive Rate vs False Positive Rate
-The AUC-ROC curve helps us visualize how well our machine learning classifier is performing. (1)
+is a plot of True Positive Rate vs False Positive Rate.
+The AUC-ROC curve helps us visualize how well our machine learning classifier is performing.(2)
 Our calculated AUC on graph is actually 0.94 for the KNN, (0.5<AUC<1), so there is a high chance that the classifier will be able to distinguish
 the positive class values from the negative class values.
 
 ![roc_curve.png](/public/roc_curve.png)
 
-The ROC is a probability curve that plots the TPR against FPR at various threshold values and essentially separates the ‘signal’ from the ‘noise’.(1)
 The Area Under the Curve (AUC) is the measure of the ability of a classifier to distinguish between classes and is used as a summary of
-the ROC curve.(1) The higher the AUC, the better the performance of the model at distinguishing between the positive and negative classes. (1)
-
+the ROC curve.(2) The higher the AUC, the better the performance of the model at distinguishing between the positive and negative classes. (2)
 This is so because the classifier is able to detect more numbers of True positives and True negatives than False negatives and False positives.
 ROC curves can present an overly optimistic view of an algorithm’s performance if there is a large skew in the class distribution.
 
@@ -234,7 +232,7 @@ Using feature selection, we selected the following features to train our neural 
 Because the dataset was very unbalanced in nature, we decide to mainly use the F1 Score. In addition, we also used a
 custom made threshold technique to help us analyse the results of our models. Since our model's outputs were very small
 probability values, we decided that the 0.5 threshold for binary prediction wasn't the way to go. Instead, for each model
-we trained, we found a better threshold value that would give us the optimal F1 score at the end.
+we trained, we fo und a better threshold value that would give us the optimal F1 score at the end.
 
 <table>
     <caption style="caption-side: bottom; font-size: small;">F1 score results for our Neural Network models</caption>
@@ -317,40 +315,22 @@ we trained, we found a better threshold value that would give us the optimal F1 
     </tr>
 </table>
 
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
-    <img src="/public/best_shot_curves/best_shot_nn_roc.png" alt="best_shot_nn_roc">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Neural Network: ROC.</figcaption>
-</figure>
-
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
-    <img src="/public/best_shot_curves/best_shot_nn_goal_rate.png" alt="best_shot_nn_goal_rate">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Neural Network: Goal rate.</figcaption>
-</figure>
-
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
-    <img src="/public/best_shot_curves/best_shot_nn_cumulative.png" alt="best_shot_nn_cumulative">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Neural Network: Goal rate cumulative.</figcaption>
-</figure>
-
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
-    <img src="/public/best_shot_curves/best_shot_nn_calib.png" alt="best_shot_nn_calib">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Neural Network: Calibration.</figcaption>
-</figure>
 
 ##### Links to our models
 
 1. [Neural Network - best_shot_nn_final](https://www.comet.ml/jaihon/ift6758-project/f02e46ac553944f7ba18060044d873e9?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
-2. [Neural Network - unnecessary_truss_2939](https://www.comet.ml/jaihon/ift6758-project/f22281d6264d462685c13628a0dd7daa?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
-3. [Neural Network - separate_alfalfa_7886](https://www.comet.ml/jaihon/ift6758-project/b086d3049e1f47b7ae8aa569994983b4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+2. [Neural Network - nn_no_bonus_feature](https://www.comet.ml/jaihon/ift6758-project/f22281d6264d462685c13628a0dd7daa?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+3. [Neural Network - nn+dropout](https://www.comet.ml/jaihon/ift6758-project/b086d3049e1f47b7ae8aa569994983b4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+4. [Neural Network - nn_no_normalisation](https://www.comet.ml/jaihon/ift6758-project/aa84b2bc14f24a48aa4c232a92ecabf0?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
 
-For the ROC curve, all the hyperparameters of the 3 models are the same, because those parameters have been optimized
-previously. So mainly, the lr is 0.001, Adam 0.9, and we used 30 epochs. The main difference is that the 'unnecessary truss' have no bonus feature,
-while the 'separate_alfalfa' has no dropout, while the retail_perch is not normalised.
+5. For the ROC curve, all the hyperparameters of the 3 models are the same, because those parameters have been optimized
+previously. So mainly, the lr is 0.001, Adam 0.9, and we used 30 epochs. The main difference is that the 'nn_no_bonus_feature' have no bonus feature,
+while the 'nn+dropout' has no dropout, while the "nn_no_normalisation" is not normalised.
 
 The best AUC on graph is actually the best_shot_nn_final with an AUC of 0.77 which corresponded to the
 model trained with the bonus_features, with the dropout, and with normalization. The performance was pretty equal
-to the other two models (unnecessary truss with AUC 0.76) trained with no bonus features, and equal to separate_alfalfa (AUC=0.76)
-trained with no dropout and pretty much the same as retail_perch (AUC 0.76) that was trained with no normalisation.
+to the other two models (nn_no_bonus_feature with AUC 0.76) trained with no bonus features, and equal to nn+dropout (AUC=0.76)
+trained with no dropout and pretty much the same nn_no_normalisation (AUC 0.76) that was trained with no normalisation.
 So we can see that at a high level,our models had pretty much the same performances.
 
 
@@ -359,6 +339,9 @@ It is evident from the plot that the AUC for the RandomForest ROC curve is highe
 Therefore, we can say that logistic regression did a better job of classifying the positive class in the dataset.
 Building a random forest starts by generating a high number of individual decision trees.
 Random forest models are accurate and non-linear models and robust to over-fitting. (4)
+
+### Question 7: Best Shot
+
 
 
 In conclusion, the XGboost and the Neural Network were the two best models with overall same performance.
@@ -370,3 +353,4 @@ Bibliography:
 2- Bhandari, Aniruddha , "AUC-ROC Curve in Machine Learning Clearly Explained" "https://www.analyticsvidhya.com/blog/2020/06/auc-roc-curve-machine-learning/", June 16, 2020
 3- Takaya Saito, "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets",  "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4349800/"
 4- Author Derrick Mwiti, October 26th, 2021; Random forest models are accurate and non-linear models and robust to over-fitting' 'https://neptune.ai/blog/random-forest-regression-when-does-it-fail-and-why'
+5- Jason Brownlee, January 1, 2020 , "Failure of Classification Accuracy for Imbalanced Class Distributions", "https://machinelearningmastery.com/failure-of-accuracy-for-imbalanced-class-distributions/"
