@@ -154,50 +154,54 @@ link to the experiment which stores the filtered DataFrame artifact
 
 ## Question 6: Best Shot
 
+<div style="text-align: right">
 After using a logistic regression and XGBoost model, we decided to try other algorithms to find the best model
 for our task of binary classification with our collected dataset. We have made many experiences in this milestone.
-They are available through out the experiment tracking of the entire milestone.
-We decided to try k-Nearest Neighbors, Random Forest and a feed-forward neural network.
-Classification requires that the algorithm learns how to assign a class label to examples from the problem domain.(2)
-Classification accuracy is usually a popular metric used to evaluate the performance of a model based on the
-predicted class labels. (2)
-Since our datas is imbalanced as we've seen with the previous models, classification accuracy and its complement error
-rate, might be a bad idea to use, because it will be an unreliable measure of model performance.
-We have have what is called an "Accuracy paradox"(5), a good performance on the minority class(Goal) will be preferred over a good performance on both class.
+They are all available on comet_ml.
+<br>
+We decided to try K-Nearest Neighbors, Random Forest and a feed-forward neural network.
+As already pointed out in section 2, our dataset is very unbalanced. Therefore, classification accuracy and its complement, the error
+rate, might be a bad idea to use because it will be an unreliable measure of the model performance. We have have what is called an "Accuracy paradox"(5). In that case, a good performance on the minority class (Goal) will be preferred over a good performance on both class.
 In order to do so, alternative performance metrics, like precision, recall or the F-measure, may be required since reporting the classification accuracy may be misleading.
-Our different models may have different preprocessing. We will explain how the features were processed in each section. However, all our models have been split into training (80%) and validation (20%) set using a stratified strategy and have been optimized using cross-validation to find the best hyperparameters. The figures shown in this section have been obtained after evaluating our models on the validation set.
+In the following section, we will explain how the features were processed for each model, how they were trained and which metrics were used. All our models have been split into training (80%) and validation (20%) set using a stratified strategy and have been optimized using cross-validation to find the best hyperparameters. The figures shown in this section have been obtained after evaluating our models on the validation set.
+</div>
 
-### Model Results and Analysis
+### Models
 
 #### 1. KNN
 
-The first curve is a ROC curve that explains the results of our KNN. Area Under the Curve” (AUC) of “Receiver Characteristic Operator” (ROC)
-is a plot of True Positive Rate vs False Positive Rate.
-The AUC-ROC curve helps us visualize how well our machine learning classifier is performing.(2)
-Quite surprisingly, our calculated AUC on graph is actually 0.94 for the KNN, (0.5<AUC<1) which tells us that there is a high chance that the classifier will be able to distinguish the positive class values from the negative class values.  This comes as a surprised for us because the results that we got on the gridsearch were less than optimal. We had AUC (of ROC) of about 0.63 for pretty much all our cross-validation trials.
+<div style="text-align: right">
+KNN was trained on all the features created in section 4. For the preprocessing, we started by changing all of the categorical features into one-hot encoding. We then dropped the rows that had nan values and
+removed the ones that had infinity values (like the Speed Column). Once this was done, we split the dataset into training and validation set as specified above.
+We trained our KNN using a GridSearch on different hyperparameters: the number of neighbors and the weights used (distance vs uniform). The best model found by the GridSearch used 8 neighbors and distance for weights.
+However, even if the GridSearch did find a "best estimator", it was only able to reach an AUC of 0.63 which is lower than the XGBoost model.
+</div>
 
-![roc_curve.png](/public/roc_curve.png)
+#### 2. Random Forest
+<div style="text-align: right">
+The Random Forest had a similar preprocessing as the KNN, i.e. we used the same features with the one-hot encoding for the categorical features, etc.
+We also trained the Random Forest using a GridSearch over 2 hyperparameters: the criterion which is the function used to measure the quality of a split in a tree and the number of estimators. [<a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html?highlight=randomforestregressor#sklearn.ensemble.RandomForestRegressor">Random Forest from Scikit-Learn</a>]
+Once again, the model seemed to perform poorly as it only had AUC of 0.63 for the cross-validation results of the GridSearch.
+</div>
 
-The Area Under the Curve (AUC) is the measure of the ability of a classifier to distinguish between classes and is used as a summary of
-the ROC curve.(2) The higher the AUC, the better the performance of the model at distinguishing between the positive and negative classes. (2)
-This is so because the classifier is able to detect more numbers of True positives and True negatives than False negatives and False positives.
-ROC curves can present an overly optimistic view of an algorithm’s performance if there is a large skew in the class distribution.
+#### 3. Neural Network
+<div style="text-align: right">
+For the neural network, different methods were used for the preprocessing. We tried first a model that did not use our
+features created in the bonus part of section 4 (everything related to penalty). This mean that our model had less features
+than the others tried as of now. Still, for all neural networks models, we transformed the categorical data into one-hot vectors.
+Moreover, we considered the feature current_friendly_on_ice and current_opposite_on_ice as categorical feature as opposed to the other models which supposed they were numerical and therefore were standardized which does not make much sense for a number of people on the ice that ranges from 1 to 5.
+As the other models, we standardized the numerical features.
+The other two models differed on the used of dropouts. They both trained with all of the features created in section 4 (including the bonus), but one of them used dropout and the other didn't.
+For the training, we did some cross validation over different hyperparameters like the learning rate, the coefficient for the adam optimizer and the number of epochs. All the hyperparameters of the 3 models are the same, because those parameters had been optimized
+previously. So mainly, the learning rate is 0.001, the Adam coefficient is 0.9, and we trained for 30 epochs. So, to reiterate, the main difference is that the 'nn_no_bonus_feature' has no feature developped during the bonus part (section 4),
+the 'nn_no_dropout' has no dropout and the "best_shot_nn_final" has all of the features and dropout.
 
-![cum_sum.png](/public/cum_sum.png)
-![goal_.rate](/public/cum_sum.png)
+Not presented here, but we did train a model without standardizing the numerical feature, but found that the performance was better if standardization was done.
+</div>
 
+Here is a list of the features selected to train our neural network which we selected based on our domain knowledge:
 
-
-#### 2. Neural Network
-
-Using standardization techniques, we can see that our neural network model performs better than without.
-
-Using very value of a small dropout technique to help prevent overfitting, we can see that our neural network model performs better with this regularization technique.
-
-Including features developed in the bonus question (current_time_seconds, time_since_pp_started, current_friendly_on_ice, current_opposite_on_ice), we can see that our neural network model performs better.
-
-##### Selected Features
-Using our domain knowledge, we selected the following features to train our neural network models:
+##### Selected Features of the Neural Networks
 
 | Feature     | Encoding |
 | ----------- | ----------- |
@@ -223,13 +227,18 @@ Using our domain knowledge, we selected the following features to train our neur
 | Speed | no encoding |
 | Rebound | one-hot |
 
+#### Threshold selection
 
-##### Results and Analysis
-
-Because the dataset was very unbalanced in nature, we decide to mainly use the F1 Score. In addition, we also used a
-custom made threshold technique to help us analyse the results of our models. Since our model's outputs were very small
+Because the dataset was very unbalanced in nature, we decided to mainly use the F1 Score. In addition, we also used a
+custom-made threshold technique to help us analyse the results of our models. Since our models' outputs were very small
 probability values, we decided that the 0.5 threshold for binary prediction wasn't the way to go. Instead, for each model
-we trained, we fo und a better threshold value that would give us the optimal F1 score at the end.
+we trained, we found a better threshold value that would give us the optimal F1 score at the end.
+
+#### Results and Analysis
+
+Using the dropout technique to help prevent over-fitting, we can see that our neural network model performs better with this regularization technique.
+
+Including features developed in the bonus question (current_time_seconds, time_since_pp_started, current_friendly_on_ice, current_opposite_on_ice), we can see that our neural network model performs better.
 
 <table>
     <caption style="caption-side: bottom; font-size: small;">F1 score results for our Neural Network models</caption>
@@ -317,12 +326,9 @@ we trained, we fo und a better threshold value that would give us the optimal F1
 
 1. [Neural Network - best_shot_nn_final](https://www.comet.ml/jaihon/ift6758-project/f02e46ac553944f7ba18060044d873e9?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
 2. [Neural Network - nn_no_bonus_feature](https://www.comet.ml/jaihon/ift6758-project/f22281d6264d462685c13628a0dd7daa?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
-3. [Neural Network - nn+dropout](https://www.comet.ml/jaihon/ift6758-project/b086d3049e1f47b7ae8aa569994983b4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
-4. [Neural Network - nn_no_normalisation](https://www.comet.ml/jaihon/ift6758-project/aa84b2bc14f24a48aa4c232a92ecabf0?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+3. [Neural Network - nn_no_dropout](https://www.comet.ml/jaihon/ift6758-project/b086d3049e1f47b7ae8aa569994983b4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
 
-All the hyperparameters of the 3 models are the same, because those parameters have been optimized
-previously. So mainly, the lr is 0.001, Adam 0.9, and we used 30 epochs. The main difference is that the 'nn_no_bonus_feature' have no bonus feature,
-while the 'nn+dropout' has no dropout, while the "nn_no_normalisation" is not normalised.
+
 
 The best AUC on graph is actually the best_shot_nn_final with an AUC of 0.77 which corresponds to the
 model trained with the bonus_features, the dropout and normalization. The performance was pretty equal
@@ -331,7 +337,22 @@ trained with no dropout and pretty much the same nn_no_normalization (AUC 0.76) 
 So we can see that at a high level,our models had pretty much the same performances.
 
 
-#### 3. Random Forest
+
+The first curve is a ROC curve that explains the results of our KNN. Area Under the Curve” (AUC) of “Receiver Characteristic Operator” (ROC)
+is a plot of True Positive Rate vs False Positive Rate.
+The AUC-ROC curve helps us visualize how well our machine learning classifier is performing.(2)
+Quite surprisingly, our calculated AUC on graph is actually 0.94 for the KNN, (0.5<AUC<1) which tells us that there is a high chance that the classifier will be able to distinguish the positive class values from the negative class values.  This comes as a surprised for us because the results that we got on the gridsearch were less than optimal. We had AUC (of ROC) of about 0.63 for pretty much all our cross-validation trials.
+
+![roc_curve.png](/public/roc_curve.png)
+
+The Area Under the Curve (AUC) is the measure of the ability of a classifier to distinguish between classes and is used as a summary of
+the ROC curve.(2) The higher the AUC, the better the performance of the model at distinguishing between the positive and negative classes. (2)
+This is so because the classifier is able to detect more numbers of True positives and True negatives than False negatives and False positives.
+ROC curves can present an overly optimistic view of an algorithm’s performance if there is a large skew in the class distribution.
+
+![cum_sum.png](/public/cum_sum.png)
+![goal_.rate](/public/cum_sum.png)
+
 It is evident from the plot that the AUC for the RandomForest ROC curve is higher than that for the KNN ROC curve.
 Therefore, we can say that logistic regression did a better job of classifying the positive class in the dataset.
 Building a random forest starts by generating a high number of individual decision trees.
