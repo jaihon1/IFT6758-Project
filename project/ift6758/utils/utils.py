@@ -96,9 +96,6 @@ def plot_goal_rate(probas, actual_y, labels, name_file=None):
         percentile, percentile_pred, y_valid_df = create_percentile_model(proba, y)
         bins = np.linspace(0, 100, len(y_valid_df['bins_percentile'].unique()))[1:]
 
-        # if label == 'Random Forest':
-        #     bins = np.linspace(0, 100, len(y_valid_df['bins_percentile'].unique()))
-
         goal_rate_by_percentile = y_valid_df.groupby(by=['bins_percentile']).apply(lambda g: g['is_goal'].sum()/len(g))
 
         g = sns.lineplot(x=bins, y=goal_rate_by_percentile[1:]*100, label=label)
@@ -129,8 +126,6 @@ def plot_cumulative_sum(probas, actual_y, labels, name_file=None):
     for proba, y, label in zip(probas, actual_y, labels):
         percentile, percentile_pred, y_valid_df = create_percentile_model(proba, y)
         bins = np.linspace(0, 100, len(y_valid_df['bins_percentile'].unique()))[1:]
-        # if label == 'Random Forest':
-        #     bins = np.linspace(0, 100, len(y_valid_df['bins_percentile'].unique()))
         total_number_goal = (y == 1).sum()
         sum_goals_by_percentile = y_valid_df.groupby(by='bins_percentile').apply(lambda g: g['is_goal'].sum()/total_number_goal)
         cum_sum_goals = sum_goals_by_percentile[::-1].cumsum(axis=0)[::-1]
@@ -176,12 +171,12 @@ def prep_data(data_train, selected_features, categorical_features, norm=None):
     Preparation of data for training models. Transforms categorical data into one-hot encoding and
     standardizes numerical data.
     Args:
-        data_train:
-        selected_features:
-        categorical_features:
-        norm:
+        data_train: pd.DataFrame, dataframe containing the training data
+        selected_features: list of strings, the names of the features to select for training the model
+        categorical_features: list of strings, the names of the features that are categorical
+        norm: list of string, the name of the features to standardize
 
-    Returns:
+    Returns: pd.DrataFrame, the preprocessed data
 
     """
     data = data_train[selected_features]

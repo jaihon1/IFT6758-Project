@@ -4,7 +4,7 @@ title: IFT6758 Milestone 2
 ---
 
 ### Question 2
-> The code for this section can be found in visualizations/plot_feature_engineer_1.py
+> The code for this section can be found in project/ift6758/visualizations/plot_feature_engineer_1.py
 
 Using our work from the previous milestone, we have extended our features by adding the following ones presented in the table below:
 
@@ -59,6 +59,9 @@ Looking at the data from Figure 6, we can observe many interesting facts. Firstl
 <br>
 <br>
 We can observe in Figure 6 that the goals scored on a non-empty net from a distance of 150-170 feet are quite high. It could be that it has been originally misclassified as "non-empty net goals" as opposed to "empty-net goals". Another reason could be that these goals were scored by the other team that was then misclassified.
+<br>
+<br>
+<i>Note about the empty_net feature: Even if we did the feature, the rest of the project does not use it because it would be a leaky feature as was discussed in piazza.</i>
 </div>
 
 ### Question 3
@@ -151,7 +154,7 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 
 
 ### Question 4
-> The code for this section is in EventGenerator.py and feat_eng2.py
+> The code for this section is in project/ift6758/data/EventGenerator.py and project/ift6758/features/feat_eng2.py
 
 <div style="text-align: justify">
 We added below a list of all of the features that we created for this section, and we listed each feature by both the column name
@@ -199,7 +202,7 @@ then subtracted the number of players lost depending on the type of the penalty 
 [wpg_v_wsh_2017021065.csv](https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
 
 ### Question 5
-> The code for this section can be found in xgboost_models.py
+> The code for this section can be found in project/ift6758/models/xgboost_models.py
 <div style="text-align: justify">
 The first XGBoost model was trained on the distance and angle from the net features just like the regression in
 section 3. We trained the model on approximately 75% of the training data from seasons 2015 to 2018 (inclusive). Since
@@ -377,6 +380,7 @@ The links to the different experiments shown in this section can be found here:
 3. [XGBoost with hyperparameter tuning and trained on subset of features selected by Lasso](https://www.comet.ml/jaihon/ift6758-project/74f19b8137e14336ba1e49c198dfd3e6)
 
 ## Question 6: Best Shot
+> The code for this section can be found in project/ift6758/models/best_shot.py, KNN_model.py, Optimised_best_shot.py
 
 <div style="text-align: justify">
 After using a logistic regression and XGBoost model, we decided to try other algorithms to find the best model
@@ -538,6 +542,7 @@ Nevertheless, we conclude that our best model for this section is the neural net
 5. [KNN](https://www.comet.ml/jaihon/ift6758-project/fc093cf3ac61416391c5f3fca4416117)
 
 ## Question 7: Evaluation
+> The code for this section can be found in project/ift6758/models/evaluation.py
 
 ### Selected models
 
@@ -595,7 +600,7 @@ For this section, we have selected as per requested, the 3 Logistic Regression m
 We saw that our models mostly generalize very well on regular season games when we compared them to our validation set results. However, we can clearly see that our models perform poorly on playoff games. Throughout Figure 29 to Figure 33, we can see that our same models perform a little bit worse on playoff games compared to regular season games. This was expected since we have trained our models only on regular season games. Also, the playoff games are fundamentally different from the regular season games ("Anything can happen in the playoffs!"). The reason for this is that the playoff games are elimination games, which means that the teams and players always play with heavy pressure. In addition, the environment and the "energy" is different during the playoffs, which ultimately could lead to features that we simply don't have access to.
 <br>
 <br>
-It would be interesting to see if adding external features such as a metric of the crowd energy(Noise volume) would help our models to generalize. Another interesting thing would be to train our models on playoff games instead of regular season games to see if it can generalize better on both regular season and playoff games.
+It would be interesting to see if adding external features such as a metric of the crowd energy (Noise volume) would help our models to generalize. Another interesting thing would be to train our models on playoff games instead of regular season games to see if it can generalize better on both regular season and playoff games.
 </div>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:100%;height:100%;">
