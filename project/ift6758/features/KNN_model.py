@@ -35,7 +35,7 @@ def prep_data(data_train):
     'coordinate_x', 'coordinate_y',
     'distance_net', 'angle_net', 'time_since_pp_started', 'current_time_seconds', 'current_friendly_on_ice', 'current_opposite_on_ice', 'Change_in_shot_angle',
     'shot_last_event_delta', 'shot_last_event_distance', 'Speed']
-    # Set seleceted features
+    # Set selected features
     selected_features = ['side', 'shot_type',
        'period', 'period_type', 'coordinate_x', 'coordinate_y',
        'is_goal', 'distance_net', 'angle_net', 'previous_event_type',
@@ -72,18 +72,14 @@ def prep_data(data_train):
 
     # Split the data into features and labels for train and validation
     X_train, X_valid, y_train, y_valid = train_test_split(data.drop(columns=['is_goal']), data['is_goal'], test_size=0.2, stratify=data['is_goal'])
-    #print(X_train, X_train.shape, y_train, y_train.shape)
     features_standardizing = num_features
 
     # normalization/standardization to features
     scaler = StandardScaler()
-    #scaler = MinMaxScaler()
-    # for i in X_train[features_standardizing]:
-    #     X_train[i] = X_train[i].astype(float)
+
     X_train[features_standardizing] = scaler.fit_transform(X_train[features_standardizing])
     X_valid[features_standardizing] = scaler.fit_transform(X_valid[features_standardizing])
     y_train = y_train.to_numpy()
-    # y_valid = y_valid.to_numpy()
 
     return X_train,X_valid, y_train, y_valid, selected_features
 

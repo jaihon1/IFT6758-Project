@@ -6,7 +6,7 @@ import numpy as np
 from pathlib import Path
 
 
-def add_new_features(csv_path = os.path.join(os.path.dirname(__file__),'games_data/games_data_all_seasons.csv')):
+def add_new_features(csv_path = os.path.join(os.path.dirname(__file__),'games_data/games_data_all_seasons_full.csv')):
     df_filtered = pd.read_csv(csv_path)
     df_filtered.drop(columns=['period_time','previous_event_period_time'], inplace=True)
     df_filtered['shot_last_event_delta'] = [t1 - t0 for t1, t0 in zip(df_filtered['current_time_seconds'], df_filtered['previous_event_time_seconds'])]
@@ -21,7 +21,7 @@ def add_new_features(csv_path = os.path.join(os.path.dirname(__file__),'games_da
     df_filtered['Speed'] = df_filtered['shot_last_event_distance'] / df_filtered['shot_last_event_delta']
     df_filtered.to_csv(csv_path, header=True, index=True)
     df_filtered.drop(columns=df_filtered.columns[0], inplace=True)
-    df_filtered.to_csv(os.path.join(os.path.dirname(__file__),'games_data/games_data_all_seasons.csv'))
+    df_filtered.to_csv(os.path.join(os.path.dirname(__file__),'games_data/games_data_all_seasons_full.csv'))
     print(df_filtered.iloc[:20,:])
 
 

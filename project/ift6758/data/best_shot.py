@@ -52,7 +52,7 @@ train_data, test_data = data[~data['game_pk'].str.startswith('2019')], data[data
 
 def prep_data(data_train, bonus):
     if bonus:
-        # Set seleceted features
+        # Set selected features
         selected_features = [
             'is_goal', 'side',
             'shot_type', 'team_side', 'period',
@@ -141,9 +141,6 @@ def prep_data(data_train, bonus):
         data.drop(columns=[feature], inplace=True)
 
         data = pd.concat([data.reset_index(drop=True), df_encoded.reset_index(drop=True)], axis=1)
-        # print("encoding:")
-        # print(data.shape)
-        # print(df_encoded.shape)
 
 
     # Split the data into features and labels for train and validation
@@ -152,11 +149,11 @@ def prep_data(data_train, bonus):
 
     # normalization/standardization to features
     scaler = StandardScaler()
-    # scaler = MinMaxScaler()
     x_train[features_standardizing] = scaler.fit_transform(x_train[features_standardizing])
     x_valid[features_standardizing] = scaler.fit_transform(x_valid[features_standardizing])
 
     return x_train, x_valid, y_train, y_valid, selected_features
+
 
 #%%
 # Compute percentile
@@ -294,8 +291,6 @@ def train_nn(x_train, x_valid, y_train, y_valid, features, comet=False):
         experiment.log_parameters({'model': 'nn', 'feature': features, 'class_weight': class_weight})
 
 
-    print('Input shape:', x_train.shape)
-
     clf = train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch=30, lr=0.001)
 
 
@@ -335,7 +330,7 @@ def main(data_train):
         predictions2 = model2.predict(x_valid)
 
 
-        find_optimal_threshold(predictions2, y_valid)
+        find_optimal_threshold(predictions1, y_valid_no_bonus)
 
 
         # ROC curve
