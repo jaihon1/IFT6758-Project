@@ -130,7 +130,7 @@ Fortunately, the main thing we can observe is that shots that have a higher prob
 </figure>
 
 <div style="text-align: justify">
-Finally, the last plot shows us the calibration curve. A good calibration curve should be linear and should have a slope of 1. The interpretation is that if your model gives you a probability of 0.8 for a shot to be a goal, then 80% of the example that have a probability of 0.8 should be positives. <a href="https://scikit-learn.org/stable/modules/calibration.html#probability-calibration"> Explaination of calibration curve from scikit-learn </a>
+Finally, the last plot shows us the calibration curve. A good calibration curve should be linear and should have a slope of 1. The interpretation is that if your model gives you a probability of 0.8 for a shot to be a goal, then 80% of the example that have a probability of 0.8 should be positives. <a href="https://scikit-learn.org/stable/modules/calibration.html#probability-calibration"> Explanation of calibration curve from scikit-learn </a>
 <br>
 <br>
 Given the calibration curve shown in Figure 10, we can easily see that our trained models did learn some valuable representations of our data. Comparing all our current models, the model that was trained on both features (distance and angle) has the closest calibration values to the <b>perfectly</b> calibrated model. Again, as mentioned before, it confirms that overall this model is the model that gives us the best results so far. However, it is important to note that the curve do not go beyond 0.25 which is due to the fact that the probability predicted by our models are all below 0.25%. This means that our models are not very confident about their predictions.
@@ -376,26 +376,75 @@ The links to the different experiments shown in this section can be found here:
 2. [XGBoost with hyperparameter tuning and trained on all features](https://www.comet.ml/jaihon/ift6758-project/05c804186d274b0c8955cbb14b1a66b3)
 3. [XGBoost with hyperparameter tuning and trained on subset of features selected by Lasso](https://www.comet.ml/jaihon/ift6758-project/74f19b8137e14336ba1e49c198dfd3e6)
 
-
 ## Question 6: Best Shot
 
-Brief intro on what and why we decide to use in this part...
+<div style="text-align: justify">
+After using a logistic regression and XGBoost model, we decided to try other algorithms to find the best model
+for our task of binary classification with our collected dataset. We have made many experiences in this milestone.
+They are all available on comet_ml.
+<br>
+<br>
+We decided to try K-Nearest Neighbors, Random Forest and a feed-forward neural network.
+As already pointed out in section 2, our dataset is very unbalanced. Therefore, classification accuracy and its complement, the error
+rate, might be a bad idea to use because it will be an unreliable measure of the model performance. We have have what is called an "Accuracy paradox"(3).
+In that case, a good performance on the minority class (Goal) will be preferred over a good performance on both class.
+In order to do so, alternative performance metrics, like precision, recall or the F-measure, may be required since reporting the classification accuracy may be misleading.
+In the following section, we will explain how the features were processed for each model, how they were trained and which metrics were used.
+All our models have been split into training (80%) and validation (20%) set using a stratified strategy and have been optimized using cross-validation
+to find the best hyperparameters. The figures shown in this section have been obtained after evaluating our models on the validation set.
+</div>
 
-### Model Results and Analysis
+### Models Results and Analysis
 
 #### 1. KNN
 
-#### 2. Neural Network
+<div style="text-align: justify">
+KNN was trained on all the features created in section 4. For the preprocessing, we started by changing all of the
+categorical features into one-hot encoding.
+We then dropped the rows that had nan values and removed the ones that had infinity values (like the Speed Column).
+Once this was done, we split the dataset into training and validation set as specified above.
+We trained our KNN using a GridSearch on different hyper-parameters: the number of neighbors and the weights used for
+prediction(distance vs uniform). The best model found by the GridSearch used 8 neighbors and distance for weights.
+However, even if the GridSearch did find a "best estimator", it was only able to reach an AUC of 0.63 which is lower
+than the XGBoost model and our best regression model from section 3.
+</div>
 
-Using standardization techniques, we can see that our neural network model performs better than without.
+#### 2. Random Forest
+<div style="text-align: justify">
+The Random Forest had a similar preprocessing as the KNN, i.e. we used the same features with the one-hot encoding for the categorical features, etc.
+We also trained the Random Forest using a GridSearch over 2 hyper-parameters: the criterion which is the function used to measure the quality of a split
+in a tree and the number of estimators.
+[<a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html?highlight=randomforestregressor#sklearn.ensemble.RandomForestRegressor">Random Forest from Scikit-Learn</a>]
+This time, the GridSearch finished with an AUC of 0.72 for the cross-validation results which is similar to what our XGBoost could do, but a little bit lower.
+</div>
 
-Using very value of a small dropout technique to help prevent overfitting, we can see that our neural network model performs better with this regularization technique.
+#### 3. Neural Network
+<div style="text-align: justify">
+For the neural network, different methods were used for the preprocessing. We tried first a model that did not use our
+features created in the bonus part of section 4 (everything related to penalty). This means that our model had less features
+than the others tried as of now (except for the linear regression of course). Still, for all neural networks models, we transformed the
+categorical data into one-hot vectors just like we did we XGBoost, KNN and Random Forest.
+However, we considered the feature current_friendly_on_ice and current_opposite_on_ice as categorical features as opposed to the other models
+which supposed they were numerical and therefore were standardized which does not make much sense for a number of people on the ice that ranges from 1 to 5.
+As the other models, we standardized the numerical features.
+<br>
+<br>
+The other two models tried with the Neural Network differed on the used of dropouts. They both trained with all of the features created in section 4 (including the bonus),
+but one of them used dropout and the other didn't.
+For the training, we did some manual cross validation over different hyper-parameters like the learning rate, the coefficient for the Adam optimizer and the number of epochs.
+All the hyper-parameters of the 3 models are the same, because those parameters had been optimized
+previously. So mainly, the learning rate is 0.001, the Adam coefficient is 0.9, and we trained for 30 epochs.
+So, to reiterate, the main difference is that the 'nn_no_bonus_feature' has no feature developed during the bonus part (section 4),
+the 'nn_no_dropout' has no dropout and the "best_shot_nn_final" has all of the features and dropout.
+<br>
+<br>
+Not presented here, but we did train a model without standardizing the numerical features, but found that the performance was better if standardization was done.
+<br>
+<br>
+Here is a list of the features selected to train our neural network which we selected based on our domain knowledge:
+</div>
 
-Including features developed in the bonus question (current_time_seconds, time_since_pp_started, current_friendly_on_ice, current_opposite_on_ice), we can see that our neural network model performs better.
-
-##### Selected Features
-Feature Selection technique: Domain knowledge
-Using feature selection, we selected the following features to train our neual network models:
+##### Selected Features of the Neural Networks
 
 | Feature     | Encoding |
 | ----------- | ----------- |
@@ -421,126 +470,72 @@ Using feature selection, we selected the following features to train our neual n
 | Speed | no encoding |
 | Rebound | one-hot |
 
+#### Threshold selection
 
-##### Results and Analysis
+<div style="text-align: justify">
+Because the dataset was very unbalanced in nature, we decided to mainly use the F1 Score for all models as well as the AUC.
+In addition, we also used a custom-made threshold technique to help us analyse the results of our models. Since our models' outputs had very small
+probability values, we decided that the 0.5 threshold for binary prediction wasn't the way to go. Instead, for each model
+we trained, we found a better threshold value that would give us the optimal F1 score at the end. To do so, we simply checked the performance of the F1 score
+of our models on the training set for different threshold and took the one that gave the highest one.
+</div>
 
-Because the dataset was very unbalanced in nature, we decide to mainly use the F1 Score. In addition, we also used a custom made threshold technique to help us analyse the results of our models. Since our model's outputs were very small probability values, we decided that the 0.5 threshold for binay prediction wasn't the way to go. Instead, for each model we trained, we found a better threshold value that would give us the optimal F1 score at the end.
+#### Results and Analysis
 
-<table>
-    <caption style="caption-side: bottom; font-size: small;">F1 score results for our Neural Network models</caption>
-    <tr>
-        <th scope="row">Model</th>
-        <th scope="col">F1 Score (Class 0)</th>
-        <th scope="col">F1 Score (Class 1)</th>
-    </tr>
-    <tr>
-        <td>best_shot_nn_final</td>
-        <td>0.90</td>
-        <td>0.32</td>
-    </tr>
-    <tr>
-        <td>unnecessary_truss_2939</td>
-        <td>0.90</td>
-        <td>0.31</td>
-    </tr>
-        <tr>
-        <td>separate_alfalfa_7886</td>
-        <td>0.89</td>
-        <td>0.31</td>
-    </tr>
-</table>
+<div style="text-align: justify">
+The following figures present the different curves (ROC, goal rate, proportion and calibration) obtained on the models presented
+in this section as well as their confusion matrices.
+<br>
+<br>
+We can see right away on all figures that the Random Forest and KNN seems to strangely be extremely good at predicting goals. Indeed, our calculated AUC on graph is actually 0.94 for the KNN,
+which tells us that there is a high chance that the classifier will be able to distinguish the positive class values from the negative class values. (1) This comes as
+a surprise to us since the KNN performed poorly during training and the Random Forest was no better than the best XGBoost model.
+This is very suspicious behaviour. We tried to investigate and see if we made a mistake, but did not find any obvious one. Even if they seem
+to perform extremely well on the validation set, we doubt their actual performance generalizes well considering the training.
+<br>
+<br>
+For the neural networks, the best AUC on graph is actually the NeuralNetwork with an AUC of 0.77 which corresponds to the
+model trained with the bonus_features, the dropout and standardization. However, the performance was pretty equal
+to the other two models (NeuralNetwork_no_bonus with AUC 0.75) trained with no bonus features, and NeuralNetwork_no_dropout (AUC=0.76)
+trained with no dropout. This means that we could think that using the dropout technique is slightly helpful, but we can't be certain as the values and curves are very close to each other.
+The same can be said about including or not the features from the bonus section. Thus, we can see that at a high level, our models had pretty much the same performances.
+Nevertheless, we conclude that our best model for this section is the neural network trained using all the features developed in section 4 as well as dropout and leave the Random Forest and KNN model for the reasons mentioned before.
+<br>
+<i>For more information about the performance of our Neural Networks, we put the F1 score in a table in the annex.</i>
+</div>
 
-<table>
-    <caption style="caption-side: bottom; font-size: small;">Confusion matrix results for best_shot_nn_final on validation set</caption>
-    <tr>
-        <th scope="row">Target/Prediction</th>
-        <th scope="col">Class 0 (not goal)</th>
-        <th scope="col">Class 1 (goal)</th>
-    </tr>
-    <tr>
-        <th scope="row">Class 0 (not goal)</th>
-        <td>46513</td>
-        <td>7228</td>
-    </tr>
-    <tr>
-        <th scope="row">Class 1 (goal)</th>
-        <td>2930</td>
-        <td>2413</td>
-    </tr>
-</table>
-
-<table>
-    <caption style="caption-side: bottom; font-size: small;">Confusion matrix results for unnecessary_truss_2939 on validation set</caption>
-    <tr>
-        <th scope="row">Target/Prediction</th>
-        <th scope="col">Class 0 (not goal)</th>
-        <th scope="col">Class 1 (goal)</th>
-    </tr>
-    <tr>
-        <th scope="row">Class 0 (not goal)</th>
-        <td>46712</td>
-        <td>7029</td>
-    </tr>
-    <tr>
-        <th scope="row">Class 1 (goal)</th>
-        <td>3091</td>
-        <td>2252</td>
-    </tr>
-</table>
-
-<table>
-    <caption style="caption-side: bottom; font-size: small;">Confusion matrix results for separate_alfalfa_7886 on validation set</caption>
-    <tr>
-        <th scope="row">Target/Prediction</th>
-        <th scope="col">Class 0 (not goal)</th>
-        <th scope="col">Class 1 (goal)</th>
-    </tr>
-    <tr>
-        <th scope="row">Class 0 (not goal)</th>
-        <td>45213</td>
-        <td>8528</td>
-    </tr>
-    <tr>
-        <th scope="row">Class 1 (goal)</th>
-        <td>2814</td>
-        <td>2529</td>
-    </tr>
-</table>
-
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
-    <img src="/public/best_shot_curves/best_shot_nn_roc.png" alt="best_shot_nn_roc">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Neural Network: ROC.</figcaption>
+<figure style="display: block;margin-left: auto; margin-right: auto;width:100%;height:100%;">
+    <img src="/public/confusion_matrix_val.png" alt="confusion_matrix_validation">
+    <figcaption style="font-size: 15px;text-align: center;">Figure 19: Confusion matrices on the validation set.</figcaption>
 </figure>
 
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
-    <img src="/public/best_shot_curves/best_shot_nn_goal_rate.png" alt="best_shot_nn_goal_rate">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Neural Network: Goal rate.</figcaption>
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/roc_curve_val.png" alt="roc_curve_validation">
+    <figcaption style="font-size: 15px;text-align: center;">Figure 20: ROC curve on the validation set.</figcaption>
 </figure>
 
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
-    <img src="/public/best_shot_curves/best_shot_nn_cumulative.png" alt="best_shot_nn_cumulative">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Neural Network: Goal rate cumulative.</figcaption>
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/goal_rate_percentile_val.png" alt="goal_rate_percentile_validation">
+    <figcaption style="font-size: 15px;text-align: center;">Figure 21: Goal Rate on the validation set.</figcaption>
 </figure>
 
-<figure style="display: block;margin-left: auto; margin-right: auto;width:50%;height:50%;">
-    <img src="/public/best_shot_curves/best_shot_nn_calib.png" alt="best_shot_nn_calib">
-    <figcaption style="font-size: 12px;text-align: center;">Figure 9: Neural Network: Calibration.</figcaption>
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/proportion_percentile_val.png" alt="proportion_percentile_validation">
+    <figcaption style="font-size: 15px;text-align: center;">Figure 22: Goal proportion on the validation set.</figcaption>
+</figure>
+
+<figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
+    <img src="/public/calibration_val.png" alt="calibration_validation">
+    <figcaption style="font-size: 15px;text-align: center;">Figure 23: Calibration on the validation set.</figcaption>
 </figure>
 
 ##### Links to our models
 
 1. [Neural Network - best_shot_nn_final](https://www.comet.ml/jaihon/ift6758-project/f02e46ac553944f7ba18060044d873e9?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
-2. [Neural Network - unnecessary_truss_2939](https://www.comet.ml/jaihon/ift6758-project/f22281d6264d462685c13628a0dd7daa?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
-3. [Neural Network - separate_alfalfa_7886](https://www.comet.ml/jaihon/ift6758-project/b086d3049e1f47b7ae8aa569994983b4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
-
-
-
-#### 3. Random Forest
-
-
-
-
-
+2. [Neural Network - nn_no_bonus_feature](https://www.comet.ml/jaihon/ift6758-project/f22281d6264d462685c13628a0dd7daa?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+3. [Neural Network - nn_no_dropout](https://www.comet.ml/jaihon/ift6758-project/b086d3049e1f47b7ae8aa569994983b4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step)
+4. [Random Forest](https://www.comet.ml/jaihon/ift6758-project/f4b6196482dc4e1c9c6ab32034bf2278)
+5. [KNN](https://www.comet.ml/jaihon/ift6758-project/fc093cf3ac61416391c5f3fca4416117)
 
 ## Question 7: Evaluation
 
@@ -629,4 +624,33 @@ It would be interesting to see if adding external features such as a metric of t
     <figcaption style="font-size: 15px;text-align: center;">Figure 33: Calibration results season (2019-2020)</figcaption>
 </figure>
 
+# Bibliography:
 
+1. Bhandari, Aniruddha , "AUC-ROC Curve in Machine Learning Clearly Explained" <a href="https://www.analyticsvidhya.com/blog/2020/06/auc-roc-curve-machine-learning/">https://www.analyticsvidhya.com/blog/2020/06/auc-roc-curve-machine-learning/</a>, June 16, 2020
+2. Takaya Saito, "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets",  <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4349800/">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4349800/</a>
+3. Jason Brownlee, January 1, 2020 , "Failure of Classification Accuracy for Imbalanced Class Distributions", <a href="https://machinelearningmastery.com/failure-of-accuracy-for-imbalanced-class-distributions/">https://machinelearningmastery.com/failure-of-accuracy-for-imbalanced-class-distributions/</a>
+
+# Annex
+<table>
+    <caption style="caption-side: bottom; font-size: small;">F1 score results for our Neural Network models</caption>
+    <tr>
+        <th scope="row">Model</th>
+        <th scope="col">F1 Score (Class 0)</th>
+        <th scope="col">F1 Score (Class 1)</th>
+    </tr>
+    <tr>
+        <td>NeuralNetwork</td>
+        <td>0.90</td>
+        <td>0.32</td>
+    </tr>
+    <tr>
+        <td>NeuralNetwork_no_dropout</td>
+        <td>0.90</td>
+        <td>0.31</td>
+    </tr>
+        <tr>
+        <td>NeuralNetwork_no_bonus</td>
+        <td>0.89</td>
+        <td>0.31</td>
+    </tr>
+</table>

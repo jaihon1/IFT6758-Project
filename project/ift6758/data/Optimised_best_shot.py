@@ -82,9 +82,11 @@ def prep_data(data_train):
 
         data = pd.concat([data.reset_index(drop=True), df_encoded.reset_index(drop=True)], axis=1)
 
+
     # Split the data into features and labels for train and validation
     x_train, x_valid, y_train, y_valid = train_test_split(data.drop(columns=['is_goal']), data['is_goal'],
                                                           test_size=0.2, stratify=data['is_goal'])
+
 
     return x_train, x_valid, y_train, y_valid
 
