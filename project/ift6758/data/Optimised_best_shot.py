@@ -81,19 +81,12 @@ def prep_data(data_train):
         data.drop(columns=[feature], inplace=True)
 
         data = pd.concat([data.reset_index(drop=True), df_encoded.reset_index(drop=True)], axis=1)
-        # print("encoding:")
-        # print(data.shape)
-        # print(df_encoded.shape)
+
 
     # Split the data into features and labels for train and validation
     x_train, x_valid, y_train, y_valid = train_test_split(data.drop(columns=['is_goal']), data['is_goal'],
                                                           test_size=0.2, stratify=data['is_goal'])
 
-
-    print(x_train.shape)
-    print(x_valid.shape)
-    print(y_train.shape)
-    print(y_valid.shape)
 
     return x_train, x_valid, y_train, y_valid
 
@@ -152,9 +145,6 @@ def main(data_train):
 
         # Generate predictions for samples
         predictions = model.predict(x_valid)
-        # print(predictions)
-        # print(np.mean(predictions))
-        # print(np.std(predictions))
 
         threshold = 0.43
         predictions[predictions <= threshold] = 0
@@ -164,10 +154,6 @@ def main(data_train):
 
         print(classification_report(y_valid, predictions))
         print(confusion_matrix(y_valid, predictions))
-
-
-
-        print(correct / len(predictions))
 
 
 if __name__ == "__main__":
