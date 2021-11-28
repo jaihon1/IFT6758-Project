@@ -3,7 +3,7 @@ from EventGenerator import EventGenerator
 import pandas as pd
 import numpy as np
 import os
-from feat_eng2 import add_new_features
+from ift6758.features.feat_eng2 import add_new_features
 
 DEBUG_MODE = False
 
@@ -29,6 +29,7 @@ def main():
     data = None
     dataframe = pd.DataFrame()
     dirpath = os.path.join(os.path.dirname(__file__))
+    print(dirpath)
     dirpath_games_data = os.path.join(dirpath, 'games_data')
 
     for season in games_info.season:
@@ -58,7 +59,7 @@ def main():
 
 
     dataframe.to_csv(f'{dirpath_games_data}/games_data_all_seasons_full.csv')
-    add_new_features()
+    add_new_features(f'{dirpath_games_data}/games_data_all_seasons_full.csv')
 
 
 
