@@ -89,15 +89,11 @@ def prep_data(data_train):
     x_train, x_valid, y_train, y_valid = train_test_split(data.drop(columns=['is_goal']), data['is_goal'],
                                                           test_size=0.2, stratify=data['is_goal'])
 
-    # # TODO: add normalization/standardization to features
-    # # normalize the data
-    # x_train, x_test = x_train / 255.0, x_valid / 255.0
 
-    # print(data.shape)
-    # print(x_train.shape)
-    # print(x_valid.shape)
-    # print(y_train.shape)
-    # print(y_valid.shape)
+    print(x_train.shape)
+    print(x_valid.shape)
+    print(y_train.shape)
+    print(y_valid.shape)
 
     return x_train, x_valid, y_train, y_valid
 
@@ -169,13 +165,9 @@ def main(data_train):
         print(classification_report(y_valid, predictions))
         print(confusion_matrix(y_valid, predictions))
 
-        # correct = 0
 
-        # for i, prediction in enumerate(predictions):
-        #     if prediction == y_valid[i]:
-        #         correct += 1
 
-        # print(correct / len(predictions))
+        print(correct / len(predictions))
 
 
 if __name__ == "__main__":

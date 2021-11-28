@@ -138,8 +138,8 @@ At the end, we added a link to the experiment which stores the filtered DataFram
 | current_opposite_on_ice | Number of opposite players on ice|
 
 
-In the bonus question, we added a few more features like the time since the penalty started and the number of friendly and opposite players on ice. To compute the time since the penalty started, we started
-by generating all types of events in our game, by evaluating, at each event, if there was a
+In the bonus question, we added a few more features like the time since the penalty started and the number of friendly and opposite players on ice.
+To compute the time since the penalty started, we started by generating all types of events in our game, by evaluating, at each event, if there was a
 penalty and by checking on which side the team was. We then built a tidy event object that gave the time and coordinates details
 relative to the previous event. Finally, we got the current event time and subtracted
 the starting time of the penalty from the current time to have the time since the penalty started (two types of penalties generated).
@@ -162,26 +162,35 @@ They are all available on comet_ml.
 <br>
 We decided to try K-Nearest Neighbors, Random Forest and a feed-forward neural network.
 As already pointed out in section 2, our dataset is very unbalanced. Therefore, classification accuracy and its complement, the error
-rate, might be a bad idea to use because it will be an unreliable measure of the model performance. We have have what is called an "Accuracy paradox"(3). In that case, a good performance on the minority class (Goal) will be preferred over a good performance on both class.
+rate, might be a bad idea to use because it will be an unreliable measure of the model performance. We have have what is called an "Accuracy paradox"(3).
+In that case, a good performance on the minority class (Goal) will be preferred over a good performance on both class.
 In order to do so, alternative performance metrics, like precision, recall or the F-measure, may be required since reporting the classification accuracy may be misleading.
-In the following section, we will explain how the features were processed for each model, how they were trained and which metrics were used. All our models have been split into training (80%) and validation (20%) set using a stratified strategy and have been optimized using cross-validation to find the best hyperparameters. The figures shown in this section have been obtained after evaluating our models on the validation set.
+In the following section, we will explain how the features were processed for each model, how they were trained and which metrics were used.
+All our models have been split into training (80%) and validation (20%) set using a stratified strategy and have been optimized using cross-validation
+to find the best hyperparameters. The figures shown in this section have been obtained after evaluating our models on the validation set.
 </div>
 
-### Models
+### Models Results and Analysis
 
 #### 1. KNN
 
 <div style="text-align: justify">
-KNN was trained on all the features created in section 4. For the preprocessing, we started by changing all of the categorical features into one-hot encoding. We then dropped the rows that had nan values and
-removed the ones that had infinity values (like the Speed Column). Once this was done, we split the dataset into training and validation set as specified above.
-We trained our KNN using a GridSearch on different hyperparameters: the number of neighbors and the weights used for prediction (distance vs uniform). The best model found by the GridSearch used 8 neighbors and distance for weights.
-However, even if the GridSearch did find a "best estimator", it was only able to reach an AUC of 0.63 which is lower than the XGBoost model and our best regression model from section 3.
+KNN was trained on all the features created in section 4. For the preprocessing, we started by changing all of the
+categorical features into one-hot encoding.
+We then dropped the rows that had nan values and removed the ones that had infinity values (like the Speed Column).
+Once this was done, we split the dataset into training and validation set as specified above.
+We trained our KNN using a GridSearch on different hyper-parameters: the number of neighbors and the weights used for
+prediction(distance vs uniform). The best model found by the GridSearch used 8 neighbors and distance for weights.
+However, even if the GridSearch did find a "best estimator", it was only able to reach an AUC of 0.63 which is lower
+than the XGBoost model and our best regression model from section 3.
 </div>
 
 #### 2. Random Forest
 <div style="text-align: justify">
 The Random Forest had a similar preprocessing as the KNN, i.e. we used the same features with the one-hot encoding for the categorical features, etc.
-We also trained the Random Forest using a GridSearch over 2 hyperparameters: the criterion which is the function used to measure the quality of a split in a tree and the number of estimators. [<a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html?highlight=randomforestregressor#sklearn.ensemble.RandomForestRegressor">Random Forest from Scikit-Learn</a>]
+We also trained the Random Forest using a GridSearch over 2 hyper-parameters: the criterion which is the function used to measure the quality of a split
+in a tree and the number of estimators.
+[<a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html?highlight=randomforestregressor#sklearn.ensemble.RandomForestRegressor">Random Forest from Scikit-Learn</a>]
 This time, the GridSearch finished with an AUC of 0.72 for the cross-validation results which is similar to what our XGBoost could do, but a little bit lower.
 </div>
 
@@ -189,14 +198,19 @@ This time, the GridSearch finished with an AUC of 0.72 for the cross-validation 
 <div style="text-align: justify">
 For the neural network, different methods were used for the preprocessing. We tried first a model that did not use our
 features created in the bonus part of section 4 (everything related to penalty). This means that our model had less features
-than the others tried as of now (except for the linear regression of course). Still, for all neural networks models, we transformed the categorical data into one-hot vectors just like we did we XGBoost, KNN and Random Forest.
-However, we considered the feature current_friendly_on_ice and current_opposite_on_ice as categorical features as opposed to the other models which supposed they were numerical and therefore were standardized which does not make much sense for a number of people on the ice that ranges from 1 to 5.
+than the others tried as of now (except for the linear regression of course). Still, for all neural networks models, we transformed the
+categorical data into one-hot vectors just like we did we XGBoost, KNN and Random Forest.
+However, we considered the feature current_friendly_on_ice and current_opposite_on_ice as categorical features as opposed to the other models
+which supposed they were numerical and therefore were standardized which does not make much sense for a number of people on the ice that ranges from 1 to 5.
 As the other models, we standardized the numerical features.
 <br>
 <br>
-The other two models tried with the Neural Network differed on the used of dropouts. They both trained with all of the features created in section 4 (including the bonus), but one of them used dropout and the other didn't.
-For the training, we did some manual cross validation over different hyperparameters like the learning rate, the coefficient for the adam optimizer and the number of epochs. All the hyperparameters of the 3 models are the same, because those parameters had been optimized
-previously. So mainly, the learning rate is 0.001, the Adam coefficient is 0.9, and we trained for 30 epochs. So, to reiterate, the main difference is that the 'nn_no_bonus_feature' has no feature developed during the bonus part (section 4),
+The other two models tried with the Neural Network differed on the used of dropouts. They both trained with all of the features created in section 4 (including the bonus),
+but one of them used dropout and the other didn't.
+For the training, we did some manual cross validation over different hyper-parameters like the learning rate, the coefficient for the Adam optimizer and the number of epochs.
+All the hyper-parameters of the 3 models are the same, because those parameters had been optimized
+previously. So mainly, the learning rate is 0.001, the Adam coefficient is 0.9, and we trained for 30 epochs.
+So, to reiterate, the main difference is that the 'nn_no_bonus_feature' has no feature developed during the bonus part (section 4),
 the 'nn_no_dropout' has no dropout and the "best_shot_nn_final" has all of the features and dropout.
 <br>
 <br>
