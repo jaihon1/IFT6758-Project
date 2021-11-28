@@ -1,4 +1,4 @@
-#%%
+# %%
 import os
 import joblib
 
@@ -11,31 +11,28 @@ import matplotlib.ticker as mtick
 from comet_ml import Experiment
 
 # import keras
-from keras.callbacks import ModelCheckpoint
 from sklearn.calibration import CalibrationDisplay
 from tensorflow import keras
 
-
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve, f1_score
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.metrics import classification_report, confusion_matrix, f1_score
+from sklearn.preprocessing import StandardScaler
 
+from ift6758.utils.utils import plot_roc_curve, plot_goal_rate, plot_cumulative_sum, plot_calibration
 
-#%%
+# %%
 # Load the data
-# data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
-data = pd.read_csv("games_data/games_data_all_seasons.csv")
-
+data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
 
 # split into train and test
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
-data = data[data['Speed'] < 300] # remove outliers with value = inf
+data = data[data['Speed'] < 300]  # remove outliers with value = inf
 
 train_data, test_data = data[~data['game_pk'].str.startswith('2019')], data[data['game_pk'].str.startswith('2019')]
 
 
-#%%
+# %%
 # features = [
 #     'game_pk', 'side', 'event_index', 'event_type',
 #     'shot_type', 'goal_strength', 'team_id', 'team_side', 'period',
@@ -68,7 +65,7 @@ def prep_data(data_train, bonus):
         data = data_train[selected_features]
 
         # Drop rows with NaN values
-        data = data.dropna(subset = selected_features)
+        data = data.dropna(subset=selected_features)
 
         # Encoding categorical features into a one-hot encoding
         categorical_features = [
@@ -104,7 +101,7 @@ def prep_data(data_train, bonus):
         data = data_train[selected_features]
 
         # Drop rows with NaN values
-        data = data.dropna(subset = selected_features)
+        data = data.dropna(subset=selected_features)
 
         # Encoding categorical features into a one-hot encoding
         categorical_features = [
@@ -124,10 +121,8 @@ def prep_data(data_train, bonus):
             'shot_last_event_distance', 'Change_in_shot_angle', 'Speed'
         ]
 
-
     # Ecoding the features
     for feature in categorical_features:
-        # print(f"Encoding categorical feature {feature}.")
         one_hot_encoder = OneHotEncoder(sparse=False)
         encoding_df = data[[feature]]
 
@@ -142,10 +137,9 @@ def prep_data(data_train, bonus):
 
         data = pd.concat([data.reset_index(drop=True), df_encoded.reset_index(drop=True)], axis=1)
 
-
     # Split the data into features and labels for train and validation
-    x_train, x_valid, y_train, y_valid = train_test_split(data.drop(columns=['is_goal']), data['is_goal'], test_size=0.2, stratify=data['is_goal'])
-
+    x_train, x_valid, y_train, y_valid = train_test_split(data.drop(columns=['is_goal']), data['is_goal'],
+                                                          test_size=0.2, stratify=data['is_goal'])
 
     # normalization/standardization to features
     scaler = StandardScaler()
@@ -155,60 +149,6 @@ def prep_data(data_train, bonus):
     return x_train, x_valid, y_train, y_valid, selected_features
 
 
-#%%
-# Compute percentile
-def plot_goal_rate(proba, true_y, label):
-    percentile = np.arange(0, 100, 2)
-    percentile_pred = np.percentile(proba, percentile)
-
-    y_valid_df = pd.DataFrame(true_y)
-
-    y_valid_df['bins_percentile'] = pd.cut(proba, percentile_pred, duplicates='drop')
-    goal_rate_by_percentile = y_valid_df.groupby(by=['bins_percentile']).apply(lambda g: g['is_goal'].sum()/len(g))
-
-
-    if len(percentile_pred)-len(goal_rate_by_percentile) == 1:
-        percentile = percentile[:-1]
-    else:
-        percentile = percentile[:-(len(percentile_pred)-len(goal_rate_by_percentile))]
-
-    sns.set_theme()
-    g = sns.lineplot(x=percentile, y=goal_rate_by_percentile*100, label=label)
-    ax = g.axes
-    ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
-
-    return y_valid_df
-
-#%%
-# plot cumulative proportion of goals as function of shot probability model percentile
-def plot_cumulative_sum(true_y, y_valid_df, label):
-    percentile = np.arange(0,100,2)
-
-    total_number_goal = (true_y == 1).sum()
-
-    sum_goals_by_percentile = y_valid_df.groupby(by='bins_percentile').apply(lambda g: g['is_goal'].sum()/total_number_goal)
-    cum_sum_goals = sum_goals_by_percentile[::-1].cumsum(axis=0)[::-1]
-
-    sns.set_theme()
-    if len(percentile)-len(cum_sum_goals) == 1:
-        percentile = percentile[:-1]
-    else:
-        percentile = percentile[:-(len(percentile)-len(cum_sum_goals))]
-
-    g = sns.lineplot(x=percentile, y=cum_sum_goals*100, label=label)
-    ax = g.axes
-    ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
-
-
-#%%
-def plot_roc_curve(pred_prob, true_y, marker, label):
-    score = roc_auc_score(true_y, pred_prob)
-    fpr, tpr, _ = roc_curve(true_y, pred_prob)
-    sns.set_theme()
-    plt.grid(True)
-    plt.plot(fpr, tpr, linestyle=marker, label=label+f' (area={score:.2f})')
-
-
 def find_optimal_threshold(predictions, true_y):
     scores = []
 
@@ -216,13 +156,12 @@ def find_optimal_threshold(predictions, true_y):
         # create a numpy array with the same shape as predictions
         masked_predictions = np.zeros(predictions.shape)
         for j, prediction in enumerate(predictions):
-            if prediction <= i/100:
+            if prediction <= i / 100:
                 masked_predictions[j] = 0
             else:
                 masked_predictions[j] = 1
 
         scores.append(f1_score(true_y, masked_predictions))
-
 
     print(np.max(scores), np.argmax(scores))
 
@@ -238,9 +177,9 @@ def find_optimal_threshold(predictions, true_y):
     print(classification_report(true_y, masked_predictions))
     print(confusion_matrix(true_y, masked_predictions))
 
-#%%
-def train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch, lr):
 
+# %%
+def train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch, lr):
     # Create the model
     model = keras.Sequential([
         keras.layers.Dense(64, activation='relu', input_shape=(x_train.shape[1],)),
@@ -260,11 +199,12 @@ def train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch, lr):
                   metrics=['accuracy'])
 
     filepath = 'nn.epoch{epoch:02d}-loss{val_loss:.2f}.hdf5'
-    checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+    checkpoint = keras.callbacks.ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
     callbacks = [checkpoint]
 
     # Train the model
-    model.fit(x_train, y_train, epochs=epoch, validation_data=(x_valid, y_valid), callbacks=callbacks, class_weight=class_weight, batch_size=128)
+    model.fit(x_train, y_train, epochs=epoch, validation_data=(x_valid, y_valid), callbacks=callbacks,
+              class_weight=class_weight, batch_size=128)
 
     # Evaluate the model
     model.evaluate(x_valid, y_valid)
@@ -272,7 +212,7 @@ def train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch, lr):
     return model
 
 
-#%%
+# %%
 def train_nn(x_train, x_valid, y_train, y_valid, features, comet=False):
     class_weight = {0: 1., 1: 3.}
 
@@ -290,62 +230,48 @@ def train_nn(x_train, x_valid, y_train, y_valid, features, comet=False):
         )
         experiment.log_parameters({'model': 'nn', 'feature': features, 'class_weight': class_weight})
 
-
     clf = train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch=30, lr=0.001)
 
-
     if comet:
-        model_name = 'nn'+'_'
-        joblib.dump(clf, model_name+'.joblib')
-        experiment.log_model(model_name, model_name+'.joblib')
+        model_name = 'nn' + '_'
+        joblib.dump(clf, model_name + '.joblib')
+        experiment.log_model(model_name, model_name + '.joblib')
 
     return clf
 
-#%%
-def main(data_train):
 
+# %%
+def main(data_train):
     TOGGLE_TRAIN = False
 
     print(os.environ.get("COMET_API_KEY"))
 
     x_train, x_valid, y_train, y_valid, features = prep_data(data_train, bonus=True)
-    x_train_no_bonus, x_valid_no_bonus, y_train_no_bonus, y_valid_no_bonus, features_no_bonus = prep_data(data_train, bonus=False)
-
+    x_train_no_bonus, x_valid_no_bonus, y_train_no_bonus, y_valid_no_bonus, features_no_bonus = prep_data(data_train,
+                                                                                                          bonus=False)
 
     if TOGGLE_TRAIN:
         clf = train_nn(x_train, x_valid, y_train, y_valid, features, comet=True)
 
     else:
         # File path
-        filepath = 'nn_models/nn.epoch25-loss0.32.hdf5'
 
         # Load the model
-        model = keras.models.load_model('nn_models_best/best_shot_nn_final.hdf5', compile = True)
-        model1 = keras.models.load_model('nn_models_best/unnecessary_truss_2939.hdf5', compile = True)
-        model2 = keras.models.load_model('nn_models_best/separate_alfalfa_7886.hdf5', compile = True)
+        model = keras.models.load_model('ift6758/models/nn/best_shot_nn_final.hdf5', compile=True)
+        model1 = keras.models.load_model('ift6758/models/nn/neuralnet_nobonus.hdf5', compile=True)
+        model2 = keras.models.load_model('ift6758/models/nn/neuralnet_no_dropout.hdf5', compile=True)
 
         # Generate predictions for samples
         predictions = model.predict(x_valid)
         predictions1 = model1.predict(x_valid_no_bonus)
         predictions2 = model2.predict(x_valid)
 
-
         find_optimal_threshold(predictions1, y_valid_no_bonus)
 
-
-        # ROC curve
-        plot_roc_curve(predictions, y_valid.to_numpy(), '-', 'best_shot_nn_final')
-        plot_roc_curve(predictions1, y_valid_no_bonus.to_numpy(), '-', 'unnecessary_truss_2939')
-        plot_roc_curve(predictions2, y_valid.to_numpy(), '-', 'separate_alfalfa_7886')
-        plt.xlabel('False positive rate')
-        plt.ylabel('True positive rate')
-        plt.legend()
-        plt.show()
-
-
+        plot_roc_curve([predictions, predictions1, predictions2], [y_valid, y_valid_no_bonus, y_valid], ['-', '-', '-'],
+                       ['NeuralNet', 'NeuralNet_no_bonus', 'NeuralNet_no_dropout'])
 
 
 if __name__ == "__main__":
     main(train_data)
 # %%
-

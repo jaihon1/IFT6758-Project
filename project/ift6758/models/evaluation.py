@@ -6,14 +6,13 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import os
-from utils import plot_roc_curve, plot_calibration, plot_cumulative_sum, plot_goal_rate
+from ift6758.utils.utils import plot_roc_curve, plot_calibration, plot_cumulative_sum, plot_goal_rate
 
-from sklearn.calibration import CalibrationDisplay
 from tensorflow import keras
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve, f1_score
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve
 from sklearn.preprocessing import StandardScaler
 
 
@@ -225,88 +224,10 @@ def prepare(data, bonus, model_type, std):
     test_data.drop(columns=['game_pk'], inplace=True)
 
     # Split test data into input and target
-    # x_test, y_test = test_data.drop(columns=['is_goal']), test_data['is_goal']
-    x_train, y_train = train_data.drop(columns=['is_goal']), train_data['is_goal']
+    x_test, y_test = test_data.drop(columns=['is_goal']), test_data['is_goal']
+    # x_train, y_train = train_data.drop(columns=['is_goal']), train_data['is_goal']
 
-    return x_train, y_train
-
-#%%
-def plot_roc_curve(pred_probs, true_y, markers, labels, save_file=None):
-    sns.set_theme()
-    plt.grid(True)
-    for proba, marker, label, y in zip(pred_probs, markers, labels, true_y):
-        score = roc_auc_score(y, proba)
-        fpr, tpr, _ = roc_curve(y, proba)
-        plt.plot(fpr, tpr, linestyle=marker, label=label+f' (area={score:.2f})')
-    plt.xlabel('False positive rate')
-    plt.ylabel('True positive rate')
-    plt.legend()
-    if save_file is not None:
-        plt.savefig(save_file, format='png')
-    plt.show()
-
-
-def create_percentile_model(proba, y):
-    percentile = np.arange(0, 102, 2)
-    percentile_pred = np.percentile(proba, percentile)
-    percentile_pred = np.unique(percentile_pred)
-    percentile_pred = np.concatenate([[0], percentile_pred])
-
-    y_valid_df = pd.DataFrame(y)
-    percentile_pred = np.unique(percentile_pred)
-    y_valid_df['bins_percentile'] = pd.cut(proba, percentile_pred)
-    return percentile, percentile_pred, y_valid_df
-
-def plot_goal_rate(probas, actual_y,labels, save_file=None):
-    sns.set_theme()
-    for proba, label, y in zip(probas, labels, actual_y):
-        percentile, percentile_pred, y_valid_df = create_percentile_model(proba, y)
-        bins = np.linspace(0,100,len(y_valid_df['bins_percentile'].unique()))[1:]
-        goal_rate_by_percentile = y_valid_df.groupby(by=['bins_percentile']).apply(lambda g: g['is_goal'].sum()/len(g))
-        g = sns.lineplot(x=bins, y=goal_rate_by_percentile[1:]*100, label=label)
-        ax = g.axes
-        ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
-    plt.xlim(100, 0)
-    plt.ylim(0, 100)
-    plt.xlabel('Shot probability model percentile')
-    plt.ylabel('Goals / (Shots + Goals)')
-    if save_file is not None:
-        plt.savefig(save_file, format='png')
-    plt.show()
-
-
-def plot_cumulative_sum(probas, actual_y, labels, save_file=None):
-    sns.set_theme()
-    for proba, label, actual_y in zip(probas, labels, actual_y):
-        percentile, percentile_pred, y_valid_df = create_percentile_model(proba, actual_y)
-        bins = np.linspace(0,100,len(y_valid_df['bins_percentile'].unique()))[1:]
-        total_number_goal = (actual_y == 1).sum()
-        sum_goals_by_percentile = y_valid_df.groupby(by='bins_percentile').apply(lambda g: g['is_goal'].sum()/total_number_goal)
-        cum_sum_goals = sum_goals_by_percentile[::-1].cumsum(axis=0)[::-1]
-
-        g = sns.lineplot(x=bins, y=cum_sum_goals[1:]*100, label=label)
-        ax = g.axes
-        ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
-    plt.xlim(100, 0)
-    plt.ylim(0, 100)
-    plt.xlabel('Shot probability model percentile')
-    plt.ylabel('Proportion')
-    if save_file is not None:
-        plt.savefig(save_file, format='png')
-    plt.show()
-
-
-def plot_calibration(probas, actual_y, labels, save_file=None):
-    sns.set_theme()
-    fig = plt.figure()
-    ax = plt.axes()
-    for proba, label, y in zip(probas, labels, actual_y):
-        disp = CalibrationDisplay.from_predictions(y, proba, n_bins=25, ax=ax, name=label, ref_line=False)
-    plt.xlim(0,1)
-    plt.legend(loc=9)
-    if save_file is not None:
-        plt.savefig(save_file, format='png')
-    plt.show()
+    return x_test, y_test
 
 # %%
 PLAYOFF_TOGGLE = False
@@ -317,7 +238,7 @@ NEURAL NETWORK MODELS
 '''
 # Load the data
 if PLAYOFF_TOGGLE:
-    data = pd.read_csv("games_data/games_data_all_seasons_full.csv")
+    data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons_full.csv")
 
     # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
     data['period'] = data['period'].replace({6: 4, 7: 4, 8: 4})
@@ -329,7 +250,7 @@ if PLAYOFF_TOGGLE:
     data.drop(columns=['game_type'], inplace=True)
 
 else:
-    data = pd.read_csv("games_data/games_data_all_seasons.csv")
+    data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
 
 
 # split into train and test
@@ -341,9 +262,9 @@ x_test_nobonus_NN, y_test_nobonus_NN = prepare(data, bonus=False, model_type='nn
 
 
 # Load the model
-model = keras.models.load_model('../../models/nn/best_shot_nn_final.hdf5', compile = True)
-model1 = keras.models.load_model('../../models/nn/unnecessary_truss_2939.hdf5', compile = True)
-model2 = keras.models.load_model('../../models/nn/separate_alfalfa_7886.hdf5', compile = True)
+model = keras.models.load_model('models/nn/best_shot_nn_final.hdf5', compile = True)
+model1 = keras.models.load_model('models/nn/neuralnet_no_dropout.hdf5', compile = True)
+model2 = keras.models.load_model('models/nn/neuralnet_nobonus.hdf5', compile = True)
 
 # Generate predictions for samples
 predictions_NN = model.predict(x_test_NN)
@@ -364,7 +285,7 @@ BASELINE MODELS
 '''
 # Load the data
 if PLAYOFF_TOGGLE:
-    data = pd.read_csv("games_data/games_data_all_seasons_full.csv")
+    data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons_full.csv")
 
     # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
     data['period'] = data['period'].replace({6: 4, 7: 4, 8: 4})
@@ -376,7 +297,7 @@ if PLAYOFF_TOGGLE:
     data.drop(columns=['game_type'], inplace=True)
 
 else:
-    data = pd.read_csv("games_data/games_data_all_seasons.csv")
+    data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
 
 
 # split into train and test
@@ -386,9 +307,9 @@ data = data[data['Speed'] < 300] # remove outliers with value = inf
 x_test_reg, y_test_reg = prepare(data, bonus=True, model_type='logreg', std=True)
 
 # Load the model
-model_angle = joblib.load('../../models/baseline/regression_angle_net.joblib')
-model_distance = joblib.load('../../models/baseline/regression_distance_net.joblib')
-model_angle_distance = joblib.load('../../models/baseline/regression_distance_net_angle_net.joblib')
+model_angle = joblib.load('models/baseline/regression_angle_net.joblib')
+model_distance = joblib.load('models/baseline/regression_distance_net.joblib')
+model_angle_distance = joblib.load('models/baseline/regression_distance_net_angle_net.joblib')
 
 # Generate predictions for samples: Returns the probability of class_1
 predictions_angle_net = model_angle.predict_proba(x_test_reg[['angle_net']].abs())[:, 1]
@@ -423,7 +344,7 @@ XGBOOST MODELS
 '''
 # Load the data
 if PLAYOFF_TOGGLE:
-    data = pd.read_csv("games_data/games_data_all_seasons_full.csv")
+    data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons_full.csv")
 
     # pandas replace all values in a column period with a 4 where period = 5, 6, 7, 8
     data['period'] = data['period'].replace({6: 4, 7: 4, 8: 4})
@@ -435,7 +356,7 @@ if PLAYOFF_TOGGLE:
     data.drop(columns=['game_type'], inplace=True)
 
 else:
-    data = pd.read_csv("games_data/games_data_all_seasons.csv")
+    data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
 
 
 # split into train and test
@@ -445,7 +366,7 @@ data = data[data['Speed'] < 300] # remove outliers with value = inf
 x_test_XG, y_test_XG = prepare(data, bonus=True, model_type='xgboost', std=True)
 
 # Load the model
-model = joblib.load('../../models/xgb_tuning_best.joblib')
+model = joblib.load('models/xgb_tuning_best.joblib')
 
 # Generate predictions for samples: Returns the probability of class_1
 predictions_xg = model.predict_proba(x_test_XG)[:, 1]
@@ -458,7 +379,7 @@ predictions_xg_int[predictions_xg_int <= 0.5] = 0
 predictions_xg_int[predictions_xg_int > 0.5] = 1
 confusion_matrix_xg = confusion_matrix(y_test_XG, predictions_xg_int)
 
-#Generating curves for 
+#Generating curves for
 # Goal rate:
 plot_goal_rate([predictions_NN_unlisted, predictions_angle_distance, predictions_angle_net, predictions_distance, predictions_xg], [y_test_NN, y_test_reg, y_test_reg, y_test_reg, y_test_XG], ['NeuralNetwork', 'LogisticRegression 1', 'LogisticRegression 2', 'LogisticRegression 3', 'XGBoost' ])
 
@@ -491,5 +412,5 @@ for matrice, ax in zip(cm, axes.flatten()):
     ax.title.set_text(titel[iterator])
     iterator += 1
 fig.delaxes(axes[2][1])
-plt.tight_layout()  
+plt.tight_layout()
 plt.show()

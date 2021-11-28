@@ -12,13 +12,13 @@ from sklearn.metrics import accuracy_score, precision_score, f1_score
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import confusion_matrix
 
-from project.ift6758.data.utils import plot_roc_curve, plot_goal_rate, plot_cumulative_sum, plot_calibration, prep_data, plot_relation
+from ift6758.utils.utils import plot_roc_curve, plot_goal_rate, plot_cumulative_sum, plot_calibration, prep_data, plot_relation
 
 #%%
 random_state = np.random.RandomState(42)
 
 #%%
-data = pd.read_csv(os.path.join(os.environ.get('PATH_DATA'), 'games_data_all_seasons.csv'))
+data = pd.read_csv('ift6758/data/games_data/games_data_all_seasons.csv')
 
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
 
@@ -205,10 +205,10 @@ pred_proba_mutual = clf.predict_proba(x_valid)
 #%%
 labels = ['default_XGBoost', 'tuning_XGBoost', 'lasso_XGBoost', 'mutual_XGBoost']
 probas = [pred_proba[:, 1], pred_proba_random[:, 1], pred_proba_lasso[:, 1], pred_proba_mutual[:, 1]]
-
+y_valids = [y_valid for i in range(4)]
 #%%
-plot_roc_curve(probas, y_valid, ['-', '-', '-', '-'], labels)
-plot_goal_rate(probas, y_valid, labels)
-plot_cumulative_sum(probas, y_valid, labels)
-plot_calibration(probas, y_valid, labels)
+plot_roc_curve(probas, y_valids, ['-', '-', '-', '-'], labels)
+plot_goal_rate(probas, y_valids, labels)
+plot_cumulative_sum(probas, y_valids, labels)
+plot_calibration(probas, y_valids, labels)
 

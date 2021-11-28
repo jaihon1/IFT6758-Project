@@ -19,7 +19,7 @@ dependencies:
   - ipywidgets
   - jupyterlab>=3.0.0
   - ipdb
-  - keras
-  - tensorflow
-  - comet_ml
   - xgboost
+  - tensorflow=2.6.0
+  - keras=2.6.0
+  - comet_ml

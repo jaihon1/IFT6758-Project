@@ -4,7 +4,7 @@ title: IFT6758 Milestone 2
 ---
 
 ### Question 2
-> The code for this section can be found in visualizations/plot_feature_engineer_1.py
+> The code for this section can be found in project/ift6758/visualizations/plot_feature_engineer_1.py
 
 Using our work from the previous milestone, we have extended our features by adding the following ones presented in the table below:
 
@@ -18,29 +18,29 @@ Using our work from the previous milestone, we have extended our features by add
 From these new features, we created different figures to analyse them:
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/histogram_goals_nogoals_vs_distance.png" alt="histogram_goals_nogoals_vs_angle">
+    <img src="/public/milestone2/histogram_goals_nogoals_vs_distance.png" alt="histogram_goals_nogoals_vs_angle">
     <figcaption style="font-size: 15px;text-align: center;">Figure 1: Goals and no goals vs distance.</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/histogram_goals_nogoals_vs_angle.png" alt="histogram_goals_nogoals_vs_angle">
+    <img src="/public/milestone2/histogram_goals_nogoals_vs_angle.png" alt="histogram_goals_nogoals_vs_angle">
     <figcaption style="font-size: 15px;text-align: center;">Figure 2: Goals and no goals vs angle.</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/angle_vs_distance.png" alt="angle_vs_distance">
+    <img src="/public/milestone2/angle_vs_distance.png" alt="angle_vs_distance">
     <figcaption style="font-size: 15px;text-align: center;">Figure 3: angle vs distance.</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/goal_rate_vs_distance.png" alt="goal_rate_vs_distance">
+    <img src="/public/milestone2/goal_rate_vs_distance.png" alt="goal_rate_vs_distance">
     <figcaption style="font-size: 15px;text-align: center;">Figure 4: Goal rate vs distance.</figcaption>
 </figure>
 <div style="text-align: justify"> All the figures above give us interesting information about shots and goals in the NHL. For example, figure 1 shows us that both goals and no goals happened more often closer to the net and that goals (in blue) are much less frequent than no goal (in orange). Figure 2, on the other hand, shows us that most shots (goal or not) are usually more aligned with the net since the angle is centered around 0. As for figure 3, it tells us that shots that are done farther from the net, generally have less of an angle with it (smaller angle). It also tells us that the two features are somewhat correlated with each other. Finally, if we analyse Figure 4, we can observe that when attacking players are very close to the opponent's net, the chance that they score is much higher which intuitively makes sense. However, it is surprising that the goal rate is so high for the farthest distances. This might be explained by a lower number of shots from this distance which could make the ratio of goal higher. This could also be due to a higher rate of empty net. It is sensible to think that it is easier to make a goal when a the net is empty, therefore, we evaluated the ratio of empty net each bins of distance and found that the farther the goal was made, the higher the ratio of empty net is (by a factor of about 10 between closer and farther bins).
  </div>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/goal_rate_vs_angle.png" alt="goal_rate_vs_angle">
+    <img src="/public/milestone2/goal_rate_vs_angle.png" alt="goal_rate_vs_angle">
     <figcaption style="font-size: 15px;text-align: center;">Figure 5: Goal rate vs angle.</figcaption>
 </figure>
 <div style="text-align: justify">
@@ -50,7 +50,7 @@ From Figure 5 above, we can see that the goal rate is much higher when the shot 
 Another interesting thing about Figure 5 is when we compare the goal rate from the left side to the right side. One reason why the goal rate is higher on the right side could be because the majority of NHL goalies have their glove on their left hand (maybe it's easier to stop shots with the glove in contrast to the blocker hand). Another reason might simply be because players shooting from the right side are much better than the ones shooting from the left side and, therefore, have a higher goal rate.
 </div>
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/histogram_goals.png" alt="Goals (empty net and non-empty net) vs distance">
+    <img src="/public/milestone2/histogram_goals.png" alt="Goals (empty net and non-empty net) vs distance">
     <figcaption style="font-size: 15px;text-align: center;">Figure 6: Goals (empty net and non-empty net) vs distance from net.</figcaption>
 </figure>
 
@@ -59,6 +59,9 @@ Looking at the data from Figure 6, we can observe many interesting facts. Firstl
 <br>
 <br>
 We can observe in Figure 6 that the goals scored on a non-empty net from a distance of 150-170 feet are quite high. It could be that it has been originally misclassified as "non-empty net goals" as opposed to "empty-net goals". Another reason could be that these goals were scored by the other team that was then misclassified.
+<br>
+<br>
+<i>Note about the empty_net feature: Even if we did the feature, the rest of the project does not use it because it would be a leaky feature as was discussed in piazza.</i>
 </div>
 
 ### Question 3
@@ -101,7 +104,7 @@ As we can see in Figure 7 below, the random classifier gives a perfect diagonal 
 </div>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/roc_curve_baseline.png" alt="roc_curve_baseline">
+    <img src="/public/milestone2/roc_curve_baseline.png" alt="roc_curve_baseline">
     <figcaption style="font-size: 15px;text-align: center;">Figure 7: Logistic Regression: ROC curve.</figcaption>
 </figure>
 
@@ -113,7 +116,7 @@ Knowing this, the plot shows us that our trained models perform much better that
 </div>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/goal_rate_curve_baseline.png" alt="goal_rate_curve_baseline">
+    <img src="/public/milestone2/goal_rate_curve_baseline.png" alt="goal_rate_curve_baseline">
     <figcaption style="font-size: 15px;text-align: center;">Figure 8: Logistic Regression: Goal rate.</figcaption>
 </figure>
 
@@ -125,7 +128,7 @@ Fortunately, the main thing we can observe is that shots that have a higher prob
 </div>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/cumulative_sum_goal_baseline.png" alt="cumulative_sum_goal_baseline">
+    <img src="/public/milestone2/cumulative_sum_goal_baseline.png" alt="cumulative_sum_goal_baseline">
     <figcaption style="font-size: 15px;text-align: center;">Figure 9: Logistic Regression: Goal proportion.</figcaption>
 </figure>
 
@@ -137,7 +140,7 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 </div>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/calibration_curve_baseline.png" alt="calibration_curve_baseline">
+    <img src="/public/milestone2/calibration_curve_baseline.png" alt="calibration_curve_baseline">
     <figcaption style="font-size: 15px;text-align: center;">Figure 10: Logistic Regression: Calibration curve.</figcaption>
 </figure>
 
@@ -151,7 +154,7 @@ Given the calibration curve shown in Figure 10, we can easily see that our train
 
 
 ### Question 4
-> The code for this section is in EventGenerator.py and feat_eng2.py
+> The code for this section is in project/ift6758/data/EventGenerator.py and project/ift6758/features/feat_eng2.py
 
 <div style="text-align: justify">
 We added below a list of all of the features that we created for this section, and we listed each feature by both the column name
@@ -199,7 +202,7 @@ then subtracted the number of players lost depending on the type of the penalty 
 [wpg_v_wsh_2017021065.csv](https://www.comet.ml/jaihon/ift6758-project/fae888ad53de4d1aa940a67b96d106ab?assetId=e46feef96edc4bf8afe7c676f05c192b&assetPath=dataframes&experiment-tab=assets)
 
 ### Question 5
-> The code for this section can be found in xgboost_models.py
+> The code for this section can be found in project/ift6758/models/xgboost_models.py
 <div style="text-align: justify">
 The first XGBoost model was trained on the distance and angle from the net features just like the regression in
 section 3. We trained the model on approximately 75% of the training data from seasons 2015 to 2018 (inclusive). Since
@@ -218,19 +221,19 @@ as it tends to be closer to the perfectly calibrated curve.
 </div>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/roc_curve_xgboost.png" alt="roc_curve_xgboost">
+    <img src="/public/milestone2/roc_curve_xgboost.png" alt="roc_curve_xgboost">
     <figcaption style="font-size: 15px;text-align: center;">Figure 11: XGBoost: ROC curve.</figcaption>
 </figure>
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/goal_rate_xgboost.png" alt="goal_rate_xgboost">
+    <img src="/public/milestone2/goal_rate_xgboost.png" alt="goal_rate_xgboost">
     <figcaption style="font-size: 15px;text-align: center;">Figure 12: XGBoost: goal rate.</figcaption>
 </figure>
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/cumulative_goals_xgboost.png" alt="cumulative_sum_xgboost">
+    <img src="/public/milestone2/cumulative_goals_xgboost.png" alt="cumulative_sum_xgboost">
     <figcaption style="font-size: 15px;text-align: center;">Figure 13: XGBoost: cumulative sum.</figcaption>
 </figure>
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/calibration_xgboost.png" alt="calibration_xgboost">
+    <img src="/public/milestone2/calibration_xgboost.png" alt="calibration_xgboost">
     <figcaption style="font-size: 15px;text-align: center;">Figure 14: XGBoost: calibration curve.</figcaption>
 </figure>
 
@@ -252,15 +255,15 @@ the better since the precision increases while the F1 score and accuracy stays p
 </div>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/n_estimators_vs_metrics_xgboost.png" alt="number_of_estimators_vs_metrics">
+    <img src="/public/milestone2/n_estimators_vs_metrics_xgboost.png" alt="number_of_estimators_vs_metrics">
     <figcaption style="font-size: 15px;text-align: center;">Figure 15: Relation between the number of estimators and different metrics.</figcaption>
 </figure>
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/max_depth_vs_metrics_xgboost.png" alt="max_depth_vs_metrics">
+    <img src="/public/milestone2/max_depth_vs_metrics_xgboost.png" alt="max_depth_vs_metrics">
     <figcaption style="font-size: 15px;text-align: center;">Figure 16: Relation between the max depth of a tree and different metrics.</figcaption>
 </figure>
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/reg_lambda_vs_metrics_xgboost.png" alt="reg_lambda_vs_metrics">
+    <img src="/public/milestone2/reg_lambda_vs_metrics_xgboost.png" alt="reg_lambda_vs_metrics">
     <figcaption style="font-size: 15px;text-align: center;">Figure 17: Relation between the regularisation coefficient lambda (l2) and different metrics.</figcaption>
 </figure>
 
@@ -298,7 +301,7 @@ the interesting observations that we found from this figure.
 </div>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:100%;height:100%;">
-    <img src="/public/importance_feature_lasso_xgboost.png" alt="importance_feature_xgboost">
+    <img src="/public/milestone2/importance_feature_lasso_xgboost.png" alt="importance_feature_xgboost">
     <figcaption style="font-size: 15px;text-align: center;">Figure 18: Importance of each feature according to lasso.</figcaption>
 </figure>
 
@@ -377,6 +380,7 @@ The links to the different experiments shown in this section can be found here:
 3. [XGBoost with hyperparameter tuning and trained on subset of features selected by Lasso](https://www.comet.ml/jaihon/ift6758-project/74f19b8137e14336ba1e49c198dfd3e6)
 
 ## Question 6: Best Shot
+> The code for this section can be found in project/ift6758/models/best_shot.py, KNN_model.py, Optimised_best_shot.py
 
 <div style="text-align: justify">
 After using a logistic regression and XGBoost model, we decided to try other algorithms to find the best model
@@ -505,27 +509,27 @@ Nevertheless, we conclude that our best model for this section is the neural net
 </div>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:100%;height:100%;">
-    <img src="/public/confusion_matrix_val.png" alt="confusion_matrix_validation">
+    <img src="/public/milestone2/confusion_matrix_val.png" alt="confusion_matrix_validation">
     <figcaption style="font-size: 15px;text-align: center;">Figure 19: Confusion matrices on the validation set.</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/roc_curve_val.png" alt="roc_curve_validation">
+    <img src="/public/milestone2/roc_curve_val.png" alt="roc_curve_validation">
     <figcaption style="font-size: 15px;text-align: center;">Figure 20: ROC curve on the validation set.</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/goal_rate_percentile_val.png" alt="goal_rate_percentile_validation">
+    <img src="/public/milestone2/goal_rate_percentile_val.png" alt="goal_rate_percentile_validation">
     <figcaption style="font-size: 15px;text-align: center;">Figure 21: Goal Rate on the validation set.</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/proportion_percentile_val.png" alt="proportion_percentile_validation">
+    <img src="/public/milestone2/proportion_percentile_val.png" alt="proportion_percentile_validation">
     <figcaption style="font-size: 15px;text-align: center;">Figure 22: Goal proportion on the validation set.</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/calibration_val.png" alt="calibration_validation">
+    <img src="/public/milestone2/calibration_val.png" alt="calibration_validation">
     <figcaption style="font-size: 15px;text-align: center;">Figure 23: Calibration on the validation set.</figcaption>
 </figure>
 
@@ -538,6 +542,7 @@ Nevertheless, we conclude that our best model for this section is the neural net
 5. [KNN](https://www.comet.ml/jaihon/ift6758-project/fc093cf3ac61416391c5f3fca4416117)
 
 ## Question 7: Evaluation
+> The code for this section can be found in project/ift6758/models/evaluation.py
 
 ### Selected models
 
@@ -563,28 +568,28 @@ In order to test our models on the test dataset (regular and playoff games from 
 For this section, we have selected as per requested, the 3 Logistic Regression models as well as the best XG_boost model and our overall best performing model (on the validation set), a Neural Network model. First, let us take a look at the overall performance of these models on the test set composed of the games from the regular season of 2019-2020. At first glance, we can clearly distinguish 3 models that stand out from the other 2 by taking a look at figure 25. They are, unsurprisingly, the Neural Network, XG Boost and Logistic Regression #3 models. As the other Logistic Regression models (1 and 2) were only using 1 feature each (angle_net, distance_net respectively), it is expected that they would perform relatively poorly based on such restricted information. It is interesting to note that although our two best models are XG Boost and the Neural Network model, the Logistic Regression #3 does not seem too far behind in terms of AUC score (0.76, 0.75, 0.69 respectively). It is important to note that, since the confidence interval of these measures are not displayed, we are not able to say with confidence that they perform similarly or not. Alghough intuitively, it does seem that XG boost and the Neural Network perform better. By looking at the confusion matrix (figure 24), one could think that since the recall of the XG boost and the Logistic Regression #3 model are essentially 0 (0 True positives), these models should have a similar AUC score as the 2 worst models (Log.Regres #1 and #2). This would be a wrong assumption though. As the default threshold for these models is 0.5, they do indeed all perform quite terribly at this threshold setting. Nevertheless, the ROC score enables the evaluation of the predictive performance of the model at different thresholds and it is clear that the Logistic Regression 3 and the XG Boost models perform significantly better than the two bottom tier models at a specific threshold. In fact, the XG boost model performs at similar levels than the neural network at a given threshold. If we compare the overall performance of all models between the test (figure 25) set and the validation set (figure 20), we clearly see very similar AUC scores. This reflects the rather robust generalisation of our models, at least on similar data (in terms of game types). By looking at the goal rate figure (figure 26) we are able to evaluate the variation of goal proportion in fonction of the percentile of the model probability. For instance: Is the highest probability percentile associated with increased goal / goal+shot (we will refer to this as :ratio)? In a way, this reflects the certainty of our models. We clearly dinstinguish 3 models that behave in a way that one would expect a decent model to perform. As such, our 3 top models have a higher ratio in the upper percentiles (100-80 for instance) compared to the low tier models. More importantly, this ratio decreases with the decrease of percentile, thus reflecting the fact that the smaller the probability is of scoring, the lower the ratio will be. Basically, our best models have less uncertainty than our low tier models. It is interesting to note that although the Logistic Regression #3 model performs relatively well, XG Boost and the Neural Network models seem to have less uncertainty, at least, at the higher percentiles (20%, 40% respectively). Another way to look at this is by looking at the cumulative goals in fonction of the shot probability percentile (Figure 27), where a good model would be a logarithmic curve, basically translating the fact that less and less goals will be scored at lower probability percentiles. Once again, these tendencies are very similar between our test set (regular season 2019-2020) and our training data. Lastly, the calibration graph (figure 28)enables one to determine if the predicted probabilities are linearly correlated with proportion of positive predictions and therefore reflects the confidence of the models predictions. A perfect model would have x = y as mentioned before. We can observe a positive correlation between x and y for our 2 top tier models (XG Boost and Neural Network), but not quite a perfect linear correlation. Concerning the remaining models, since their prediction distribution was centered around a very restricted interval, we did not obtain an interpretable visual. Except for the realisation that these models were incapable of producing a wide interval of predicted probabilities.
 </div>
 <figure style="display: block;margin-left: auto; margin-right: auto;width:100%;height:100%;">
-    <img src="/public/conf_matrix_regular.png" alt="conf_matrix_regular">
+    <img src="/public/milestone2/conf_matrix_regular.png" alt="conf_matrix_regular">
     <figcaption style="font-size: 15px;text-align: center;">Figure 24: Confusion Matrices Regular Season (2019-2020)</figcaption>
 </figure>
 
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/roc_regular.png" alt="best_shot_nn_calib">
+    <img src="/public/milestone2/roc_regular.png" alt="best_shot_nn_calib">
     <figcaption style="font-size: 15px;text-align: center;">Figure 25: ROC Regular Season (2019-2020)</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/goal_rate_vs_percentile_regular.png" alt="best_shot_nn_calib">
+    <img src="/public/milestone2/goal_rate_vs_percentile_regular.png" alt="best_shot_nn_calib">
     <figcaption style="font-size: 15px;text-align: center;">Figure 26: Goal rate Regular Season (2019-2020)</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/proportion_goal_percentile_regular.png" alt="best_shot_nn_calib">
+    <img src="/public/milestone2/proportion_goal_percentile_regular.png" alt="best_shot_nn_calib">
     <figcaption style="font-size: 15px;text-align: center;">Figure 27: Goal rate cumulative Regular Season (2019-2020)</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/calibration_regular.png" alt="best_shot_nn_calib">
+    <img src="/public/milestone2/calibration_regular.png" alt="best_shot_nn_calib">
     <figcaption style="font-size: 15px;text-align: center;">Figure 28: Calibration results Regular Season (2019-2020)</figcaption>
 </figure>
 
@@ -595,32 +600,32 @@ For this section, we have selected as per requested, the 3 Logistic Regression m
 We saw that our models mostly generalize very well on regular season games when we compared them to our validation set results. However, we can clearly see that our models perform poorly on playoff games. Throughout Figure 29 to Figure 33, we can see that our same models perform a little bit worse on playoff games compared to regular season games. This was expected since we have trained our models only on regular season games. Also, the playoff games are fundamentally different from the regular season games ("Anything can happen in the playoffs!"). The reason for this is that the playoff games are elimination games, which means that the teams and players always play with heavy pressure. In addition, the environment and the "energy" is different during the playoffs, which ultimately could lead to features that we simply don't have access to.
 <br>
 <br>
-It would be interesting to see if adding external features such as a metric of the crowd energy(Noise volume) would help our models to generalize. Another interesting thing would be to train our models on playoff games instead of regular season games to see if it can generalize better on both regular season and playoff games.
+It would be interesting to see if adding external features such as a metric of the crowd energy (Noise volume) would help our models to generalize. Another interesting thing would be to train our models on playoff games instead of regular season games to see if it can generalize better on both regular season and playoff games.
 </div>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:100%;height:100%;">
-    <img src="/public/conf_matrix_playoffs.png" alt="conf_matrix_playoffs">
+    <img src="/public/milestone2/conf_matrix_playoffs.png" alt="conf_matrix_playoffs">
     <figcaption style="font-size: 15px;text-align: center;">Figure 29: Confusion Matrices Playoffs season (2019-2020)</figcaption>
 </figure>
 
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/roc_playoffs.png" alt="best_shot_nn_calib">
+    <img src="/public/milestone2/roc_playoffs.png" alt="best_shot_nn_calib">
     <figcaption style="font-size: 15px;text-align: center;">Figure 30: ROC Playoffs season (2019-2020)</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/goal_rate_vs_percentile_playoff.png" alt="best_shot_nn_calib">
+    <img src="/public/milestone2/goal_rate_vs_percentile_playoff.png" alt="best_shot_nn_calib">
     <figcaption style="font-size: 15px;text-align: center;">Figure 31: Goal rate Playoffs season (2019-2020)</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/proportion_goal_percentile_playoffs.png" alt="best_shot_nn_calib">
+    <img src="/public/milestone2/proportion_goal_percentile_playoffs.png" alt="best_shot_nn_calib">
     <figcaption style="font-size: 15px;text-align: center;">Figure 32: Goal rate cumulative Playoffs season (2019-2020)</figcaption>
 </figure>
 
 <figure style="display: block;margin-left: auto; margin-right: auto;width:75%;height:75%;">
-    <img src="/public/calibration_curve_playoffs.png" alt="best_shot_nn_calib">
+    <img src="/public/milestone2/calibration_curve_playoffs.png" alt="best_shot_nn_calib">
     <figcaption style="font-size: 15px;text-align: center;">Figure 33: Calibration results season (2019-2020)</figcaption>
 </figure>
 

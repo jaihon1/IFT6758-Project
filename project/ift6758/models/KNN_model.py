@@ -9,20 +9,20 @@ from comet_ml import Experiment
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve, f1_score
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.neighbors import KNeighborsClassifier,KNeighborsRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import GridSearchCV as GS
-from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
 import matplotlib.ticker as mtick
 from sklearn.calibration import CalibrationDisplay
 from sklearn.metrics import plot_confusion_matrix
 
-
+from ift6758.utils.utils import plot_roc_curve, plot_goal_rate, plot_cumulative_sum, plot_calibration
 
 
 
 #%%
-data = pd.read_csv(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'data/games_data/games_data_all_seasons.csv')),index_col=0)
+data = pd.read_csv(('ift6758/data/games_data/games_data_all_seasons.csv'), index_col=0)
 # split into train and test
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
 data = data[data['Speed'] < 300]
@@ -86,7 +86,7 @@ def prep_data(data_train):
 
 # %%
 
-def train_model(X_train, y_train, n_neighbors = [5, 6, 7,8], weights=['uniform', 'distance'], n_estimators=[100,200,300],criterion=['squared_error','poisson'],  comet=False, train_KNN=False, train_forest=False):
+def train_model(X_train, y_train, selected_features, n_neighbors = [5, 6, 7,8], weights=['uniform', 'distance'], n_estimators=[100,200,300],criterion=['squared_error','poisson'],  comet=False, train_KNN=False, train_forest=False):
     if train_KNN is True:
         tuned_parameters = [
         {"n_neighbors": n_neighbors, "weights": weights}]
@@ -130,83 +130,6 @@ def train_model(X_train, y_train, n_neighbors = [5, 6, 7,8], weights=['uniform',
 
     return GS_model
 
-def plot_roc_curve(pred_probs, true_y, markers, labels, save_file=None):
-    sns.set_theme()
-    plt.grid(True)
-    for proba, marker, label in zip(pred_probs, markers, labels):
-        score = roc_auc_score(true_y, proba)
-        fpr, tpr, _ = roc_curve(true_y, proba)
-        plt.plot(fpr, tpr, linestyle=marker, label=label+f' (area={score:.2f})')
-    plt.xlabel('False positive rate')
-    plt.ylabel('True positive rate')
-    plt.legend()
-    if save_file is not None:
-        plt.savefig(save_file, format='png')
-    plt.show()
-
-
-def create_percentile_model(proba, actual_y):
-    percentile = np.arange(0, 102, 2)
-    percentile_pred = np.percentile(proba, percentile)
-    percentile_pred = np.unique(percentile_pred)
-    percentile_pred = np.concatenate([[0], percentile_pred])
-
-    y_valid_df = pd.DataFrame(actual_y)
-    percentile_pred = np.unique(percentile_pred)
-    y_valid_df['bins_percentile'] = pd.cut(proba, percentile_pred)
-    return percentile, percentile_pred, y_valid_df
-
-
-def plot_goal_rate(probas, actual_y,labels, save_file=None):
-    sns.set_theme()
-    for proba, label in zip(probas, labels):
-        percentile, percentile_pred, y_valid_df = create_percentile_model(proba, actual_y)
-        bins = np.linspace(0,100,len(y_valid_df['bins_percentile'].unique()))[1:]
-        goal_rate_by_percentile = y_valid_df.groupby(by=['bins_percentile']).apply(lambda g: g['is_goal'].sum()/len(g))
-        g = sns.lineplot(x=bins, y=goal_rate_by_percentile*100, label=label)
-        ax = g.axes
-        ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
-    plt.xlim(100, 0)
-    plt.ylim(0, 100)
-    plt.xlabel('Shot probability model percentile')
-    plt.ylabel('Goals / (Shots + Goals)')
-    if save_file is not None:
-        plt.savefig(save_file, format='png')
-    plt.show()
-
-
-def plot_cumulative_sum(probas, actual_y, labels, save_file=None):
-    sns.set_theme()
-    for proba, label in zip(probas, labels):
-        percentile, percentile_pred, y_valid_df = create_percentile_model(proba, actual_y)
-        bins = np.linspace(0,100,len(y_valid_df['bins_percentile'].unique()))[1:]
-        total_number_goal = (actual_y == 1).sum()
-        sum_goals_by_percentile = y_valid_df.groupby(by='bins_percentile').apply(lambda g: g['is_goal'].sum()/total_number_goal)
-        cum_sum_goals = sum_goals_by_percentile[::-1].cumsum(axis=0)[::-1]
-
-        g = sns.lineplot(x=bins, y=cum_sum_goals*100, label=label)
-        ax = g.axes
-        ax.yaxis.set_major_formatter(mtick.PercentFormatter(100))
-    plt.xlim(100, 0)
-    plt.ylim(0, 100)
-    plt.xlabel('Shot probability model percentile')
-    plt.ylabel('Proportion')
-    if save_file is not None:
-        plt.savefig(save_file, format='png')
-    plt.show()
-
-
-def plot_calibration(probas, actual_y, labels, save_file=None):
-    sns.set_theme()
-    fig = plt.figure()
-    ax = plt.axes()
-    for proba, label in zip(probas, labels):
-        disp = CalibrationDisplay.from_predictions(actual_y, proba, n_bins=25, ax=ax, name=label, ref_line=False)
-    plt.xlim(0,0.3)
-    plt.legend(loc=9)
-    if save_file is not None:
-        plt.savefig(save_file, format='png')
-    plt.show()
 
 def find_optimal_threshold(predictions, true_y):
     scores = []
@@ -251,7 +174,7 @@ def main(data_train):
 
 
     if TOGGLE_TRAIN:
-        GS_model = train_model(X_train, y_train, comet=True, train_forest=TRAIN_FOREST, train_KNN=TRAIN_KNN)
+        GS_model = train_model(X_train, y_train, selected_features, comet=True, train_forest=TRAIN_FOREST, train_KNN=TRAIN_KNN)
         if TRAIN_KNN:
             joblib.dump(GS_model, 'KNN_model.pkl')
 
@@ -260,8 +183,8 @@ def main(data_train):
 
     else:
         # File path
-        filepath_KNN = 'KNN_model.pkl'
-        filepath_forest = 'rngforest.pkl'
+        filepath_KNN = 'models/KNN_Final_Final_model.pkl'
+        filepath_forest = 'models/Randomforestclassifier_Final_model.pkl'
 
         # Load the model
         model_KNN = joblib.load(filepath_KNN , mmap_mode ='r')
@@ -290,21 +213,22 @@ def main(data_train):
         predictions_forest[predictions_forest <= best_forest_threshold] = 0
         predictions_forest[predictions_forest > best_forest_threshold] = 1
 
-        print(confusion_matrix(y_valid,predictions_KNN))
+        print(confusion_matrix(y_valid, predictions_KNN))
         print(confusion_matrix(y_valid, predictions_forest))
 
     
 
         # Goal rate:
-        plot_goal_rate([predictions_KNN_prob,predictions_forest_prob], y_valid, ['k-NNRegressor', 'RandomForestRegressor'], 'goal_rate')
+        plot_goal_rate([predictions_KNN_prob,predictions_forest_prob], [y_valid, y_valid], ['k-NNRegressor', 'Random Forest'], 'goal_rate')
 
         #Cumsum
-        plot_cumulative_sum([predictions_KNN_prob,predictions_forest_prob], y_valid, ['k-NNRegressor', 'RandomForestRegressor'], 'cum_sum')
+        plot_cumulative_sum([predictions_KNN_prob,predictions_forest_prob], [y_valid, y_valid], ['k-NNRegressor', 'Random Forest'], 'cum_sum')
 
         #Calibration
-        plot_cumulative_sum([predictions_KNN_prob, predictions_forest_prob], y_valid, ['k-NNRegressor', 'RandomForestRegressor'], 'calibration')
+        plot_calibration([predictions_KNN_prob, predictions_forest_prob], [y_valid, y_valid], ['k-NNRegressor', 'Random Forest'], 'calibration')
+
         # ROC curve
-        plot_roc_curve([predictions_KNN_prob, predictions_forest_prob], y_valid, ['-', '-'], ['k-NNRegressor', 'RandomForestRegressor'], 'roc_curve')
+        plot_roc_curve([predictions_KNN_prob, predictions_forest_prob], [y_valid, y_valid], ['-', '-'], ['k-NNRegressor', 'Random Forest'], 'roc_curve')
     
 
 
