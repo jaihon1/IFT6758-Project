@@ -8,7 +8,6 @@ import matplotlib.ticker as mtick
 import os
 from ift6758.utils.utils import plot_roc_curve, plot_calibration, plot_cumulative_sum, plot_goal_rate
 
-from sklearn.calibration import CalibrationDisplay
 from tensorflow import keras
 
 from sklearn.model_selection import train_test_split

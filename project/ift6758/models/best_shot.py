@@ -11,7 +11,6 @@ import matplotlib.ticker as mtick
 from comet_ml import Experiment
 
 # import keras
-from keras.callbacks import ModelCheckpoint
 from sklearn.calibration import CalibrationDisplay
 from tensorflow import keras
 
@@ -25,7 +24,7 @@ from ift6758.utils.utils import plot_roc_curve, plot_goal_rate, plot_cumulative_
 # %%
 # Load the data
 # data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
-data = pd.read_csv("games_data/games_data_all_seasons.csv")
+data = pd.read_csv("../data/games_data/games_data_all_seasons.csv")
 
 # split into train and test
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
@@ -201,7 +200,7 @@ def train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch, lr):
                   metrics=['accuracy'])
 
     filepath = 'nn.epoch{epoch:02d}-loss{val_loss:.2f}.hdf5'
-    checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+    checkpoint = keras.callbacks.ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
     callbacks = [checkpoint]
 
     # Train the model
