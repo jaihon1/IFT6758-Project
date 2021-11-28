@@ -51,7 +51,7 @@ def plot_roc_curve(pred_probs, true_y, linestyles, labels, name_file=None):
     plt.xlabel('False positive rate')
     plt.ylabel('True positive rate')
     plt.legend()
-    if False:
+    if name_file:
         plt.savefig(name_file)
     plt.show()
 
@@ -105,7 +105,7 @@ def plot_goal_rate(probas, actual_y, labels, name_file=None):
     plt.ylim(0, 100)
     plt.xlabel('Shot probability model percentile')
     plt.ylabel('Goals / (Shots + Goals)')
-    if False:
+    if name_file:
         plt.savefig(name_file)
     plt.show()
 
@@ -137,7 +137,7 @@ def plot_cumulative_sum(probas, actual_y, labels, name_file=None):
     plt.ylim(0, 100)
     plt.xlabel('Shot probability model percentile')
     plt.ylabel('Proportion')
-    if False:
+    if name_file:
         plt.savefig(name_file)
     plt.show()
 
@@ -161,7 +161,7 @@ def plot_calibration(probas, actual_y, labels, name_file=None):
         disp = CalibrationDisplay.from_predictions(y, proba, n_bins=25, ax=ax, name=label, ref_line=False)
     plt.xlim(0, 1)
     plt.legend(loc=9)
-    if False:
+    if name_file:
         plt.savefig(name_file)
     plt.show()
 
@@ -208,6 +208,19 @@ def prep_data(data_train, selected_features, categorical_features, norm=None):
 
 
 def plot_relation(x, ys, labels, xlabel, ylabel, name_file=None):
+    """
+    Plot the relation between x and y give as input
+    Args:
+        x: a list of arrays
+        ys: a list of arrays
+        labels: list of strings, labels to put on the legend
+        xlabel: str, name of the x axis
+        ylabel: str, name of the y axis
+        name_file: str, name of the file to save, None if you don't want to save
+
+    Returns:
+
+    """
     sns.set_theme()
     for y, label in zip(ys,labels):
         plt.plot(x, y, label=label)
