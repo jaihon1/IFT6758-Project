@@ -23,8 +23,7 @@ from ift6758.utils.utils import plot_roc_curve, plot_goal_rate, plot_cumulative_
 
 # %%
 # Load the data
-# data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
-data = pd.read_csv("../data/games_data/games_data_all_seasons.csv")
+data = pd.read_csv("ift6758/data/games_data/games_data_all_seasons.csv")
 
 # split into train and test
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
@@ -258,9 +257,9 @@ def main(data_train):
         # File path
 
         # Load the model
-        model = keras.models.load_model('../../models/nn/best_shot_nn_final.hdf5', compile=True)
-        model1 = keras.models.load_model('../../models/nn/neuralnet_nobonus.hdf5', compile=True)
-        model2 = keras.models.load_model('../../models/nn/neuralnet_no_dropout.hdf5', compile=True)
+        model = keras.models.load_model('ift6758/models/nn/best_shot_nn_final.hdf5', compile=True)
+        model1 = keras.models.load_model('ift6758/models/nn/neuralnet_nobonus.hdf5', compile=True)
+        model2 = keras.models.load_model('ift6758/models/nn/neuralnet_no_dropout.hdf5', compile=True)
 
         # Generate predictions for samples
         predictions = model.predict(x_valid)
