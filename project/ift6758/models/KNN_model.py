@@ -204,7 +204,7 @@ def main(data_train):
         # best_forest_threshold = find_optimal_threshold(predictions_forest_prob, y_train)
         best_KNN_threshold=0.73
         best_forest_threshold = 0.44
-        predictions_KNN_prob = model_KNN.predict(X_valid[:50])
+        predictions_KNN_prob = model_KNN.predict(X_valid)
         predictions_forest_prob = model_forest.predict(X_valid)
         predictions_KNN = predictions_KNN_prob.copy()
         predictions_forest = predictions_forest_prob.copy()
@@ -213,21 +213,22 @@ def main(data_train):
         predictions_forest[predictions_forest <= best_forest_threshold] = 0
         predictions_forest[predictions_forest > best_forest_threshold] = 1
 
-        print(confusion_matrix(y_valid[:50], predictions_KNN))
+        print(confusion_matrix(y_valid, predictions_KNN))
         print(confusion_matrix(y_valid, predictions_forest))
 
     
 
         # Goal rate:
-        plot_goal_rate([predictions_KNN_prob,predictions_forest_prob], [y_valid[:50], y_valid], ['k-NNRegressor', 'Random Forest'], 'goal_rate')
+        plot_goal_rate([predictions_KNN_prob,predictions_forest_prob], [y_valid, y_valid], ['k-NNRegressor', 'Random Forest'], 'goal_rate')
 
         #Cumsum
-        plot_cumulative_sum([predictions_KNN_prob,predictions_forest_prob], [y_valid[:50], y_valid], ['k-NNRegressor', 'Random Forest'], 'cum_sum')
+        plot_cumulative_sum([predictions_KNN_prob,predictions_forest_prob], [y_valid, y_valid], ['k-NNRegressor', 'Random Forest'], 'cum_sum')
 
         #Calibration
-        plot_calibration([predictions_KNN_prob, predictions_forest_prob], [y_valid[:50], y_valid], ['k-NNRegressor', 'Random Forest'], 'calibration')
+        plot_calibration([predictions_KNN_prob, predictions_forest_prob], [y_valid, y_valid], ['k-NNRegressor', 'Random Forest'], 'calibration')
+
         # ROC curve
-        plot_roc_curve([predictions_KNN_prob, predictions_forest_prob], [y_valid[:50], y_valid], ['-', '-'], ['k-NNRegressor', 'Random Forest'], 'roc_curve')
+        plot_roc_curve([predictions_KNN_prob, predictions_forest_prob], [y_valid, y_valid], ['-', '-'], ['k-NNRegressor', 'Random Forest'], 'roc_curve')
     
 
 
