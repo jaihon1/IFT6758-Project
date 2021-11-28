@@ -22,7 +22,7 @@ from ift6758.utils.utils import plot_roc_curve, plot_goal_rate, plot_cumulative_
 
 
 #%%
-data = pd.read_csv(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'data/games_data/games_data_all_seasons.csv')), index_col=0)
+data = pd.read_csv(('ift6758/data/games_data/games_data_all_seasons.csv'), index_col=0)
 # split into train and test
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
 data = data[data['Speed'] < 300]
@@ -183,8 +183,8 @@ def main(data_train):
 
     else:
         # File path
-        filepath_KNN = '../../models/KNN_Final_Final_model.joblib'
-        filepath_forest = '../../models/Randomforestclassifier_Final_model.joblib'
+        filepath_KNN = 'models/KNN_Final_Final_model.pkl'
+        filepath_forest = 'models/Randomforestclassifier_Final_model.pkl'
 
         # Load the model
         model_KNN = joblib.load(filepath_KNN , mmap_mode ='r')

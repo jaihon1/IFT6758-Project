@@ -18,7 +18,7 @@ from ift6758.utils.utils import plot_roc_curve, plot_goal_rate, plot_cumulative_
 random_state = np.random.RandomState(42)
 
 #%%
-data = pd.read_csv('../data/games_data/games_data_all_seasons.csv')
+data = pd.read_csv('ift6758/data/games_data/games_data_all_seasons.csv')
 
 data['game_pk'] = data['game_pk'].apply(lambda i: str(i))
 
