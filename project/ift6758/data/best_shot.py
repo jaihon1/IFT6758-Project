@@ -91,28 +91,34 @@ def prep_data(data_train, bonus):
 
     else:
         # Set seleceted features
-        selected_features = [
-            'is_goal', 'side',
-            'shot_type', 'team_side', 'period',
-            'period_type', 'coordinate_x', 'coordinate_y',
-            'distance_net', 'angle_net', 'previous_event_type',
-            'previous_event_x_coord',
-            'previous_event_y_coord',
-            'previous_event_time_seconds', 'shot_last_event_delta',
-            'shot_last_event_distance', 'Change_in_shot_angle', 'Speed', 'Rebound'
-        ]
+        selected_features = ['side', 'shot_type',
+                         'period', 'period_type', 'coordinate_x', 'coordinate_y', 'empty_net',
+                         'is_goal', 'distance_net', 'angle_net', 'previous_event_type',
+                         'time_since_pp_started', 'current_time_seconds',
+                         'current_friendly_on_ice', 'current_opposite_on_ice']
+
+            # 'is_goal', 'side',
+            # 'shot_type', 'team_side', 'period',
+            # 'period_type', 'coordinate_x', 'coordinate_y',
+            # 'distance_net', 'angle_net', 'previous_event_type',
+            # 'previous_event_x_coord',
+            # 'previous_event_y_coord',
+            # 'previous_event_time_seconds', 'shot_last_event_delta',
+            # 'shot_last_event_distance', 'Change_in_shot_angle', 'Speed', 'Rebound'
+        
         data = data_train[selected_features]
 
         # Drop rows with NaN values
         data = data.dropna(subset = selected_features)
 
         # Encoding categorical features into a one-hot encoding
-        categorical_features = [
-            'side',
-            'shot_type', 'team_side', 'period',
-            'period_type', 'previous_event_type',
-            'Rebound'
-        ]
+        categorical_features = ['side', 'shot_type', 'period', 'period_type', 'empty_net', 'previous_event_type']
+        # [
+        #     'side',
+        #     'shot_type', 'team_side', 'period',
+        #     'period_type', 'previous_event_type',
+        #     'Rebound'
+        # ]
 
         features_standardizing = [
             'coordinate_x', 'coordinate_y',
@@ -246,16 +252,16 @@ def train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch, lr):
 
     # Create the model
     model = keras.Sequential([
-        keras.layers.Dense(64, activation='relu', input_shape=(x_train.shape[1],)),
-        keras.layers.Dropout(0.05),
-        keras.layers.Dense(32, activation='relu'),
-        keras.layers.Dropout(0.05),
-        keras.layers.Dense(64, activation='relu'),
-        keras.layers.Dropout(0.05),
+        keras.layers.Dense(32, activation='relu', input_shape=(x_train.shape[1],)),
+        #keras.layers.Dropout(0.05),
+        keras.layers.Dense(16, activation='relu'),
+        #keras.layers.Dropout(0.05),
+        #keras.layers.Dense(64, activation='relu'),
+        #keras.layers.Dropout(0.05),
         keras.layers.Dense(1, activation='sigmoid')
     ])
 
-    opt = keras.optimizers.Adam(learning_rate=lr)
+    opt = SGD(lr=1.0, momentum=0)
 
     # Compile the model
     model.compile(optimizer=opt,
@@ -296,7 +302,7 @@ def train_nn(x_train, x_valid, y_train, y_valid, features, comet=False):
 
     print('Input shape:', x_train.shape)
 
-    clf = train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch=30, lr=0.001)
+    clf = train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch=20, lr=0.1)
 
 
     if comet:
