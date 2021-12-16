@@ -7,12 +7,13 @@ import numpy as np
 
 class EventGenerator:
     """
-        Class that builds a list of desired events from liveData and ultimately generates a dataframe with the 
+        Class that builds a list of desired events from liveData and ultimately generates a dataframe with the
         selected features. This class points to TidyEvent class to generate a dictionnary to be able to create the dataframe.
     """
 
-    def __init__(self, game_pk, home, away, sides, live_events, target_events=['GOAL', 'SHOT']) -> None:
+    def __init__(self, game_pk, home, away, sides, live_events, game_type, target_events=['GOAL', 'SHOT']) -> None:
         self.game_pk = game_pk
+        self.game_type = game_type
         self.live_events = live_events
 
         self.target_events = target_events
@@ -104,6 +105,7 @@ class EventGenerator:
                 # Build tidy event object
                 tidy_event = TidyEvent(
                     self.game_pk,
+                    self.game_type,
                     side,
                     event['about']['eventIdx'], event_type,
                     event['team']['triCode'],
@@ -285,12 +287,13 @@ class TidyEvent:
         Class that generates a dictionnary from selected features in liveData.
     """
 
-    def __init__(self, game_pk, side, event_index, event_type, team_id, period, period_type, period_time, datetime, previous_event_type, previous_event_team,
+    def __init__(self, game_pk, game_type, side, event_index, event_type, team_id, period, period_type, period_time, datetime, previous_event_type, previous_event_team,
                  previous_event_x_coord, previous_event_y_coord, previous_event_period, previous_event_period_time, previous_event_time,
                  coordinate_x=None, coordinate_y=None, goal_strength=None, shot_type=None, player_shooter=None,
                  player_scorer=None, player_goalie=None, empty_net=None, is_goal=None, team_side=None,
                  distance_net=None, angle_net=None) -> None:
         self.game_pk = game_pk
+        self.game_type = game_type
         self.side = side
         self.event_index = event_index
         self.event_type = event_type
@@ -379,6 +382,7 @@ class TidyEvent:
         """
         return {
             'game_pk': self.game_pk,
+            'game_type': self.game_type,
             'side': self.side,
             'event_index': self.event_index,
             'event_type': self.event_type,

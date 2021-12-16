@@ -3,7 +3,7 @@ from EventGenerator import EventGenerator
 import pandas as pd
 import numpy as np
 import os
-from feat_eng2 import add_new_features
+from ift6758.features.feat_eng2 import add_new_features
 
 DEBUG_MODE = False
 
@@ -29,22 +29,24 @@ def main():
     data = None
     dataframe = pd.DataFrame()
     dirpath = os.path.join(os.path.dirname(__file__))
+    print(dirpath)
     dirpath_games_data = os.path.join(dirpath, 'games_data')
 
     for season in games_info.season:
         print(f'Creating  dataframe for {season} season...')
 
-        for i, data in enumerate(games_info.get_regular_games()[season]):
+        for i, data in enumerate(games_info.all_games[season]):
             live_events = data['liveData']['plays']['allPlays']
             game_pk = data['gamePk']
             home = data['gameData']['teams']['home']['triCode']
             away = data['gameData']['teams']['away']['triCode']
+            game_type =  data['gameData']['game']['type']
             sides = dict()
 
             for period in data['liveData']['linescore']['periods']:
                 sides[period['num']] = {home: period['home'].setdefault('rinkSide', np.NaN), away: period['away'].setdefault('rinkSide', np.NaN)}
 
-            game = EventGenerator(game_pk, home, away, sides, live_events)
+            game = EventGenerator(game_pk, home, away, sides, live_events, game_type)
 
             if len(dataframe) == 0:
                 dataframe = game.build()
@@ -56,8 +58,8 @@ def main():
             break
 
 
-    dataframe.to_csv(f'{dirpath_games_data}/games_data_all_seasons.csv')
-    add_new_features()
+    dataframe.to_csv(f'{dirpath_games_data}/games_data_all_seasons_full.csv')
+    add_new_features(f'{dirpath_games_data}/games_data_all_seasons_full.csv')
 
 
 
