@@ -6,8 +6,8 @@ import numpy as np
 from pathlib import Path
 
 
-def add_new_features(csv_path = os.path.join(os.path.dirname(__file__),'games_data/games_data_all_seasons_full.csv')):
-    df_filtered = pd.read_csv(csv_path)
+def add_new_features(dataframe):
+    df_filtered = dataframe
     df_filtered.drop(columns=['period_time','previous_event_period_time'], inplace=True)
     df_filtered['shot_last_event_delta'] = [t1 - t0 for t1, t0 in zip(df_filtered['current_time_seconds'], df_filtered['previous_event_time_seconds'])]
     df_filtered['shot_last_event_distance'] = [np.sqrt((x2-x1)**2 + (y2 - y1)**2) for x1, x2, y1, y2 in zip(df_filtered['previous_event_x_coord'], df_filtered['coordinate_x'], df_filtered['previous_event_y_coord'], df_filtered['coordinate_y'])]
@@ -19,8 +19,6 @@ def add_new_features(csv_path = os.path.join(os.path.dirname(__file__),'games_da
     df_filtered.loc[df_filtered['Rebound'] == 'False', 'Change_in_shot_angle'] = '0'
     # ### Adding Speed feature: distance from the previous event, divided by the time since the previous event
     df_filtered['Speed'] = df_filtered['shot_last_event_distance'] / df_filtered['shot_last_event_delta']
-    df_filtered.to_csv(csv_path, header=True, index=True)
     df_filtered.drop(columns=df_filtered.columns[0], inplace=True)
-    df_filtered.to_csv(csv_path)
-
+    return df_filtered
 
