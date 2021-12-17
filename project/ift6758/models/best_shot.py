@@ -236,6 +236,7 @@ def train_nn(x_train, x_valid, y_train, y_valid, features, comet=False):
         )
         experiment.log_parameters({'model': 'nn', 'feature': features, 'class_weight': class_weight})
 
+<<<<<<< HEAD:project/ift6758/models/best_shot.py
 <<<<<<< HEAD:project/ift6758/data/best_shot.py
 
     print('Input shape:', x_train.shape)
@@ -244,6 +245,9 @@ def train_nn(x_train, x_valid, y_train, y_valid, features, comet=False):
 =======
     clf = train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch=30, lr=0.001)
 >>>>>>> 9da31f938f05834e4a231a4fea8953303977da3a:project/ift6758/models/best_shot.py
+=======
+    clf = train_model(x_train, x_valid, y_train, y_valid, class_weight, epoch=30, lr=0.001)
+>>>>>>> origin/main:project/ift6758/data/best_shot.py
 
     if comet:
         model_name = 'nn' + '_'
