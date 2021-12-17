@@ -11,10 +11,12 @@ gunicorn can be installed via:
 import os
 from pathlib import Path
 import logging
-from flask import Flask, jsonify, request, abort
+from typing import List
+from flask import Flask, Response, jsonify, request, abort
 import sklearn
 import pandas as pd
 import joblib
+from custom_exceptions import EmptyLogs
 
 
 
@@ -22,6 +24,25 @@ LOG_FILE = os.environ.get("FLASK_LOG", "flask.log")
 
 
 app = Flask(__name__)
+
+# class EmptyLogs(Exception):
+#     status_code = 400
+
+#     def __init__(self, message, status_code=None, payload=None):
+#         Exception.__init__(self)
+#         self.message = message
+#         if status_code is not None:
+#             self.status_code = status_code
+#         self.payload = payload
+
+#     def log_error(self):
+#         logging.error(f"Empty Log Error: {self.to_dict()}")
+
+#     def to_dict(self):
+#         rv = dict(self.payload or ())
+#         rv['message'] = self.message
+#         rv['status_code'] = self.status_code
+#         return rv
 
 
 @app.before_first_request
@@ -37,15 +58,39 @@ def before_first_request():
     pass
 
 
+@app.errorhandler(EmptyLogs)
+def handle_foo_exception(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    error.log_error()
+
+    return response
+
 @app.route("/logs", methods=["GET"])
 def logs():
-    """Reads data from the log file and returns them as the response"""
-    
-    # TODO: read the log file specified and return the data
-    raise NotImplementedError("TODO: implement this endpoint")
+    """
+        Reads data from the log file and returns them as the response.
+    """
+    data: List = []
+    try:
+        with open('flask.log') as f:
+            # Read the log file
+            lines = f.readlines()
 
-    response = None
-    return jsonify(response)  # response must be json serializable!
+            # Build the response data
+            for line in lines:
+                r = line.split('\t\t')
+                data.append(r[0])
+
+            app.logger.info('Log file successfully read.')
+    except Exception as e:
+        app.logger.error('Failed to read Log file: '+ str(e))
+
+    # # Verify that the logs is not empty
+    # if not data:
+    #     raise EmptyLogs('Logs are empty.', status_code=404)
+
+    return jsonify(data), 200 # response must be json serializable!
 
 
 @app.route("/download_registry_model", methods=["POST"])
@@ -63,7 +108,7 @@ def download_registry_model():
             version: (required),
             ... (other fields if needed) ...
         }
-    
+
     """
     # Get POST json data
     json = request.get_json()
@@ -71,11 +116,11 @@ def download_registry_model():
 
     # TODO: check to see if the model you are querying for is already downloaded
 
-    # TODO: if yes, load that model and write to the log about the model change.  
+    # TODO: if yes, load that model and write to the log about the model change.
     # eg: app.logger.info(<LOG STRING>)
-    
+
     # TODO: if no, try downloading the model: if it succeeds, load that model and write to the log
-    # about the model change. If it fails, write to the log about the failure and keep the 
+    # about the model change. If it fails, write to the log about the failure and keep the
     # currently loaded model
 
     # Tip: you can implement a "CometMLClient" similar to your App client to abstract all of this
@@ -102,7 +147,7 @@ def predict():
 
     # TODO:
     raise NotImplementedError("TODO: implement this enpdoint")
-    
+
     response = None
 
     app.logger.info(response)
