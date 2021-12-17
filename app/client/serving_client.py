@@ -27,12 +27,18 @@ class ServingClient:
         Args:
             X (Dataframe): Input dataframe to submit to the prediction service.
         """
-
+        X = get_input_features_df()
+        print(X)
+        r = ("http:// 0.0.0.0:<PORT>/predict", json.loads(X.to_json()))
+        print(r.json())
         raise NotImplementedError("TODO: implement this function")
 
     def logs(self) -> dict:
         """Get server logs"""
-
+        X = get_input_features_df()
+        print(X)
+        r = ("http:// 0.0.0.0:<PORT>/logs", json.loads(X.to_json()))
+        print(r.json())
         raise NotImplementedError("TODO: implement this function")
 
     def download_registry_model(self, workspace: str, model: str, version: str) -> dict:
@@ -50,5 +56,8 @@ class ServingClient:
             model (str): The model in the Comet ML registry to download
             version (str): The model version to download
         """
-
+        X = get_input_features_df()
+        print(X)
+        r = ("http:// 0.0.0.0:<PORT>/download_registry_model", json.loads(X.to_json()))
+        print(r.json())
         raise NotImplementedError("TODO: implement this function")
