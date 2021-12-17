@@ -28,9 +28,14 @@ LOG_FILE = os.environ.get("FLASK_LOG", "flask.log")
 
 # Move this to env variables!!
 COMET_API_KEY = 'ZqM4liL9boT3pGhQWAP5Bj1xD'
-COMET_WORKSPACE = 'jaihon'
-COMET_DEFAULT_MODEL_REGISTRY_NAME = 'regression-distance-net-angle-net'
-COMET_DEFAULT_MODEL_REGISTRY_VERSION = '1.0.0'
+COMET_DEFAUTL_MODEL_WORKSPACE = 'jaihon'
+COMET_DEFAULT_MODEL_NAME = 'regression-distance-net-angle-net'
+COMET_DEFAULT_MODEL_VERSION = '1.0.0'
+
+# Set current model to default
+CURRENT_MODEL_WORKSPACE = COMET_DEFAUTL_MODEL_WORKSPACE
+CURRENT_MODEL_NAME = COMET_DEFAULT_MODEL_NAME
+CURRENT_MODEL_VERSION = COMET_DEFAULT_MODEL_VERSION
 
 
 app = Flask(__name__)
@@ -50,11 +55,11 @@ def before_first_request():
         format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s'
     )
 
+    # Download a Registry Model as a default model
     try:
-        # Download a Registry Model as a default model
-        api.download_registry_model(COMET_WORKSPACE, COMET_DEFAULT_MODEL_REGISTRY_NAME, COMET_DEFAULT_MODEL_REGISTRY_VERSION, output_path="./models", expand=True)
+        api.download_registry_model(CURRENT_MODEL_WORKSPACE, CURRENT_MODEL_NAME, CURRENT_MODEL_VERSION, output_path="./models", expand=True)
 
-        app.logger.info("Loaded default model from Registry")
+        app.logger.info(f"Downloaded default model from Registry: {CURRENT_MODEL_WORKSPACE}/{CURRENT_MODEL_NAME}/{CURRENT_MODEL_VERSION}")
 
     except Exception as e:
         app.logger.error(f"Failed to download default model: {e}")
@@ -76,7 +81,7 @@ def logs():
     """
     data: List = []
     try:
-        with open('flask.log') as f:
+        with open(LOG_FILE) as f:
             # Read the log file
             lines = f.readlines()
 
@@ -94,7 +99,11 @@ def logs():
         # Return the error
         return abort(404, description="Failed to read Log file")
 
-    return jsonify(data), 200
+    response = {
+        "data": data,
+        "success": True
+    }
+    return jsonify(response), 200
 
 
 @app.route("/download_registry_model", methods=["POST"])
@@ -118,24 +127,49 @@ def download_registry_model():
     json = request.get_json()
     app.logger.info(json)
 
-    # TODO: check to see if the model you are querying for is already downloaded
+    # Get the workspace, model and version from the request
+    workspace = json['workspace']
+    model_name = json['model']
+    model_version = json['version']
 
-    # TODO: if yes, load that model and write to the log about the model change.
-    # eg: app.logger.info(<LOG STRING>)
+    # # Remove this later!!!
+    # workspace = 'jaihon'
+    # model_name = 'regression-distance-net-angle-net'
+    # model_version = '1.0.0'
 
-    # TODO: if no, try downloading the model: if it succeeds, load that model and write to the log
-    # about the model change. If it fails, write to the log about the failure and keep the
-    # currently loaded model
+    if workspace == COMET_DEFAUTL_MODEL_WORKSPACE and model_name == COMET_DEFAULT_MODEL_NAME and model_version == COMET_DEFAULT_MODEL_VERSION:
+        # Use default model
+        # Set current model to default
+        CURRENT_MODEL_WORKSPACE = COMET_DEFAUTL_MODEL_WORKSPACE
+        CURRENT_MODEL_NAME = COMET_DEFAULT_MODEL_NAME
+        CURRENT_MODEL_VERSION = COMET_DEFAULT_MODEL_VERSION
 
-    # Tip: you can implement a "CometMLClient" similar to your App client to abstract all of this
-    # logic and querying of the CometML servers away to keep it clean here
+        app.logger.info(f'No change required for model. Using default model from Registry: {CURRENT_MODEL_WORKSPACE}/{CURRENT_MODEL_NAME}/{CURRENT_MODEL_VERSION}')
 
-    raise NotImplementedError("TODO: implement this endpoint")
+    else:
+        try:
+            # Download the requested model
+            api.download_registry_model(workspace, model_name, model_version, output_path="./models", expand=True)
 
-    response = None
+            # Set current model to requested model
+            CURRENT_MODEL_WORKSPACE = workspace
+            CURRENT_MODEL_NAME = model_name
+            CURRENT_MODEL_VERSION = model_version
 
-    app.logger.info(response)
-    return jsonify(response)  # response must be json serializable!
+            # Log the changes
+            app.logger.info(f"Changed model. Downloaded model from Registry: {CURRENT_MODEL_WORKSPACE}/{CURRENT_MODEL_NAME}/{CURRENT_MODEL_VERSION}")
+
+        except Exception as e:
+            app.logger.error(f"Failed to download requested model from Registry: {e}")
+
+            # Return the error
+            return abort(404, description="Failed to download model from Registry. Keeping currently loaded model.")
+
+    response = {
+        'data': None,
+        'success': True
+    }
+    return jsonify(response), 200
 
 
 @app.route("/predict", methods=["POST"])
