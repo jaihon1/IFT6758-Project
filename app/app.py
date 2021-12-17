@@ -16,14 +16,25 @@ from flask import Flask, Response, jsonify, request, abort
 import sklearn
 import pandas as pd
 import joblib
+
 from custom_exceptions import EmptyLogs
+
+from comet_ml import API
 
 
 
 LOG_FILE = os.environ.get("FLASK_LOG", "flask.log")
 
 
+# Move this to env variables!!
+COMET_API_KEY = 'ZqM4liL9boT3pGhQWAP5Bj1xD'
+COMET_WORKSPACE = 'jaihon'
+COMET_DEFAULT_MODEL_REGISTRY_NAME = 'regression-distance-net-angle-net'
+COMET_DEFAULT_MODEL_REGISTRY_VERSION = '1.0.0'
+
+
 app = Flask(__name__)
+api = API(api_key=COMET_API_KEY)
 
 
 @app.before_first_request
@@ -32,14 +43,22 @@ def before_first_request():
     Hook to handle any initialization before the first request (e.g. load model,
     setup logging handler, etc.)
     """
+    # Setup logging
     logging.basicConfig(
         filename=LOG_FILE,
         level=logging.INFO,
         format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s'
     )
 
-    # TODO: any other initialization before the first request (e.g. load default model)
-    pass
+    try:
+        # Download a Registry Model as a default model
+        api.download_registry_model(COMET_WORKSPACE, COMET_DEFAULT_MODEL_REGISTRY_NAME, COMET_DEFAULT_MODEL_REGISTRY_VERSION, output_path="./models", expand=True)
+
+        app.logger.info("Loaded default model from Registry")
+
+    except Exception as e:
+        app.logger.error(f"Failed to download default model: {e}")
+
 
 # @app.errorhandler(EmptyLogs)
 # def handle_foo_exception(error):
@@ -53,7 +72,7 @@ def before_first_request():
 @app.route("/logs", methods=["GET"])
 def logs():
     """
-        Reads data from the log file and returns them as the response.
+    Reads data from the log file and returns them as the response.
     """
     data: List = []
     try:
@@ -66,7 +85,7 @@ def logs():
                 r = line.split('\t\t')
                 data.append(r[0])
 
-            app.logger.info('Log file successfully read.')
+            app.logger.info('Log file successfully read')
 
     except Exception as e:
         # Log the error
