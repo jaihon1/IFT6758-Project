@@ -25,25 +25,6 @@ LOG_FILE = os.environ.get("FLASK_LOG", "flask.log")
 
 app = Flask(__name__)
 
-# class EmptyLogs(Exception):
-#     status_code = 400
-
-#     def __init__(self, message, status_code=None, payload=None):
-#         Exception.__init__(self)
-#         self.message = message
-#         if status_code is not None:
-#             self.status_code = status_code
-#         self.payload = payload
-
-#     def log_error(self):
-#         logging.error(f"Empty Log Error: {self.to_dict()}")
-
-#     def to_dict(self):
-#         rv = dict(self.payload or ())
-#         rv['message'] = self.message
-#         rv['status_code'] = self.status_code
-#         return rv
-
 
 @app.before_first_request
 def before_first_request():
@@ -51,20 +32,23 @@ def before_first_request():
     Hook to handle any initialization before the first request (e.g. load model,
     setup logging handler, etc.)
     """
-    # TODO: setup basic logging configuration
-    logging.basicConfig(filename=LOG_FILE, level=logging.INFO)
+    logging.basicConfig(
+        filename=LOG_FILE,
+        level=logging.INFO,
+        format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s'
+    )
 
     # TODO: any other initialization before the first request (e.g. load default model)
     pass
 
+# @app.errorhandler(EmptyLogs)
+# def handle_foo_exception(error):
+#     response = jsonify(error.to_dict())
+#     response.status_code = error.status_code
+#     error.log_error()
 
-@app.errorhandler(EmptyLogs)
-def handle_foo_exception(error):
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
-    error.log_error()
+#     return response
 
-    return response
 
 @app.route("/logs", methods=["GET"])
 def logs():
@@ -83,14 +67,15 @@ def logs():
                 data.append(r[0])
 
             app.logger.info('Log file successfully read.')
+
     except Exception as e:
+        # Log the error
         app.logger.error('Failed to read Log file: '+ str(e))
 
-    # # Verify that the logs is not empty
-    # if not data:
-    #     raise EmptyLogs('Logs are empty.', status_code=404)
+        # Return the error
+        return abort(404, description="Failed to read Log file")
 
-    return jsonify(data), 200 # response must be json serializable!
+    return jsonify(data), 200
 
 
 @app.route("/download_registry_model", methods=["POST"])
