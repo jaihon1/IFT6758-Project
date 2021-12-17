@@ -12,25 +12,23 @@ import os
 from pathlib import Path
 import logging
 from typing import List
-from flask import Flask, Response, jsonify, request, abort
+from flask import Flask, jsonify, request, abort
 import sklearn
 import pandas as pd
 import joblib
 
-from custom_exceptions import EmptyLogs
 
 from comet_ml import API
-
 
 
 LOG_FILE = os.environ.get("FLASK_LOG", "flask.log")
 
 
 # Move this to env variables!!
-COMET_API_KEY = 'ZqM4liL9boT3pGhQWAP5Bj1xD'
-COMET_DEFAUTL_MODEL_WORKSPACE = 'jaihon'
-COMET_DEFAULT_MODEL_NAME = 'regression-distance-net-angle-net'
-COMET_DEFAULT_MODEL_VERSION = '1.0.0'
+COMET_API_KEY = os.environ.get("COMET_API_KEY")
+COMET_DEFAUTL_MODEL_WORKSPACE = os.environ.get("COMET_DEFAUTL_MODEL_WORKSPACE", 'jaihon')
+COMET_DEFAULT_MODEL_NAME = os.environ.get("COMET_DEFAULT_MODEL_NAME", 'regression-distance-net-angle-net')
+COMET_DEFAULT_MODEL_VERSION = os.environ.get("COMET_DEFAULT_MODEL_VERSION", '1.0.0')
 
 # Set current model to default
 CURRENT_MODEL_WORKSPACE = COMET_DEFAUTL_MODEL_WORKSPACE
@@ -65,15 +63,6 @@ def before_first_request():
         app.logger.error(f"Failed to download default model: {e}")
 
 
-# @app.errorhandler(EmptyLogs)
-# def handle_foo_exception(error):
-#     response = jsonify(error.to_dict())
-#     response.status_code = error.status_code
-#     error.log_error()
-
-#     return response
-
-
 @app.route("/logs", methods=["GET"])
 def logs():
     """
@@ -99,6 +88,7 @@ def logs():
         # Return the error
         return abort(404, description="Failed to read Log file")
 
+    # Build the response
     response = {
         "data": data,
         "success": True
@@ -119,7 +109,6 @@ def download_registry_model():
             workspace: (required),
             model: (required),
             version: (required),
-            ... (other fields if needed) ...
         }
 
     """
@@ -165,6 +154,7 @@ def download_registry_model():
             # Return the error
             return abort(404, description="Failed to download model from Registry. Keeping currently loaded model.")
 
+    # Build the response
     response = {
         'data': None,
         'success': True
@@ -176,6 +166,9 @@ def download_registry_model():
 def predict():
     """
     Handles POST requests made to http://IP_ADDRESS:PORT/predict
+    {
+        event: (required),
+    }
 
     Returns predictions
     """
@@ -183,10 +176,26 @@ def predict():
     json = request.get_json()
     app.logger.info(json)
 
-    # TODO:
-    raise NotImplementedError("TODO: implement this enpdoint")
+    event = json['event']
 
-    response = None
+    # Load the model
+    model = joblib.load('models/'+CURRENT_MODEL_NAME+'.joblib')
+
+    # Predict
+    try:
+        predictions = model.predict_proba(event)[:, 1]
+
+    except Exception as e:
+        app.logger.error(f"Failed to predict with current model {CURRENT_MODEL_WORKSPACE}/{CURRENT_MODEL_NAME}/{CURRENT_MODEL_VERSION}: {e}")
+
+        # Return the error
+        return abort(404, description="Failed to predict :(")
+
+    # Build the response
+    response = {
+        "data": predictions,
+        "success": True
+    }
 
     app.logger.info(response)
-    return jsonify(response)  # response must be json serializable!
+    return jsonify(response)
