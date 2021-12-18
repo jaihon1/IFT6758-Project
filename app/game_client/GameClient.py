@@ -1,8 +1,8 @@
-from EventGenerator import EventGenerator
+from .EventGenerator import EventGenerator
 import numpy as np
 import pandas as pd
 import requests
-from feat_eng2 import add_new_features
+from .feat_eng2 import add_new_features
 import json
 
 
