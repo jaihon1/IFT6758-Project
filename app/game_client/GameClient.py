@@ -19,7 +19,7 @@ class GameClient:
         data = self.__download(game_id)
         if data is None:
             logger.error("Unable to get the game data. Make sure the Game ID exists.")
-            return
+            return pd.DataFrame()
         logger.log("Game data successfully downloaded.")
         #file_path = '/home/johannplantin4/Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/2019/2019020900.json'
         # with open(file_path, 'r') as jaihon:
