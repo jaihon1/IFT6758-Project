@@ -46,6 +46,7 @@ WORKDIR /code
 
 # syntax=docker/dockerfile:1
 FROM python:3.8.3-slim:latest
+COPY . /usr/src/app
 WORKDIR /IFT6758-Project/app
 
 ENV COMET_API_KEY
