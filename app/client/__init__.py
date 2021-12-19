@@ -1,1 +1,0 @@
-from app.client.serving_client import ServingClient
