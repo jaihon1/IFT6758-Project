@@ -4,8 +4,19 @@ import pandas as pd
 import logging
 
 
+### logger object
+#logging.basicConfig(filename = "E", level = logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+###  Test the logger
+logger.info("Our first mesage")
+print(logger.level)
+
+data = {"calories": [420, 380, 390],"duration": [50, 40, 45]}
+X = pd.DataFrame(data)
+###
+#def get_input_features_df():
+#    return
 
 class ServingClient:
     def __init__(self, ip: str = "0.0.0.0", port: int = 5000, features=None):
@@ -27,19 +38,17 @@ class ServingClient:
         Args:
             X (Dataframe): Input dataframe to submit to the prediction service.
         """
-        X = get_input_features_df()
-        print(X)
-        r = ("http:// 0.0.0.0:<PORT>/predict", json.loads(X.to_json()))
-        print(r.json())
-        raise NotImplementedError("TODO: implement this function")
+        #X = get_input_features_df()
+        #print(X)
+        r = (f"{self.base_url}/predict", json.loads(X.to_json()))
+        #print(r.json())
+        #raise NotImplementedError("TODO: implement this function")
 
     def logs(self) -> dict:
         """Get server logs"""
-        X = get_input_features_df()
-        print(X)
-        r = ("http:// 0.0.0.0:<PORT>/logs", json.loads(X.to_json()))
-        print(r.json())
-        raise NotImplementedError("TODO: implement this function")
+        r = (f"{self.base_url}/logs", json.loads(X.to_json()))
+        #print(r.json())
+        #raise NotImplementedError("TODO: implement this function")
 
     def download_registry_model(self, workspace: str, model: str, version: str) -> dict:
         """
@@ -56,8 +65,13 @@ class ServingClient:
             model (str): The model in the Comet ML registry to download
             version (str): The model version to download
         """
-        X = get_input_features_df()
-        print(X)
-        r = ("http:// 0.0.0.0:<PORT>/download_registry_model", json.loads(X.to_json()))
-        print(r.json())
-        raise NotImplementedError("TODO: implement this function")
+
+        r = (f"{self.base_url}/download_registry_model", json.loads(X.to_json()))
+        #print(r.json())
+        #raise NotImplementedError("TODO: implement this function")
+
+
+Objet = ServingClient()
+Objet.predict(X)
+Objet.logs()
+Objet.download_registry_model("jaihon", "xgb-all-features", 1)
