@@ -2,7 +2,9 @@ import json
 import requests
 import pandas as pd
 import logging
+from flask import Flask, redirect, url_for, request
 
+app = Flask(__name__)
 
 ### logger object
 #logging.basicConfig(filename = "E", level = logging.DEBUG)
@@ -28,7 +30,7 @@ class ServingClient:
         self.features = features
 
         # any other potential initialization
-
+    #@app.route('/<predict>', methods=['POST'])
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         """
         Formats the inputs into an appropriate payload for a POST request, and queries the
@@ -38,18 +40,20 @@ class ServingClient:
         Args:
             X (Dataframe): Input dataframe to submit to the prediction service.
         """
-        #X = get_input_features_df()
-        #print(X)
+        r = requests.post(self.base_url)
         r = (f"{self.base_url}/predict", json.loads(X.to_json()))
         #print(r.json())
         #raise NotImplementedError("TODO: implement this function")
 
+    #@app.route('/<logs>', methods=['POST'])
     def logs(self) -> dict:
         """Get server logs"""
+        requests.post(self.base_url)
         r = (f"{self.base_url}/logs", json.loads(X.to_json()))
         #print(r.json())
         #raise NotImplementedError("TODO: implement this function")
 
+    #@app.route('/<download_registry_model>', methods=['POST'])
     def download_registry_model(self, workspace: str, model: str, version: str) -> dict:
         """
         Triggers a "model swap" in the service; the workspace, model, and model version are
@@ -65,7 +69,7 @@ class ServingClient:
             model (str): The model in the Comet ML registry to download
             version (str): The model version to download
         """
-
+        requests.post(self.base_url)
         r = (f"{self.base_url}/download_registry_model", json.loads(X.to_json()))
         #print(r.json())
         #raise NotImplementedError("TODO: implement this function")
