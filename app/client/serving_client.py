@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import logging
 
+from sklearn.preprocessing import StandardScaler
 
 logger = logging.getLogger(__name__)
 
@@ -13,10 +14,10 @@ class ServingClient:
         logger.info(f"Initializing client; base URL: {self.base_url}")
 
         if features is None:
-            features = ["distance"]
+            features = ["distance_net", "angle_net"]
         self.features = features
 
-        # any other potential initialization
+        self.current_model = "regression-distance-net-angle-net"
 
     def predict(self, X: pd.DataFrame) -> pd.DataFrame:
         """
@@ -27,13 +28,16 @@ class ServingClient:
         Args:
             X (Dataframe): Input dataframe to submit to the prediction service.
         """
-
-        raise NotImplementedError("TODO: implement this function")
+        X = self.__get_features(X)
+        r = requests.post(self.base_url+"/predict", json=X.to_json())
+        if r.status_code != 200:
+            return pd.DataFrame()
+        return pd.read_json(r.json()['data'])
 
     def logs(self) -> dict:
         """Get server logs"""
-
-        raise NotImplementedError("TODO: implement this function")
+        r = requests.get(self.base_url+"/logs")
+        return r.json()
 
     def download_registry_model(self, workspace: str, model: str, version: str) -> dict:
         """
@@ -50,5 +54,40 @@ class ServingClient:
             model (str): The model in the Comet ML registry to download
             version (str): The model version to download
         """
+        model_info = {'workspace': workspace, 'model': model, 'version': version}
+        r = requests.post(self.base_url+"/download_registry_model", json=model_info)
+        if r.status_code == 200:
+            self.current_model = model
 
-        raise NotImplementedError("TODO: implement this function")
+    def __get_features(self, X):
+        if self.current_model == "regression-distance-net":
+            self.features = ["distance_net"]
+        elif self.current_model == "regression-angle-net":
+            self.features = ["angle_net"]
+        elif self.current_model == "regression-distance-net-angle-net":
+            self.features = ["distance_net", "angle_net"]
+        elif self.current_model == "xgb-all-features":
+            scale_features = ['coordinate_x', 'coordinate_y', 'distance_net', 'angle_net', 'time_since_pp_started',
+                              'previous_event_time_seconds', 'current_time_seconds', 'current_friendly_on_ice',
+                              'current_opposite_on_ice', 'previous_event_x_coord', 'previous_event_y_coord',
+                              'shot_last_event_delta', 'shot_last_event_distance', 'Change_in_shot_angle', 'Speed']
+            scaler = StandardScaler()
+            X[scale_features] = scaler.fit_transform(X[scale_features])
+            self.features = X.columns.tolist()
+        elif self.current_model == "xgboost-lasso":
+            scale_features = ['coordinate_x', 'coordinate_y', 'distance_net', 'angle_net', 'time_since_pp_started',
+                              'previous_event_time_seconds', 'current_time_seconds', 'current_friendly_on_ice',
+                              'current_opposite_on_ice', 'previous_event_x_coord', 'previous_event_y_coord',
+                              'shot_last_event_delta', 'shot_last_event_distance', 'Change_in_shot_angle', 'Speed']
+            scaler = StandardScaler()
+            X[scale_features] = scaler.fit_transform(X[scale_features])
+            self.features = ['coordinate_x', 'coordinate_y', 'distance_net', 'angle_net', 'time_since_pp_started',
+                             'previous_event_time_seconds', 'current_time_seconds', 'current_friendly_on_ice',
+                             'current_opposite_on_ice', 'previous_event_x_coord', 'previous_event_y_coord',
+                             'shot_last_event_delta', 'shot_last_event_distance', 'Rebound', 'Change_in_shot_angle',
+                             'Speed', "('away',)", "('home',)", "('Backhand',)", "('Deflected',)", "('Slap Shot',)",
+                             "('Snap Shot',)", "('Tip-In',)", "('Wrap-around',)", "('Wrist Shot',)", '(1,)', '(2,)',
+                             '(3,)', '(4,)', "('OVERTIME',)", "('REGULAR',)", "('left',)", "('right',)",
+                             "('BLOCKED_SHOT',)", "('FACEOFF',)", "('GIVEAWAY',)", "('GOAL',)", "('HIT',)",
+                             "('MISSED_SHOT',)", "('PENALTY',)", "('SHOT',)", "('TAKEAWAY',)"]
+        return X[self.features]
