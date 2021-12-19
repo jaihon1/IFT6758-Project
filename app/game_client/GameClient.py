@@ -4,14 +4,23 @@ import pandas as pd
 import requests
 from feat_eng2 import add_new_features
 import json
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class GameClient: 
     def __init__(self):
         self.game_id = None
+
     def ping_game(self,game_id):
         # Generate and save dataframe about specific features
         data = self.__download(game_id)
+        if data is None:
+            logger.error("Unable to get the game data. Make sure the Game ID exists.")
+            return
+        logger.log("Game data successfully downloaded.")
         #file_path = '/home/johannplantin4/Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/2019/2019020900.json'
         # with open(file_path, 'r') as jaihon:
         #     data = json.load(jaihon)
@@ -20,7 +29,7 @@ class GameClient:
             self.game_pk = data['gamePk']
             self.home = data['gameData']['teams']['home']['triCode']
             self.away = data['gameData']['teams']['away']['triCode']
-            self.game_type =  data['gameData']['game']['type']
+            self.game_type = data['gameData']['game']['type']
         sides = dict()
 
         for period in data['liveData']['linescore']['periods']:
@@ -52,7 +61,9 @@ class GameClient:
         # get the general information of all the regular and playoff games from the season
         url_game = f'https://statsapi.web.nhl.com/api/v1/game/{game_id}/feed/live/'
 
-        # iterate over the games included in ids to get the whole information on a game with its ID
-        ids = requests.get(url_game).json()
+        r = requests.get(url_game)
 
-        return ids
+        if r.status_code != 200:
+            return None
+
+        return r.json()
