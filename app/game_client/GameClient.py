@@ -6,7 +6,7 @@ from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 import pandas as pd
 
-from EventGenerator import EventGenerator
+from .EventGenerator import EventGenerator
 
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class GameClient: 
     def __init__(self):
         self.game_id = None
-        self.features = ['side', 'shot_type', 'period', 'period_type', 'coordinate_x', 'coordinate_y', 'is_goal',
+        self.features = ['side', 'shot_type', 'period', 'period_type', 'coordinate_x', 'coordinate_y',
                          'team_side', 'distance_net', 'angle_net', 'previous_event_type', 'time_since_pp_started',
                          'previous_event_time_seconds', 'current_time_seconds', 'current_friendly_on_ice',
                          'current_opposite_on_ice', 'previous_event_x_coord', 'previous_event_y_coord',
@@ -23,14 +23,22 @@ class GameClient:
                         ]
 
         self.categorical_features = ['side', 'shot_type', 'period', 'period_type', 'team_side', 'previous_event_type']
+        self.categorical_features_encoded = [
+            ['away', 'home'],
+            ['Backhand', 'Deflected', 'Snap Shot', 'Slap Shot', 'Wrap-around', 'Wrist Shot', 'Tip-In'],
+            [1, 2, 3, 4],
+            ['OVERTIME', 'REGULAR'],
+            ['left', 'right'],
+            ['BLOCKED_SHOT', 'GOAL', 'MISSED_SHOT', 'SHOT', 'FACEOFF', 'GIVEAWAY', 'HIT', 'PENALTY', 'TAKEAWAY']
+        ]
 
-    def ping_game(self,game_id):
+    def ping_game(self, game_id):
         # Generate and save dataframe about specific features
         data = self.__download(game_id)
         if data is None:
             logger.error("Unable to get the game data. Make sure the Game ID exists.")
             return pd.DataFrame()
-        logger.log("Game data successfully downloaded.")
+        logger.info("Game data successfully downloaded.")
         #file_path = '/home/johannplantin4/Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/2019/2019020900.json'
         # with open(file_path, 'r') as jaihon:
         #     data = json.load(jaihon)
@@ -65,6 +73,8 @@ class GameClient:
             # Drop rows with NaN values
             final_df = final_df.dropna(subset=self.features)
             final_df = self.__encode_categorical(final_df)
+
+            final_df['Rebound'] = final_df['Rebound'].astype('bool')
         else:
             final_df = pd.DataFrame()
 
@@ -107,8 +117,8 @@ class GameClient:
 
     def __encode_categorical(self, data):
         # Encoding categorical features into a one-hot encoding
-        for feature in self.categorical_features:
-            one_hot_encoder = OneHotEncoder(sparse=False)
+        for feature, encoding in zip(self.categorical_features, self.categorical_features_encoded):
+            one_hot_encoder = OneHotEncoder(sparse=False, categories=[encoding])
             encoding_df = data[[feature]]
 
             one_hot_encoder.fit(encoding_df)

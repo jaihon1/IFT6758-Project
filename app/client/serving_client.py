@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class ServingClient:
-    def __init__(self, ip: str = "0.0.0.0", port: int = 5000, features=None):
+    def __init__(self, ip: str = "0.0.0.0", port: int = 2000, features=None):
         self.base_url = f"http://{ip}:{port}"
         logger.info(f"Initializing client; base URL: {self.base_url}")
 
@@ -24,19 +24,23 @@ class ServingClient:
         Formats the inputs into an appropriate payload for a POST request, and queries the
         prediction service. Retrieves the response from the server, and processes it back into a
         dataframe that corresponds index-wise to the input dataframe.
-        
+
         Args:
             X (Dataframe): Input dataframe to submit to the prediction service.
         """
         X = self.__get_features(X)
-        r = requests.post(self.base_url+"/predict", json=X.to_json())
+        model_info = {'event': X.to_json()}
+        r = requests.post(self.base_url+"/predict", json=model_info)
         if r.status_code != 200:
             return pd.DataFrame()
-        return pd.read_json(r.json()['data'])
+        return pd.Series(r.json()['data'])
 
     def logs(self) -> dict:
         """Get server logs"""
         r = requests.get(self.base_url+"/logs")
+        if r.status_code != 200:
+            return dict()
+
         return r.json()
 
     def download_registry_model(self, workspace: str, model: str, version: str) -> dict:
@@ -48,7 +52,7 @@ class ServingClient:
         See more here:
 
             https://www.comet.ml/docs/python-sdk/API/#apidownload_registry_model
-        
+
         Args:
             workspace (str): The Comet ML workspace
             model (str): The model in the Comet ML registry to download
@@ -66,7 +70,7 @@ class ServingClient:
             self.features = ["angle_net"]
         elif self.current_model == "regression-distance-net-angle-net":
             self.features = ["distance_net", "angle_net"]
-        elif self.current_model == "xgb-all-features":
+        elif self.current_model == "xgb-tuning2":
             scale_features = ['coordinate_x', 'coordinate_y', 'distance_net', 'angle_net', 'time_since_pp_started',
                               'previous_event_time_seconds', 'current_time_seconds', 'current_friendly_on_ice',
                               'current_opposite_on_ice', 'previous_event_x_coord', 'previous_event_y_coord',
@@ -74,20 +78,18 @@ class ServingClient:
             scaler = StandardScaler()
             X[scale_features] = scaler.fit_transform(X[scale_features])
             self.features = X.columns.tolist()
-        elif self.current_model == "xgboost-lasso":
+        elif self.current_model == "xgb-lasso":
             scale_features = ['coordinate_x', 'coordinate_y', 'distance_net', 'angle_net', 'time_since_pp_started',
                               'previous_event_time_seconds', 'current_time_seconds', 'current_friendly_on_ice',
                               'current_opposite_on_ice', 'previous_event_x_coord', 'previous_event_y_coord',
                               'shot_last_event_delta', 'shot_last_event_distance', 'Change_in_shot_angle', 'Speed']
             scaler = StandardScaler()
             X[scale_features] = scaler.fit_transform(X[scale_features])
-            self.features = ['coordinate_x', 'coordinate_y', 'distance_net', 'angle_net', 'time_since_pp_started',
-                             'previous_event_time_seconds', 'current_time_seconds', 'current_friendly_on_ice',
-                             'current_opposite_on_ice', 'previous_event_x_coord', 'previous_event_y_coord',
-                             'shot_last_event_delta', 'shot_last_event_distance', 'Rebound', 'Change_in_shot_angle',
-                             'Speed', "('away',)", "('home',)", "('Backhand',)", "('Deflected',)", "('Slap Shot',)",
-                             "('Snap Shot',)", "('Tip-In',)", "('Wrap-around',)", "('Wrist Shot',)", '(1,)', '(2,)',
-                             '(3,)', '(4,)', "('OVERTIME',)", "('REGULAR',)", "('left',)", "('right',)",
-                             "('BLOCKED_SHOT',)", "('FACEOFF',)", "('GIVEAWAY',)", "('GOAL',)", "('HIT',)",
-                             "('MISSED_SHOT',)", "('PENALTY',)", "('SHOT',)", "('TAKEAWAY',)"]
+            self.features = ['coordinate_x', 'distance_net', 'previous_event_time_seconds',
+                'current_opposite_on_ice', 'shot_last_event_delta', 'Rebound',
+                'Speed', ('Backhand',), ('Deflected',), ('Slap Shot',),
+                ('Snap Shot',), ('Tip-In',), ('Wrap-around',), (1,),
+                (3,), (4,), ('left',), ('FACEOFF',), ('GIVEAWAY',),
+                ('HIT',), ('TAKEAWAY',)
+            ]
         return X[self.features]
