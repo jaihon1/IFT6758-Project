@@ -25,7 +25,7 @@ LOG_FILE = os.environ.get("FLASK_LOG", "flask.log")
 
 
 # Move this to env variables!!
-COMET_API_KEY = os.environ.get("COMET_API_KEY")
+COMET_API_KEY = os.environ.get("COMET_API_KEY", "ZqM4liL9boT3pGhQWAP5Bj1xD")
 COMET_DEFAUTL_MODEL_WORKSPACE = os.environ.get("COMET_DEFAUTL_MODEL_WORKSPACE", 'jaihon')
 COMET_DEFAULT_MODEL_NAME = os.environ.get("COMET_DEFAULT_MODEL_NAME", 'regression-distance-net-angle-net')
 COMET_DEFAULT_MODEL_VERSION = os.environ.get("COMET_DEFAULT_MODEL_VERSION", '1.0.0')
@@ -85,8 +85,8 @@ def logs():
         # Log the error
         app.logger.error('Failed to read Log file: '+ str(e))
 
-        # Return the error
-        return abort(404, description="Failed to read Log file")
+        # # Return the error
+        # return abort(404, description="Failed to read Log file")
 
     # Build the response
     response = {
@@ -121,10 +121,10 @@ def download_registry_model():
     model_name = json['model']
     model_version = json['version']
 
-    # # Remove this later!!!
-    # workspace = 'jaihon'
-    # model_name = 'regression-distance-net-angle-net'
-    # model_version = '1.0.0'
+    # Set global variables
+    global CURRENT_MODEL_WORKSPACE
+    global CURRENT_MODEL_NAME
+    global CURRENT_MODEL_VERSION
 
     if workspace == COMET_DEFAUTL_MODEL_WORKSPACE and model_name == COMET_DEFAULT_MODEL_NAME and model_version == COMET_DEFAULT_MODEL_VERSION:
         # Use default model
@@ -172,6 +172,8 @@ def predict():
 
     Returns predictions
     """
+
+    print(CURRENT_MODEL_NAME)
     # Get POST json data
     json = request.get_json()
     app.logger.info(json)
@@ -179,11 +181,11 @@ def predict():
     event = json['event']
 
     # Load the model
-    model = joblib.load('models/'+CURRENT_MODEL_NAME+'.joblib')
+    model = joblib.load('models/'+CURRENT_MODEL_NAME.replace('-', '_')+'.joblib')
 
     # Predict
     try:
-        predictions = model.predict_proba(event)[:, 1]
+        predictions = model.predict_proba(pd.read_json(event))[:, 1]
 
     except Exception as e:
         app.logger.error(f"Failed to predict with current model {CURRENT_MODEL_WORKSPACE}/{CURRENT_MODEL_NAME}/{CURRENT_MODEL_VERSION}: {e}")
@@ -191,9 +193,10 @@ def predict():
         # Return the error
         return abort(404, description="Failed to predict :(")
 
+    print(predictions)
     # Build the response
     response = {
-        "data": predictions,
+        "data": list(predictions.astype(str)),
         "success": True
     }
 

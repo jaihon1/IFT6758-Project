@@ -1,1 +1,1 @@
-from .serving_client import ServingClient
+from app.client.serving_client import ServingClient
