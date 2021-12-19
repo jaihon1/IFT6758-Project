@@ -1,2 +1,2 @@
 
-docker run -p80:3000 yourusername/example-node-app
+docker run -p80:3000 app/Dockerfile.serving

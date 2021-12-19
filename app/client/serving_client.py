@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 logger.info("Our first mesage")
 print(logger.level)
 
-data = {"calories": [420, 380, 390],"duration": [50, 40, 45]}
-X = pd.DataFrame(data)
+# data = {"calories": [420, 380, 390],"duration": [50, 40, 45]}
+# X = pd.DataFrame(data)
 ###
 #def get_input_features_df():
 #    return
@@ -40,16 +40,16 @@ class ServingClient:
         Args:
             X (Dataframe): Input dataframe to submit to the prediction service.
         """
-        r = requests.post(self.base_url)
-        r = (f"{self.base_url}/predict", json.loads(X.to_json()))
+        X = pd.DataFrame(data)
+        r = requests.post(f"{self.base_url}/predict", json=json.loads(X.to_json()))
         #print(r.json())
         #raise NotImplementedError("TODO: implement this function")
 
     #@app.route('/<logs>', methods=['POST'])
     def logs(self) -> dict:
         """Get server logs"""
-        requests.post(self.base_url)
-        r = (f"{self.base_url}/logs", json.loads(X.to_json()))
+        X = pd.DataFrame(data)
+        r = requests.post(f"{self.base_url}/logs", json=json.loads(X.to_json()))
         #print(r.json())
         #raise NotImplementedError("TODO: implement this function")
 
@@ -69,8 +69,8 @@ class ServingClient:
             model (str): The model in the Comet ML registry to download
             version (str): The model version to download
         """
-        requests.post(self.base_url)
-        r = (f"{self.base_url}/download_registry_model", json.loads(X.to_json()))
+        X = pd.DataFrame(data)
+        r = requests.post(f"{self.base_url}/download_registry_model", json=json.loads(X.to_json()))
         #print(r.json())
         #raise NotImplementedError("TODO: implement this function")
 
