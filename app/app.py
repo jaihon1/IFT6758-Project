@@ -9,11 +9,9 @@ gunicorn can be installed via:
 
 """
 import os
-from pathlib import Path
 import logging
 from typing import List
 from flask import Flask, jsonify, request, abort
-import sklearn
 import pandas as pd
 import joblib
 
@@ -173,7 +171,6 @@ def predict():
     Returns predictions
     """
 
-    print(CURRENT_MODEL_NAME)
     # Get POST json data
     json = request.get_json()
     app.logger.info(json)
@@ -193,7 +190,6 @@ def predict():
         # Return the error
         return abort(404, description="Failed to predict :(")
 
-    print(predictions)
     # Build the response
     response = {
         "data": list(predictions.astype(str)),
