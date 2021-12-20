@@ -3,11 +3,7 @@
 ### 1. Prerequisites:
 
 1. Make sure to have Docker installed on your machine.
-2. Navigate to the directory where the app is located:
-
-```bash
-cd app
-```
+2. Navigate to the directory where the app is located.
 
 *Note: Make sure you are under the app directory.*
 
