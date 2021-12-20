@@ -17,10 +17,9 @@ class GameClient:
         self.away = None
         self.game_type = None
         self.dateTime = None
-        self.data = pd.DataFrame()
         self.period = 0
         self.time_left = "20:00"
-        self.features = ['side', 'shot_type', 'period', 'period_type', 'coordinate_x', 'coordinate_y',
+        self.features = ['side', 'shot_type', 'period', 'period_type', 'coordinate_x', 'coordinate_y', 'is_goal',
                          'team_side', 'distance_net', 'angle_net', 'previous_event_type', 'time_since_pp_started',
                          'previous_event_time_seconds', 'current_time_seconds', 'current_friendly_on_ice',
                          'current_opposite_on_ice', 'previous_event_x_coord', 'previous_event_y_coord',
@@ -42,9 +41,6 @@ class GameClient:
         data = self.__download(game_id)
         if data is None:
             return pd.DataFrame()
-        #file_path = '/home/johannplantin4/Documents/Dev/Code/IFT6758_group_project/IFT6758-Project/project/ift6758/data/games_data/2019/2019020900.json'
-        # with open(file_path, 'r') as jaihon:
-        #     data = json.load(jaihon)
         if self.game_id != str(game_id):
             self.idx = 0
             self.game_pk = data['gamePk']
@@ -52,16 +48,13 @@ class GameClient:
             self.away = data['gameData']['teams']['away']['triCode']
             self.game_type = data['gameData']['game']['type']
             self.dateTime = data['gameData']['datetime']['dateTime']
+
         sides = dict()
         for period in data['liveData']['linescore']['periods']:
-            if self.period < period['num']:
-                self.period = period['num']
             sides[period['num']] = {self.home: period['home'].setdefault('rinkSide', np.NaN), self.away: period['away'].setdefault('rinkSide', np.NaN)}
+
         live_events = data['liveData']['plays']['allPlays']
-        # if self.idx == 0:
-        #     live_events = live_events[:len(live_events)//4]
-        # else:
-        #     live_events = live_events[:self.idx +len(live_events)//4]
+
         if self.game_id != str(game_id):
             self.game = EventGenerator(self.game_pk, self.home, self.away, sides, live_events, self.game_type)
             self.game_id = str(game_id)
@@ -73,6 +66,7 @@ class GameClient:
         self.idx = len(self.game.live_events)
         if len(dataframe) != 0:
             self.time_left = self.game.live_events[-1]['about']['periodTimeRemaining']
+            self.period = self.game.live_events[-1]['about']['period']
             final_df = self.__add_new_features(dataframe)
             final_df = final_df[self.features]
 
@@ -81,10 +75,6 @@ class GameClient:
             final_df = self.__encode_categorical(final_df)
 
             final_df['Rebound'] = final_df['Rebound'].astype('bool')
-            if self.game_id != str(game_id):
-                self.data = final_df
-            else:
-                self.data.append(final_df)
         else:
             final_df = pd.DataFrame()
 

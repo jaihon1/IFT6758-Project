@@ -77,6 +77,7 @@ class ServingClient:
                               'shot_last_event_delta', 'shot_last_event_distance', 'Change_in_shot_angle', 'Speed']
             scaler = StandardScaler()
             X[scale_features] = scaler.fit_transform(X[scale_features])
+            X = X.drop(columns='is_goal')
             self.features = X.columns.tolist()
         elif self.current_model == "xgb-lasso":
             scale_features = ['coordinate_x', 'coordinate_y', 'distance_net', 'angle_net', 'time_since_pp_started',
