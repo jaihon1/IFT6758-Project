@@ -1,9 +1,9 @@
 # Milestone 3: How To have Fun
 
-1. Prerequisites:
+### 1. Prerequisites:
 
-a. Make sure to have Docker installed on your machine.
-b. Navigate to the directory where the app is located:
+1. Make sure to have Docker installed on your machine.
+2. Navigate to the directory where the app is located:
 
 ```bash
 cd app
@@ -11,7 +11,7 @@ cd app
 
 *Note: Make sure you are under the app directory.*
 
-2. Environment Variables
+### 2. Environment Variables
 
 First start by setting the following environment variables to configure the application.
 
@@ -31,7 +31,7 @@ export COMET_API_KEY="<your-api-key>"
 
 *Note: The Comet API key can be found in your Comet account settings!*
 
-3. Build docker images
+### 3. Build docker images
 
 Run the following command to build the docker images:
 
@@ -44,13 +44,13 @@ Run the following command to run the docker containers:
 docker-compose up
 ```
 
-4. Run the application
+### 4. Run the application
 
 Open the URL given by Jupyter-Lab (in the terminal) on your browser to access the application!
 
 *Note: Make sure to also take the lab token!*
 
-5. Don't forget, have fun!!
+### 5. Most important step. Don't forget, have fun!!
 
 
 
