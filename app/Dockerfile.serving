@@ -5,7 +5,6 @@
 #   docker build -t <IMAGE TAG> -f Dockerfile.jupyter .
 #
 
-
 # https://docs.docker.com/engine/reference/builder/#from
 # You shouldn't need to change this
 FROM python:3.7
@@ -46,11 +45,6 @@ COPY /ift6758/requirements.txt /code/requirements.txt
 #       CMD <SHELL COMMAND>
 
 
-
-# TODO: add code, optionally a default model if you want
-
-
-# TODO: install libs
 RUN pip install -r requirements.txt
 
 COPY . .

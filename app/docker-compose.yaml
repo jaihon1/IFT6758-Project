@@ -1,28 +1,29 @@
-# docker-compose.yml
 version: '3'
 
 services:
+# -------------------------
+# Flask backend
   serving:
     build:
       context: ./
       dockerfile: ./Dockerfile.serving
     command: gunicorn --bind 0.0.0.0:${PORT_SERVING} app:app
-    image: ift6758/serving:${TAG}
+    image: ift6758/serving:${TAG_SERVING}
     ports:
       - ${PORT_SERVING}:${PORT_SERVING}
     environment:
       - COMET_API_KEY=${COMET_API_KEY}
 
-
-###### Uncomment below when you're ready to add the final notebook container to your docker compose
-##  jupyter:
-##    build:
-##      context: ./
-##      dockerfile: ./Dockerfile.jupyter
-##      args:
-##        ARG: <ARG>
-##    image: ift6758/jupyter:<TAG>
-##    ports:
-##      - <JUPYTER_PORT>:<JUPYTER_PORT>
-##    environment:
-##      OTHER_DOCKER_ENV_VAR = ${OTHER_LOCAL_ENV_VAR}
+# -------------------------
+# Jupyter client
+  jupyter:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.jupyter
+    command: jupyter-lab --port=${PORT_JUPYTER} --no-browser --ip=0.0.0.0 --allow-root
+    image: ift6758/jupyter:${TAG_JUPYTER}
+    ports:
+      - ${PORT_JUPYTER}:${PORT_JUPYTER}
+    environment:
+      - COMET_API_KEY=${COMET_API_KEY}
+      - PORT_SERVING=${PORT_SERVING}
