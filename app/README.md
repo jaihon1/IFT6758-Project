@@ -3,7 +3,7 @@
 1. Prerequisites:
 
 a. Make sure to have Docker installed on your machine.
-b. Navigate to the directory where the project is located:
+b. Navigate to the directory where the app is located:
 
 ```bash
 cd app
