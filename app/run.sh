@@ -1,0 +1,1 @@
+docker run 5000:5000 app/Dockerfile.serving

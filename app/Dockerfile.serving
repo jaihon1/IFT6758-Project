@@ -44,14 +44,16 @@ WORKDIR /code
 
 
 
-# TODO: add code, optionally a default model if you want 
+# syntax=docker/dockerfile:1
+FROM python:3.9.7
+WORKDIR /ift6758-project/app
+ADD ./ift6758 ./ift6758
 
-
-# TODO: install libs
-
-
-# TODO: expose ports (or do this in docker-compose)
-
-
-# TODO: specify default command - this is not required because you can always specify the command
-# either with the docker run command or in the docker-compose file
+ADD ./ift6758/requirements.txt requirements.txt
+ADD app.py app.py
+ADD ./ift6758/ /code/ift6758
+RUN pip install -e ift6758/
+RUN pip install waitress
+RUN pip install -r requirements.txt
+EXPOSE 5000
+CMD ["waitress-serve","--listen=0.0.0.0:5000","app:app", "app.py"]

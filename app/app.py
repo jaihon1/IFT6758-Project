@@ -25,7 +25,7 @@ LOG_FILE = os.environ.get("FLASK_LOG", "flask.log")
 
 
 # Move this to env variables!!
-COMET_API_KEY = os.environ.get("COMET_API_KEY", "ZqM4liL9boT3pGhQWAP5Bj1xD")
+COMET_API_KEY = os.environ.get("COMET_API_KEY")
 COMET_DEFAUTL_MODEL_WORKSPACE = os.environ.get("COMET_DEFAUTL_MODEL_WORKSPACE", 'jaihon')
 COMET_DEFAULT_MODEL_NAME = os.environ.get("COMET_DEFAULT_MODEL_NAME", 'regression-distance-net-angle-net')
 COMET_DEFAULT_MODEL_VERSION = os.environ.get("COMET_DEFAULT_MODEL_VERSION", '1.0.0')
