@@ -61,7 +61,3 @@ ENV PORT 5000
 EXPOSE 5000
 # TODO: specify default command - this is not required because you can always specify the command
 # either with the docker run command or in the docker-compose file
-
-# docker build -t ift6758/serving:1.0.0 -f Dockerfile.serving .
-# docker run -it -p 127.0.0.1:5000:5000/tcp --env COMET_API_KEY="ZqM4liL9boT3pGhQWAP5Bj1xD" -d ift6758/serving:1.0.0
-# docker exec -it 08e5e11c1170 bash
