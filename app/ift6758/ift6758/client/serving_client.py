@@ -27,12 +27,13 @@ class ServingClient:
         Args:
             X (Dataframe): Input dataframe to submit to the prediction service.
         """
-        X = self.__get_features(X)
+        X = self.__get_features(X.copy())
         model_info = {'event': X.to_json()}
         r = requests.post(self.base_url+"/predict", json=model_info)
         if r.status_code != 200:
             return pd.DataFrame()
-        return pd.Series(r.json()['data'])
+        X['prediction'] = r.json()['data']
+        return X
 
     def logs(self) -> dict:
         """Get server logs"""
@@ -84,7 +85,7 @@ class ServingClient:
                               'current_opposite_on_ice', 'previous_event_x_coord', 'previous_event_y_coord',
                               'shot_last_event_delta', 'shot_last_event_distance', 'Change_in_shot_angle', 'Speed']
             scaler = StandardScaler()
-            X[scale_features] = scaler.fit_transform(X[scale_features])
+            X[scale_features] = scaler.fit_transform(X[scale_features].copy())
             self.features = ['coordinate_x', 'distance_net', 'previous_event_time_seconds',
                 'current_opposite_on_ice', 'shot_last_event_delta', 'Rebound',
                 'Speed', ('Backhand',), ('Deflected',), ('Slap Shot',),
