@@ -1,4 +1,3 @@
-import json
 import requests
 import pandas as pd
 import logging
@@ -47,7 +46,7 @@ class ServingClient:
         """
         Triggers a "model swap" in the service; the workspace, model, and model version are
         specified and the service looks for this model in the model registry and tries to
-        download it. 
+        download it.
 
         See more here:
 
@@ -93,4 +92,5 @@ class ServingClient:
                 (3,), (4,), ('left',), ('FACEOFF',), ('GIVEAWAY',),
                 ('HIT',), ('TAKEAWAY',)
             ]
+
         return X[self.features]

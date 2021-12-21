@@ -5,7 +5,6 @@
 #   docker build -t <IMAGE TAG> -f Dockerfile.jupyter .
 #
 
-
 # https://docs.docker.com/engine/reference/builder/#from
 # You shouldn't need to change this
 FROM python:3.7
@@ -41,7 +40,6 @@ COPY ift6758 /code/ift6758
 # https://docs.docker.com/engine/reference/builder/#cmd
 #
 #       CMD <SHELL COMMAND>
-
 
 
 RUN pip install -r ift6758/requirements.txt

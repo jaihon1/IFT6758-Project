@@ -29,22 +29,22 @@ export COMET_API_KEY="<your-api-key>"
 
 ### 3. Build docker images
 
-Run the following command to build the docker images:
+Run the following command to build and run the docker containers:
+```bash
+docker-compose up
+```
+
+*Note: If you need to only build docker images separetly, then run the following command:*
 
 ```bash
 sh build.sh
 ```
 
-Run the following command to run the docker containers:
-```bash
-docker-compose up
-```
-
 ### 4. Run the application
 
-Open the URL given by Jupyter-Lab (in the terminal) on your browser to access the application!
+Open the URL given by Jupyter-Lab (logs shown on the terminal) on your browser to access the application.
 
-*Note: Make sure to also take the lab token!*
+*Note: Make sure to also take the lab token given by Jupyter!*
 
 ### 5. Most important step. Don't forget, have fun!!
 

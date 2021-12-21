@@ -89,6 +89,7 @@ def logs():
         "data": data,
         "success": True
     }
+
     return jsonify(response), 200
 
 
@@ -117,7 +118,7 @@ def download_registry_model():
     model_name = json['model']
     model_version = json['version']
 
-    # Set global variables
+    # Use the global variables
     global CURRENT_MODEL_WORKSPACE
     global CURRENT_MODEL_NAME
     global CURRENT_MODEL_VERSION
@@ -155,6 +156,7 @@ def download_registry_model():
         'data': None,
         'success': True
     }
+
     return jsonify(response), 200
 
 
@@ -195,4 +197,5 @@ def predict():
     }
 
     app.logger.info(response)
+
     return jsonify(response)

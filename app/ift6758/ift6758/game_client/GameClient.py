@@ -1,15 +1,15 @@
 import requests
-
-from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 import pandas as pd
+
+from sklearn.preprocessing import OneHotEncoder
 
 from .EventGenerator import EventGenerator
 
 import warnings
 warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
-class GameClient: 
+class GameClient:
     def __init__(self):
         self.game_id = None
         self.game_pk = None
