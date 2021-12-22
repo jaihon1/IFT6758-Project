@@ -51,7 +51,7 @@ class GameClient:
 
         sides = dict()
         for period in data['liveData']['linescore']['periods']:
-            sides[period['num']] = {self.home: period['home'].setdefault('rinkSide', np.NaN), self.away: period['away'].setdefault('rinkSide', np.NaN)}
+            sides[period['num']] = {self.home: period['home'].setdefault('rinkSide', 'right'), self.away: period['away'].setdefault('rinkSide', 'left')}
 
         live_events = data['liveData']['plays']['allPlays']
 
