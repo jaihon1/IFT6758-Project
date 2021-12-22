@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+# -------------------------
+# Flask backend
+  serving:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.serving
+    command: gunicorn --bind 0.0.0.0:${PORT_SERVING} app:app
+    image: ift6758/serving:${TAG_SERVING}
+    ports:
+      - ${PORT_SERVING}:${PORT_SERVING}
+    environment:
+      - COMET_API_KEY=${COMET_API_KEY}
+
+# -------------------------
+# Jupyter client
+  jupyter:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.jupyter
+    command: jupyter-lab --port=${PORT_JUPYTER} --no-browser --ip=0.0.0.0 --allow-root
+    image: ift6758/jupyter:${TAG_JUPYTER}
+    ports:
+      - ${PORT_JUPYTER}:${PORT_JUPYTER}
+    environment:
+      - COMET_API_KEY=${COMET_API_KEY}
+      - PORT_SERVING=${PORT_SERVING}

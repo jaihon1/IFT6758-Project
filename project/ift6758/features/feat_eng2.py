@@ -22,6 +22,5 @@ def add_new_features(csv_path = os.path.join(os.path.dirname(__file__),'games_da
     df_filtered.to_csv(csv_path, header=True, index=True)
     df_filtered.drop(columns=df_filtered.columns[0], inplace=True)
     df_filtered.to_csv(csv_path)
-    print(df_filtered.iloc[:20,:])
 
 
